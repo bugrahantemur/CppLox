@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.27.8)
-project(cpplox VERSION 0.1.0 LANGUAGES CXX)
-set (CMAKE_CXX_STANDARD 20)
+project(
+  cpplox
+  VERSION 0.1.0
+  LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# DEPENDENCIES
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -11,8 +13,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-# TARGETS
-add_executable(cpplox src/cpplox.cpp)
+set(TARGET_SRC src/cpplox.cpp src/scanner.cpp src/token.cpp)
+add_executable(cpplox ${TARGET_SRC})
 
 # TESTING
 enable_testing()

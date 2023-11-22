@@ -52,6 +52,10 @@ class Lox {
     auto const file_contents = read_file(file_path);
 
     run(file_contents);
+
+    if (had_error) {
+      std::exit(EXIT_FAILURE);
+    }
   }
 
   auto run_prompt() -> void {
@@ -59,6 +63,7 @@ class Lox {
 
     for_each_line(std::cin, [this](auto const &line) {
       run(line);
+      had_error = false;
       print_prompt_marker(std::cout);
     });
   };

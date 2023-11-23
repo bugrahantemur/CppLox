@@ -1,7 +1,11 @@
 #include "scanner.h"
 
+#include <optional>
 #include <string>
 #include <vector>
+
+#include "../ext/magic_enum/include/magic_enum/magic_enum.hpp"
+#include "token_types.h"
 
 struct InvalidCharException : public std::exception {
   InvalidCharException() = default;
@@ -30,6 +34,12 @@ auto Scanner::peek() const -> char {
   if (is_at_end()) return '\0';
 
   return source_.at(current_);
+}
+
+auto Scanner::peek_next() const -> char {
+  if (current_ + 1 >= source_.length()) return '\0';
+
+  return source_.at(current_ + 1);
 }
 
 auto Scanner::match(char expected) -> bool {
@@ -69,6 +79,36 @@ auto Scanner::handle_string_literal() -> void {
 
   std::string value = source_.substr(start_ + 1, current_ - 1);
   add_token(TokenType::STRING, value);
+}
+
+auto Scanner::handle_number_literal() -> void {
+  while (std::isdigit(peek())) {
+    advance();
+  }
+
+  // Look for a fractional part.
+  if (peek() == '.' and std::isdigit(peek_next())) {
+    // Consume the "."
+    advance();
+
+    while (std::isdigit(peek())) {
+      advance();
+    }
+  }
+
+  add_token(TokenType::NUMBER, std::stod(source_.substr(start_, current_)));
+}
+
+auto Scanner::handle_identifier() -> void {
+  while (peek() == '_' or std::isalnum(peek())) {
+    advance();
+  }
+
+  std::string const& text = source_.substr(start_, current_);
+  // Text is either a reserved keyword, or a regular user-defined identifier
+  auto const token_type =
+      get_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
+  add_token(token_type);
 }
 
 auto Scanner::scan_token() -> void {
@@ -142,7 +182,14 @@ auto Scanner::scan_token() -> void {
       handle_string_literal();
       break;
     default:
-      // what to do here?
+      if (std::isdigit(c)) {
+        handle_number_literal();
+      } else if (std::isalpha(c)) {
+        handle_identifier();
+      } else {
+        // what to do here? throw exception
+      }
+
       break;
   }
 }

@@ -47,4 +47,25 @@ enum class TokenType {
   EOFF
 };
 
+auto get_keyword_token_type(std::string const& identifier)
+    -> std::optional<TokenType> {
+  if (identifier == "and") return TokenType::AND;
+  if (identifier == "class") return TokenType::CLASS;
+  if (identifier == "else") return TokenType::ELSE;
+  if (identifier == "for") return TokenType::FOR;
+  if (identifier == "fun") return TokenType::FUN;
+  if (identifier == "if") return TokenType::IF;
+  if (identifier == "nil") return TokenType::NIL;
+  if (identifier == "or") return TokenType::OR;
+  if (identifier == "print") return TokenType::PRINT;
+  if (identifier == "return") return TokenType::RETURN;
+  if (identifier == "super") return TokenType::SUPER;
+  if (identifier == "this") return TokenType::THIS;
+  if (identifier == "true") return TokenType::TRUE;
+  if (identifier == "var") return TokenType::VAR;
+  if (identifier == "while") return TokenType::WHILE;
+
+  return std::nullopt;
+}
+
 #endif

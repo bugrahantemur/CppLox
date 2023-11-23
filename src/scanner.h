@@ -22,7 +22,11 @@ class Scanner {
 
   [[nodiscard]] auto peek() const -> char;
 
+  [[nodiscard]] auto peek_next() const -> char;
+
   [[nodiscard]] auto match(char expected) -> bool;
+
+  auto scan_token() -> void;
 
   auto advance() -> char;
 
@@ -32,7 +36,9 @@ class Scanner {
 
   auto handle_string_literal() -> void;
 
-  auto scan_token() -> void;
+  auto handle_number_literal() -> void;
+
+  auto handle_identifier() -> void;
 
   std::string source_;
   std::vector<Token> tokens_;

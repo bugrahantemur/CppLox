@@ -2,12 +2,11 @@
 #ifndef LOX_SCANNER
 #define LOX_SCANNER
 
-#include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "token.h"
-#include "token_types.h"
 
 class Scanner {
   using Literal = std::variant<std::monostate, std::string, double>;

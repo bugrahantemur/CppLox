@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../ext/magic_enum/include/magic_enum/magic_enum.hpp"
-#include "token_types.h"
+#include "token.h"
 
 struct InvalidCharException : public std::exception {
   InvalidCharException() = default;

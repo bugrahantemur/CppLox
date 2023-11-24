@@ -13,8 +13,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(TARGET_SRC src/cpplox.cpp src/scanner.cpp src/token.cpp)
-add_executable(cpplox ${TARGET_SRC})
+set(TARGET_SRC src/lox.cpp src/scanner.cpp src/token.cpp)
+add_executable(lox ${TARGET_SRC})
 
 # TESTING
 enable_testing()

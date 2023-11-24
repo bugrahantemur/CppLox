@@ -66,7 +66,7 @@ class Token {
   int line_;
 };
 
-auto get_keyword_token_type(std::string const& text)
+auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType>;
 
 #endif

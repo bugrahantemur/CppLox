@@ -106,7 +106,7 @@ auto Scanner::handle_identifier() -> void {
   std::string const& text = source_.substr(start_, current_);
   // Text is either a reserved keyword, or a regular user-defined identifier
   auto const token_type =
-      get_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
+      match_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
   add_token(token_type);
 }
 

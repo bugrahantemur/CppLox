@@ -22,7 +22,7 @@ auto Token::to_string() const -> std::string {
   return type_name + " " + lexeme_ + " " + std::visit(ToString{}, literal_);
 }
 
-auto get_keyword_token_type(std::string const& text)
+auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType> {
   if (text == "and") return TokenType::AND;
   if (text == "class") return TokenType::CLASS;

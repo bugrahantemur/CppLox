@@ -1,5 +1,6 @@
 #include "token.h"
 
+#include <iostream>
 #include <string>
 #include <variant>
 
@@ -19,7 +20,8 @@ Token::Token(TokenType type, std::string lexeme, Literal literal, int line)
 auto Token::to_string() const -> std::string {
   auto const type_name = std::string{magic_enum::enum_name(type_)};
 
-  return type_name + " " + lexeme_ + " " + std::visit(ToString{}, literal_);
+  return "-> " + type_name + " " + lexeme_ + " " +
+         std::visit(ToString{}, literal_) + "\n";
 }
 
 auto match_keyword_token_type(std::string const& text)

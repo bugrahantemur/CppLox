@@ -1,17 +1,23 @@
 #include "scanner.h"
 
+#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "token.h"
+#include "utils/error.h"
 
-struct InvalidCharException : public std::exception {
-  InvalidCharException() = default;
-  auto what() const noexcept -> char const* override {
-    return "Invalid character.";
-  }
-};
+/**
+ * Check if a character is a word character.
+ *
+ * @param c the character to check
+ *
+ * @return true if the character is a word character, false otherwise
+ */
+[[nodiscard]] auto is_word_char(char c) -> bool {
+  return std::isalnum(c) || c == '_';
+}
 
 Scanner::Scanner(std::string const& source) : source_(source) {}
 
@@ -59,7 +65,7 @@ auto Scanner::add_token(TokenType token_type) -> void {
 }
 
 auto Scanner::add_token(TokenType token_type, Literal const& literal) -> void {
-  std::string text = source_.substr(start_, current_);
+  std::string text = source_.substr(start_, current_ - start_);
   tokens_.emplace_back(token_type, text, literal, line_);
 }
 
@@ -76,7 +82,7 @@ auto Scanner::handle_string_literal() -> void {
 
   advance();  // Closing "
 
-  std::string value = source_.substr(start_ + 1, current_ - 1);
+  std::string value = source_.substr(start_ + 1, current_ - start_ - 2);
   add_token(TokenType::STRING, value);
 }
 
@@ -86,7 +92,7 @@ auto Scanner::handle_number_literal() -> void {
   }
 
   // Look for a fractional part.
-  if (peek() == '.' and std::isdigit(peek_next())) {
+  if (peek() == '.' && std::isdigit(peek_next())) {
     // Consume the "."
     advance();
 
@@ -99,7 +105,7 @@ auto Scanner::handle_number_literal() -> void {
 }
 
 auto Scanner::handle_identifier() -> void {
-  while (peek() == '_' or std::isalnum(peek())) {
+  while (is_word_char(peek())) {
     advance();
   }
 
@@ -171,6 +177,7 @@ auto Scanner::scan_token() -> void {
     case ' ':
     case '\r':
     case '\t':
+      // Ignore whitespace
       break;
     // New line
     case '\n':
@@ -183,12 +190,12 @@ auto Scanner::scan_token() -> void {
     default:
       if (std::isdigit(c)) {
         handle_number_literal();
-      } else if (std::isalpha(c)) {
+      } else if (is_word_char(c)) {
         handle_identifier();
       } else {
-        // what to do here? throw exception
+        auto const message = "Unexpected character '" + std::string(1, c) + "'";
+        throw LoxError(line_, message);
       }
-
       break;
   }
 }

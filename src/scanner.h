@@ -44,7 +44,7 @@ class Scanner {
 
   int start_{0};
   int current_{0};
-  int line_{0};
+  int line_{1};
 };
 
 #endif

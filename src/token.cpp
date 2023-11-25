@@ -1,10 +1,9 @@
 #include "token.h"
 
-#include <iostream>
 #include <string>
 #include <variant>
 
-#include "../ext/magic_enum/include/magic_enum/magic_enum.hpp"
+#include "../magic_enum/include/magic_enum/magic_enum.hpp"
 
 struct ToString {
   std::string operator()(std::string const& str) { return str; }

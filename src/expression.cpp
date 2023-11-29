@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-#include "box.h"
+#include "utils/box.h"
 
 template <typename T>
 LiteralExpression::LiteralExpression(T const& value) : value_(value){};

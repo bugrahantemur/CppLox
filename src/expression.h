@@ -1,8 +1,8 @@
 #include <string>
 #include <variant>
 
-#include "box.h"
 #include "token.h"
+#include "utils/box.h"
 
 struct LiteralExpression {
   using Literal = std::variant<std::monostate, double, std::string>;

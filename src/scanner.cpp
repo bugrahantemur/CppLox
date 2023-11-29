@@ -50,9 +50,9 @@ auto advance(Cursor& cursor) -> void { cursor.current++; }
   return true;
 }
 
-[[nodiscard]] auto make_token(
-    Cursor const& cursor, TokenType token_type,
-    std::variant<std::monostate, std::string, double> const& literal) -> Token {
+using Literal = std::variant<std::monostate, std::string, double>;
+[[nodiscard]] auto make_token(Cursor const& cursor, TokenType token_type,
+                              Literal const& literal) -> Token {
   auto const text =
       cursor.source.substr(cursor.start, cursor.current - cursor.start);
   return {token_type, text, literal, cursor.line};

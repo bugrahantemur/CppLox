@@ -17,7 +17,7 @@ struct Cursor {
   int line;
 };
 
-[[nodiscard]] auto is_word_char(char c) -> bool {
+[[nodiscard]] auto is_word_char(char const c) -> bool {
   return std::isalnum(c) || c == '_';
 }
 
@@ -42,7 +42,7 @@ auto advance(Cursor& cursor) -> void { cursor.current++; }
       Cursor{cursor.source, cursor.start, cursor.current + 1, cursor.line});
 }
 
-[[nodiscard]] auto match(Cursor& cursor, char expected) -> bool {
+[[nodiscard]] auto match(Cursor& cursor, char const expected) -> bool {
   if (is_at_end(cursor) || peek(cursor) != expected) {
     return false;
   };

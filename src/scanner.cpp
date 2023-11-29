@@ -217,7 +217,7 @@ auto handle_whitespace(Cursor& cursor) -> std::nullopt_t {
     return handle_number_literal(cursor);
   }
   // identifier
-  if (is_word_char(c)) {
+  if (std::isalpha(c) || c == '_') {
     return handle_identifier(cursor);
   }
   // single or double character tokens

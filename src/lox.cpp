@@ -39,12 +39,10 @@ class Lox {
   };
 
   auto run(std::string const &contents) -> void {
-    Scanner scanner(contents);
     try {
-      std::vector<Token> const tokens = scanner.scan_tokens();
-      for (auto const &token : tokens) {
-        std::cout << token.to_string() << '\n';
-      }
+      std::vector<Token> const tokens = Scanner::scan_tokens(contents);
+      // do something with these tokens
+      (void)tokens;
     } catch (LoxError const &e) {
       error(std::cerr, e);
     }

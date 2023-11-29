@@ -1,5 +1,6 @@
 #include "scanner.h"
 
+#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
@@ -7,194 +8,243 @@
 #include "token.h"
 #include "utils/error.h"
 
-/**
- * Check if a character is a word character.
- *
- * @param c the character to check
- *
- * @return true if the character is a word character, false otherwise
- */
+namespace {
+
+struct Cursor {
+  std::string const& source;
+  int start;
+  int current;
+  int line;
+};
+
 [[nodiscard]] auto is_word_char(char c) -> bool {
   return std::isalnum(c) || c == '_';
 }
 
-Scanner::Scanner(std::string const& source) : source_(source) {}
+auto take(Cursor& cursor) -> char { return cursor.source.at(cursor.current++); }
 
-auto Scanner::scan_tokens() -> std::vector<Token> {
-  while (not is_at_end()) {
-    start_ = current_;
-    scan_token();
-  }
+auto advance(Cursor& cursor) -> void { cursor.current++; }
 
-  tokens_.emplace_back(TokenType::EOFF, "", std::monostate{}, line_);
-
-  return tokens_;
-  ;
+[[nodiscard]] auto is_at_end(Cursor const& cursor) -> bool {
+  return cursor.current >= cursor.source.size();
 }
 
-auto Scanner::is_at_end() const -> bool { return current_ >= source_.size(); }
+[[nodiscard]] auto peek(Cursor const& cursor) -> char {
+  if (is_at_end(cursor)) return '\0';
 
-auto Scanner::peek() const -> char {
-  if (is_at_end()) return '\0';
-
-  return source_.at(current_);
+  return cursor.source.at(cursor.current);
 }
 
-auto Scanner::peek_next() const -> char {
-  if (current_ + 1 >= source_.length()) return '\0';
-
-  return source_.at(current_ + 1);
+[[nodiscard]] auto peek_next(Cursor const& cursor) -> char {
+  return peek(
+      Cursor{cursor.source, cursor.start, cursor.current + 1, cursor.line});
 }
 
-auto Scanner::match(char expected) -> bool {
-  if (is_at_end()) return false;
-
-  if (source_.at(current_) != expected) return false;
-
-  // Consume the character if matched
-  current_++;
+[[nodiscard]] auto match(Cursor& cursor, char expected) -> bool {
+  if (is_at_end(cursor) || peek(cursor) != expected) {
+    return false;
+  };
 
   return true;
 }
 
-auto Scanner::advance() -> char { return source_.at(current_++); }
-
-auto Scanner::add_token(TokenType token_type) -> void {
-  add_token(token_type, std::monostate{});
+using Literal = std::variant<std::monostate, std::string, double>;
+[[nodiscard]] auto make_token(Cursor const& cursor, TokenType token_type,
+                              Literal const& literal) -> Token {
+  auto const text =
+      cursor.source.substr(cursor.start, cursor.current - cursor.start);
+  return {token_type, text, literal, cursor.line};
 }
 
-auto Scanner::add_token(TokenType token_type, Literal const& literal) -> void {
-  std::string text = source_.substr(start_, current_ - start_);
-  tokens_.emplace_back(token_type, text, literal, line_);
+[[nodiscard]] auto make_token(Cursor const& cursor, TokenType token_type)
+    -> Token {
+  return make_token(cursor, token_type, std::monostate{});
 }
 
-auto Scanner::handle_string_literal() -> void {
-  while (peek() != '"' and not is_at_end()) {
-    if (peek() == '\n') line_++;
-    advance();
+[[nodiscard]] auto handle_string_literal(Cursor& cursor) -> Token {
+  while (peek(cursor) != '"' and !is_at_end(cursor)) {
+    if (peek(cursor) == '\n') {
+      cursor.line++;
+    }
+    advance(cursor);
   }
 
-  if (is_at_end()) {
-    // Error
-    return;
+  if (is_at_end(cursor)) {
+    auto const message = "Unterminated string literal";
+    throw LoxError{cursor.line, message};
   }
 
-  advance();  // Closing "
+  // Closing double quotes
+  advance(cursor);
 
-  std::string value = source_.substr(start_ + 1, current_ - start_ - 2);
-  add_token(TokenType::STRING, value);
+  auto const value =
+      cursor.source.substr(cursor.start + 1, cursor.current - cursor.start - 2);
+  return make_token(cursor, TokenType::STRING, value);
 }
 
-auto Scanner::handle_number_literal() -> void {
-  while (std::isdigit(peek())) {
-    advance();
+[[nodiscard]] auto handle_number_literal(Cursor& cursor) -> Token {
+  while (std::isdigit(peek(cursor))) {
+    advance(cursor);
   }
 
   // Look for a fractional part.
-  if (peek() == '.' && std::isdigit(peek_next())) {
+  if (peek(cursor) == '.' && std::isdigit(peek_next(cursor))) {
     // Consume the "."
-    advance();
+    advance(cursor);
 
-    while (std::isdigit(peek())) {
-      advance();
+    while (std::isdigit(peek(cursor))) {
+      advance(cursor);
     }
   }
 
-  add_token(TokenType::NUMBER, std::stod(source_.substr(start_, current_)));
+  return make_token(cursor, TokenType::NUMBER,
+                    std::stod(cursor.source.substr(
+                        cursor.start, cursor.current - cursor.start)));
 }
 
-auto Scanner::handle_identifier() -> void {
-  while (is_word_char(peek())) {
-    advance();
+[[nodiscard]] auto handle_identifier(Cursor& cursor) -> Token {
+  while (is_word_char(peek(cursor))) {
+    advance(cursor);
   }
 
-  std::string const& text = source_.substr(start_, current_);
+  std::string const& text =
+      cursor.source.substr(cursor.start, cursor.current - cursor.start);
   // Text is either a reserved keyword, or a regular user-defined identifier
   auto const token_type =
       match_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
-  add_token(token_type);
+  return make_token(cursor, token_type);
 }
 
-auto Scanner::scan_token() -> void {
-  char c = advance();
+[[nodiscard]] auto build_single_or_double_character_token(Cursor& cursor,
+                                                          char const c)
+    -> std::optional<Token> {
+  // For chars that definitely make a single char token
+  auto const single = [&cursor](auto const token_type) {
+    return make_token(cursor, token_type);
+  };
+
+  // For characters that may make a double char token when followed by '='
+  auto const single_or_double = [&cursor](auto const with_eq,
+                                          auto const without_eq) {
+    auto const matched = match(cursor, '=');
+    if (matched) {
+      advance(cursor);
+      return make_token(cursor, with_eq);
+    }
+    return make_token(cursor, without_eq);
+  };
+
   switch (c) {
-    // Single character tokens
     case '(':
-      add_token(TokenType::LEFT_PAREN);
-      break;
+      return single(TokenType::LEFT_PAREN);
     case ')':
-      add_token(TokenType::RIGHT_PAREN);
-      break;
+      return single(TokenType::RIGHT_PAREN);
     case '{':
-      add_token(TokenType::LEFT_BRACE);
-      break;
+      return single(TokenType::LEFT_BRACE);
     case '}':
-      add_token(TokenType::RIGHT_BRACE);
-      break;
+      return single(TokenType::RIGHT_BRACE);
     case ',':
-      add_token(TokenType::COMMA);
-      break;
+      return single(TokenType::COMMA);
     case '.':
-      add_token(TokenType::DOT);
-      break;
+      return single(TokenType::DOT);
     case '-':
-      add_token(TokenType::MINUS);
-      break;
+      return single(TokenType::MINUS);
     case '+':
-      add_token(TokenType::PLUS);
-      break;
+      return single(TokenType::PLUS);
     case ';':
-      add_token(TokenType::SEMICOLON);
-      break;
+      return single(TokenType::SEMICOLON);
     case '*':
-      add_token(TokenType::STAR);
-      break;
-    // Possibly two character tokens
+      return single(TokenType::STAR);
     case '!':
-      add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
-      break;
+      return single_or_double(TokenType::BANG_EQUAL, TokenType::BANG);
     case '=':
-      add_token(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
-      break;
+      return single_or_double(TokenType::EQUAL_EQUAL, TokenType::EQUAL);
     case '<':
-      add_token(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
-      break;
+      return single_or_double(TokenType::LESS_EQUAL, TokenType::LESS);
     case '>':
-      add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
-    case '/':
-      // Comments start with a double slash.
-      if (match('/')) {
-        // A comment goes until the end of the line.
-        while (peek() != '\n' && !is_at_end()) {
-          advance();
-        }
-      } else {  // Not a comment
-        add_token(TokenType::SLASH);
-      }
-      break;
-    // Whitespace
-    case ' ':
-    case '\r':
-    case '\t':
-      // Ignore whitespace
-      break;
-    // New line
-    case '\n':
-      line_++;
-      break;
-    // String literals start with double quotes
-    case '"':
-      handle_string_literal();
-      break;
+      return single_or_double(TokenType::GREATER_EQUAL, TokenType::GREATER);
     default:
-      if (std::isdigit(c)) {
-        handle_number_literal();
-      } else if (is_word_char(c)) {
-        handle_identifier();
-      } else {
-        auto const message = "Unexpected character '" + std::string(1, c) + "'";
-        throw LoxError(line_, message);
-      }
-      break;
+      return std::nullopt;
   }
 }
+
+[[nodiscard]] auto handle_slash(Cursor& cursor) -> std::optional<Token> {
+  // Comments start with a double slash.
+  if (match(cursor, '/')) {
+    // A comment goes until the end of the line.
+    while (peek(cursor) != '\n' && !is_at_end(cursor)) {
+      advance(cursor);
+    }
+    return std::nullopt;
+  }
+
+  // Not a comment
+  return make_token(cursor, TokenType::SLASH);
+}
+
+auto handle_newline(Cursor& cursor) -> std::nullopt_t {
+  cursor.line++;
+  return std::nullopt;
+}
+
+auto handle_whitespace(Cursor& cursor) -> std::nullopt_t {
+  return std::nullopt;
+}
+
+[[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
+  auto const c = take(cursor);
+
+  // newline
+  if (c == '\n') {
+    return handle_newline(cursor);
+  }
+  // whitespace
+  if (c == ' ' || c == '\r' || c == '\t') {
+    return handle_whitespace(cursor);
+  }
+  // slash
+  if (c == '/') {
+    return handle_slash(cursor);
+  }
+  // string literal
+  if (c == '"') {
+    return handle_string_literal(cursor);
+  }
+  // number literal
+  if (std::isdigit(c)) {
+    return handle_number_literal(cursor);
+  }
+  // identifier
+  if (is_word_char(c)) {
+    return handle_identifier(cursor);
+  }
+  // single or double character tokens
+  if (auto const sod_char_token =
+          build_single_or_double_character_token(cursor, c)) {
+    return sod_char_token.value();
+  }
+
+  auto const message = "Unexpected character '" + std::string(1, c) + "'";
+  throw LoxError(cursor.line, message);
+}
+}  // namespace
+
+namespace Scanner {
+[[nodiscard]] auto scan_tokens(std::string const& contents)
+    -> std::vector<Token> {
+  std::vector<Token> tokens;
+  Cursor cursor{contents, 0, 0, 1};
+
+  while (!is_at_end(cursor)) {
+    cursor.start = cursor.current;
+    if (auto const token = scan_token(cursor)) {
+      tokens.push_back(token.value());
+      std::cout << token.value().to_string();
+    }
+  }
+
+  tokens.emplace_back(TokenType::EOFF, "", std::monostate{}, cursor.line);
+
+  return tokens;
+}
+}  // namespace Scanner

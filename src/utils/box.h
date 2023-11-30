@@ -1,5 +1,5 @@
-#ifndef LOX_BOX
-#define LOX_BOX
+#ifndef LOX_UTILS_BOX
+#define LOX_UTILS_BOX
 
 #include <memory>
 

@@ -1,5 +1,5 @@
-#ifndef CPPLOX_UTILS_READER
-#define CPPLOX_UTILS_READER
+#ifndef LOX_UTILS_READER
+#define LOX_UTILS_READER
 
 #include <fstream>
 #include <sstream>

@@ -1,5 +1,5 @@
-#ifndef CPPLOX_UTILS_PRINTER
-#define CPPLOX_UTILS_PRINTER
+#ifndef LOX_UTILS_PRINTER
+#define LOX_UTILS_PRINTER
 
 namespace Printer {
 

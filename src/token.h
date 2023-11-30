@@ -55,7 +55,7 @@ class Token {
   using Literal = std::variant<std::monostate, std::string, double>;
 
  public:
-  Token(TokenType type, std::string lexeme, Literal literal, int line);
+  Token(TokenType type, std::string lexeme, Literal literal, std::size_t line);
 
   auto to_string() const -> std::string;
 
@@ -63,7 +63,7 @@ class Token {
   TokenType type_;
   std::string lexeme_;
   Literal literal_;
-  int line_;
+  std::size_t line_;
 };
 
 auto match_keyword_token_type(std::string const& text)

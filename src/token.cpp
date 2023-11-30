@@ -13,7 +13,8 @@ struct ToString {
   std::string operator()(std::monostate const& none) { return ""; }
 };
 
-Token::Token(TokenType type, std::string lexeme, Literal literal, int line)
+Token::Token(TokenType type, std::string lexeme, Literal literal,
+             std::size_t line)
     : type_(type), lexeme_(lexeme), literal_(literal), line_(line) {}
 
 auto Token::to_string() const -> std::string {

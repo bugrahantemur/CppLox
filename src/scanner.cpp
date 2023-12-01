@@ -124,17 +124,16 @@ using Literal = std::variant<std::monostate, std::string, double>;
   return make_token(cursor, token_type);
 }
 
-[[nodiscard]] auto build_single_or_double_character_token(Cursor& cursor,
-                                                          char const c)
+[[nodiscard]] auto build_special_character_token(Cursor& cursor, char const c)
     -> std::optional<Token> {
   // For chars that definitely make a single char token
-  auto const single = [&cursor](auto const token_type) {
+  auto const single_char = [&cursor](auto const token_type) {
     return make_token(cursor, token_type);
   };
 
   // For characters that may make a double char token when followed by '='
-  auto const single_or_double = [&cursor](auto const with_equal,
-                                          auto const without_equal) {
+  auto const single_or_double_char = [&cursor](auto const with_equal,
+                                               auto const without_equal) {
     if (cursor.match('=')) {
       cursor.advance_char();
       return make_token(cursor, with_equal);
@@ -144,33 +143,34 @@ using Literal = std::variant<std::monostate, std::string, double>;
 
   switch (c) {
     case '(':
-      return single(TokenType::LEFT_PAREN);
+      return single_char(TokenType::LEFT_PAREN);
     case ')':
-      return single(TokenType::RIGHT_PAREN);
+      return single_char(TokenType::RIGHT_PAREN);
     case '{':
-      return single(TokenType::LEFT_BRACE);
+      return single_char(TokenType::LEFT_BRACE);
     case '}':
-      return single(TokenType::RIGHT_BRACE);
+      return single_char(TokenType::RIGHT_BRACE);
     case ',':
-      return single(TokenType::COMMA);
+      return single_char(TokenType::COMMA);
     case '.':
-      return single(TokenType::DOT);
+      return single_char(TokenType::DOT);
     case '-':
-      return single(TokenType::MINUS);
+      return single_char(TokenType::MINUS);
     case '+':
-      return single(TokenType::PLUS);
+      return single_char(TokenType::PLUS);
     case ';':
-      return single(TokenType::SEMICOLON);
+      return single_char(TokenType::SEMICOLON);
     case '*':
-      return single(TokenType::STAR);
+      return single_char(TokenType::STAR);
     case '!':
-      return single_or_double(TokenType::BANG_EQUAL, TokenType::BANG);
+      return single_or_double_char(TokenType::BANG_EQUAL, TokenType::BANG);
     case '=':
-      return single_or_double(TokenType::EQUAL_EQUAL, TokenType::EQUAL);
+      return single_or_double_char(TokenType::EQUAL_EQUAL, TokenType::EQUAL);
     case '<':
-      return single_or_double(TokenType::LESS_EQUAL, TokenType::LESS);
+      return single_or_double_char(TokenType::LESS_EQUAL, TokenType::LESS);
     case '>':
-      return single_or_double(TokenType::GREATER_EQUAL, TokenType::GREATER);
+      return single_or_double_char(TokenType::GREATER_EQUAL,
+                                   TokenType::GREATER);
     default:
       return std::nullopt;
   }
@@ -224,9 +224,8 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
     return handle_identifier(cursor);
   }
   // single or double character tokens
-  if (auto const sod_char_token =
-          build_single_or_double_character_token(cursor, c)) {
-    return sod_char_token.value();
+  if (auto const sp_char_token = build_special_character_token(cursor, c)) {
+    return sp_char_token.value();
   }
 
   auto const message = "Unexpected character '" + std::string(1, c) + "'";

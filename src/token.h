@@ -52,12 +52,16 @@ enum class TokenType {
 };
 
 class Token {
-  using Literal = std::variant<std::monostate, std::string, double>;
+  using Literal = std::variant<std::monostate, bool, double, std::string>;
 
  public:
   Token(TokenType type, std::string lexeme, Literal literal, std::size_t line);
 
   auto to_string() const -> std::string;
+
+  auto type() const -> TokenType { return type_; }
+
+  auto literal() const -> Literal { return literal_; }
 
  private:
   TokenType type_;

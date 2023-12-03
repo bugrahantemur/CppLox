@@ -62,7 +62,7 @@ class Cursor {
   std::size_t line_;
 };
 
-using Literal = std::variant<std::monostate, std::string, double>;
+using Literal = std::variant<std::monostate, bool, double, std::string>;
 [[nodiscard]] auto make_token(Cursor const& cursor, TokenType token_type,
                               Literal const& literal = std::monostate{})
     -> Token {

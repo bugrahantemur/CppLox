@@ -9,25 +9,27 @@ namespace {
 
 class TokenCursor {
  public:
-  TokenCursor(std::vector<Token>&& tokens)
+  explicit TokenCursor(std::vector<Token>&& tokens)
       : tokens_(std::move(tokens)), current_(begin(tokens_)){};
 
   template <typename Type>
-  auto match(Type type) const -> bool {
+  [[nodiscard]] auto match(Type type) const -> bool {
     return !is_at_end() && peek().type() == type;
   }
   template <typename Type, typename... Types>
-  auto match(Type type, Types... types) const -> bool {
+  [[nodiscard]] auto match(Type type, Types... types) const -> bool {
     return match(type) || match(types...);
   }
 
-  auto take() -> Token { return *current_++; }
+  [[nodiscard]] auto take() -> Token { return *current_++; }
 
   auto advance() -> void { current_++; }
 
-  auto peek() const -> Token { return *current_; }
+  [[nodiscard]] auto peek() const -> Token { return *current_; }
 
-  auto is_at_end() const -> bool { return peek().type() == TokenType::EOFF; }
+  [[nodiscard]] auto is_at_end() const -> bool {
+    return peek().type() == TokenType::EOFF;
+  }
 
  private:
   std::vector<Token> tokens_;

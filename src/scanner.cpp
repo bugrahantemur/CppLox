@@ -1,5 +1,6 @@
 #include "scanner.h"
 
+#include <cassert>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -19,15 +20,27 @@ class Cursor {
   Cursor(std::string const& source)
       : source_(source), start_(0), current_(0), line_(1) {}
 
-  auto advance_char() -> void { current_++; }
+  auto advance() -> void { current_++; }
 
-  auto advance_line() -> void { line_++; }
+  auto down() -> void { line_++; }
 
-  auto reset_start_to_current() -> void { start_ = current_; }
+  auto advance_word() -> void { start_ = current_; }
 
-  [[nodiscard]] auto take_char() const -> char { return source_.at(current_); }
+  [[nodiscard]] auto peek(std::size_t forward = 0) const -> char {
+    if (is_at_end()) return '\0';
 
-  [[nodiscard]] auto take_word() const -> std::string {
+    assert(current_ + forward < source_.size());
+
+    return source_.at(current_ + forward);
+  }
+
+  [[nodiscard]] auto take() -> char {
+    auto const tmp = peek();
+    advance();
+    return tmp;
+  }
+
+  [[nodiscard]] auto peek_word() const -> std::string {
     return source_.substr(start_, current_ - start_);
   }
 
@@ -35,16 +48,6 @@ class Cursor {
 
   [[nodiscard]] auto is_at_end() const -> bool {
     return current_ >= source_.size();
-  }
-
-  [[nodiscard]] auto peek(std::size_t forward = 0) const -> char {
-    if (is_at_end()) return '\0';
-
-    try {
-      return source_.at(current_ + forward);
-    } catch (std::out_of_range const&) {
-      return '\0';
-    }
   }
 
   [[nodiscard]] auto match(char const expected) const -> bool {
@@ -63,19 +66,19 @@ class Cursor {
 };
 
 using Literal = std::variant<std::monostate, bool, double, std::string>;
-[[nodiscard]] auto make_token(Cursor const& cursor, TokenType token_type,
+[[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
                               Literal const& literal = std::monostate{})
     -> Token {
-  auto const text = cursor.take_word();
+  auto const text = cursor.peek_word();
   return Token{token_type, text, literal, cursor.at_line()};
 }
 
 [[nodiscard]] auto handle_string_literal(Cursor& cursor) -> Token {
   while (cursor.peek() != '"' and !cursor.is_at_end()) {
     if (cursor.peek() == '\n') {
-      cursor.advance_line();
+      cursor.down();
     }
-    cursor.advance_char();
+    cursor.advance();
   }
 
   if (cursor.is_at_end()) {
@@ -84,9 +87,9 @@ using Literal = std::variant<std::monostate, bool, double, std::string>;
   }
 
   // Closing double quotes
-  cursor.advance_char();
+  cursor.advance();
 
-  auto const text = cursor.take_word();
+  auto const text = cursor.peek_word();
 
   // Trim the surrounding quotes
   auto const value = text.substr(1, text.size() - 2);
@@ -96,28 +99,28 @@ using Literal = std::variant<std::monostate, bool, double, std::string>;
 
 [[nodiscard]] auto handle_number_literal(Cursor& cursor) -> Token {
   while (std::isdigit(cursor.peek())) {
-    cursor.advance_char();
+    cursor.advance();
   }
 
   // Look for a fractional part.
   if (cursor.peek() == '.' && std::isdigit(cursor.peek(1))) {
     // Consume the "."
-    cursor.advance_char();
+    cursor.advance();
 
     while (std::isdigit(cursor.peek())) {
-      cursor.advance_char();
+      cursor.advance();
     }
   }
 
-  return make_token(cursor, TokenType::NUMBER, std::stod(cursor.take_word()));
+  return make_token(cursor, TokenType::NUMBER, std::stod(cursor.peek_word()));
 }
 
 [[nodiscard]] auto handle_identifier(Cursor& cursor) -> Token {
   while (is_word_char(cursor.peek())) {
-    cursor.advance_char();
+    cursor.advance();
   }
 
-  std::string text = cursor.take_word();
+  std::string text = cursor.peek_word();
   // Text is either a reserved keyword, or a regular user-defined identifier
   auto const token_type =
       match_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
@@ -135,7 +138,7 @@ using Literal = std::variant<std::monostate, bool, double, std::string>;
   auto const single_or_double_char = [&cursor](auto const with_equal,
                                                auto const without_equal) {
     if (cursor.match('=')) {
-      cursor.advance_char();
+      cursor.advance();
       return make_token(cursor, with_equal);
     }
     return make_token(cursor, without_equal);
@@ -181,7 +184,7 @@ using Literal = std::variant<std::monostate, bool, double, std::string>;
   if (cursor.match('/')) {
     // A comment goes until the end of the line.
     while (cursor.peek() != '\n' && !cursor.is_at_end()) {
-      cursor.advance_char();
+      cursor.advance();
     }
     return std::nullopt;
   }
@@ -190,18 +193,22 @@ using Literal = std::variant<std::monostate, bool, double, std::string>;
   return make_token(cursor, TokenType::SLASH);
 }
 
+auto handle_whitespace(Cursor& cursor) -> std::nullopt_t {
+  cursor.advance_word();
+  return std::nullopt;
+}
+
 auto handle_newline(Cursor& cursor) -> std::nullopt_t {
-  cursor.advance_line();
+  cursor.down();
   return std::nullopt;
 }
 
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
-  auto const c = cursor.take_char();
-  cursor.advance_char();
+  auto const c = cursor.take();
 
   // whitespace
   if (c == ' ' || c == '\r' || c == '\t') {
-    return std::nullopt;
+    return handle_whitespace(cursor);
   }
   // newline
   if (c == '\n') {
@@ -240,7 +247,7 @@ namespace Scanner {
   Cursor cursor(contents);
 
   while (!cursor.is_at_end()) {
-    cursor.reset_start_to_current();
+    cursor.advance_word();
     if (auto const token = scan_token(cursor)) {
       tokens.push_back(token.value());
     }

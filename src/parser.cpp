@@ -10,7 +10,7 @@ namespace {
 class TokenCursor {
  public:
   explicit TokenCursor(std::vector<Token>&& tokens)
-      : tokens_(std::move(tokens)), current_(begin(tokens_)){};
+      : tokens_(std::move(tokens)), current_(0){};
 
   template <typename Type>
   [[nodiscard]] auto match(Type type) const -> bool {
@@ -21,11 +21,15 @@ class TokenCursor {
     return match(type) || match(types...);
   }
 
-  [[nodiscard]] auto take() -> Token { return *current_++; }
+  [[nodiscard]] auto take() -> Token {
+    auto const tmp = peek();
+    advance();
+    return tmp;
+  }
 
   auto advance() -> void { current_++; }
 
-  [[nodiscard]] auto peek() const -> Token { return *current_; }
+  [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
 
   [[nodiscard]] auto is_at_end() const -> bool {
     return peek().type() == TokenType::EOFF;
@@ -33,7 +37,7 @@ class TokenCursor {
 
  private:
   std::vector<Token> tokens_;
-  std::vector<Token>::iterator current_;
+  std::size_t current_;
 };
 
 // Forward declare expression

@@ -242,8 +242,8 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
 
 namespace Scanner {
 [[nodiscard]] auto scan_tokens(std::string const& contents)
-    -> std::vector<Token> {
-  std::vector<Token> tokens;
+    -> std::vector<Token const> {
+  std::vector<Token const> tokens;
   Cursor cursor(contents);
 
   while (!cursor.is_at_end()) {
@@ -253,7 +253,8 @@ namespace Scanner {
     }
   }
 
-  tokens.emplace_back(TokenType::EOFF, "", std::monostate{}, cursor.at_line());
+  tokens.emplace_back(
+      Token{TokenType::EOFF, "", std::monostate{}, cursor.at_line()});
 
   return tokens;
 }

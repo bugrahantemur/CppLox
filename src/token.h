@@ -51,21 +51,11 @@ enum class TokenType {
   EOFF
 };
 
-class Token {
+struct Token {
   using Literal = std::variant<std::monostate, bool, double, std::string>;
-
- public:
-  Token(TokenType type, std::string lexeme, Literal literal, std::size_t line);
 
   auto to_string() const -> std::string;
 
-  auto type() const -> TokenType { return type_; }
-
-  auto literal() const -> Literal { return literal_; }
-
-  auto line() const -> std::size_t { return line_; }
-
- private:
   TokenType type_;
   std::string lexeme_;
   Literal literal_;

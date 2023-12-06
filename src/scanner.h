@@ -8,7 +8,7 @@
 
 namespace Scanner {
 [[nodiscard]] auto scan_tokens(std::string const& contents)
-    -> std::vector<Token>;
+    -> std::vector<Token const>;
 }  // namespace Scanner
 
 #endif

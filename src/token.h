@@ -63,6 +63,8 @@ class Token {
 
   auto literal() const -> Literal { return literal_; }
 
+  auto line() const -> std::size_t { return line_; }
+
  private:
   TokenType type_;
   std::string lexeme_;

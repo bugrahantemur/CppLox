@@ -65,9 +65,8 @@ class Cursor {
   std::size_t line_;
 };
 
-using Literal = std::variant<std::monostate, bool, double, std::string>;
 [[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
-                              Literal const& literal = std::monostate{})
+                              Token::Literal const& literal = std::monostate{})
     -> Token {
   auto const text = cursor.peek_word();
   return Token{token_type, text, literal, cursor.at_line()};

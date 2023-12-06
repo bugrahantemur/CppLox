@@ -8,8 +8,7 @@
 #include "utils/box.h"
 
 struct LiteralExpression {
-  using Literal = std::variant<std::monostate, bool, double, std::string>;
-  Literal value_;
+  Token::Literal value_;
 };
 
 using Expression =

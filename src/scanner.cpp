@@ -65,6 +65,17 @@ class Cursor {
   std::size_t line_;
 };
 
+class ScannerError : public std::exception {
+ public:
+  ScannerError() = default;
+
+  auto what() const noexcept -> char const* final { return "Scanner error"; }
+};
+
+auto error(Cursor& cursor, std::string const& message) -> void {
+  report(cursor.at_line(), "", message);
+}
+
 [[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
                               Token::Literal const& literal = std::monostate{})
     -> Token {
@@ -82,7 +93,8 @@ class Cursor {
 
   if (cursor.is_at_end()) {
     auto const message = "Unterminated string literal";
-    throw LoxError{cursor.at_line(), message};
+    error(cursor, message);
+    throw ScannerError{};
   }
 
   // Closing double quotes
@@ -235,7 +247,8 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
   }
 
   auto const message = "Unexpected character '" + std::string(1, c) + "'";
-  throw LoxError(cursor.at_line(), message);
+  error(cursor, message);
+  throw ScannerError{};
 }
 }  // namespace
 

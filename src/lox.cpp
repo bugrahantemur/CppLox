@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include "expression.h"
+#include "parser.h"
 #include "scanner.h"
 #include "token.h"
 #include "utils/error.h"
@@ -31,20 +33,12 @@ class Lox {
   };
 
  private:
-  template <typename OStream>
-  auto error(OStream &out, LoxError const &e) -> void {
-    out << "[line " << e.line() << "] Error: " << e.what() << '\n';
-
-    had_error = true;
-  };
-
   auto run(std::string const &contents) -> void {
     try {
       std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
-      // do something with these tokens
-      (void)tokens;
-    } catch (LoxError const &e) {
-      error(std::cerr, e);
+      Expression expr = Parser::parse(tokens);
+    } catch (std::exception const &e) {
+      had_error = true;
     }
   }
 

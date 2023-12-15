@@ -2,19 +2,21 @@
 
 #include <vector>
 
+#include "../magic_enum/include/magic_enum/magic_enum.hpp"
 #include "expression.h"
 #include "token.h"
+#include "utils/error.h"
 
 namespace {
 
 class TokenCursor {
  public:
-  explicit TokenCursor(std::vector<Token>&& tokens)
-      : tokens_(std::move(tokens)), current_(0){};
+  explicit TokenCursor(std::vector<Token const> const& tokens)
+      : tokens_(tokens), current_(0){};
 
   template <typename Type>
   [[nodiscard]] auto match(Type type) const -> bool {
-    return !is_at_end() && peek().type() == type;
+    return !is_at_end() && peek().type_ == type;
   }
   template <typename Type, typename... Types>
   [[nodiscard]] auto match(Type type, Types... types) const -> bool {
@@ -32,15 +34,61 @@ class TokenCursor {
   [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
 
   [[nodiscard]] auto is_at_end() const -> bool {
-    return peek().type() == TokenType::EOFF;
+    return peek().type_ == TokenType::EOFF;
   }
 
  private:
-  std::vector<Token> tokens_;
+  auto synchronize() -> void {
+    advance();
+
+    while (!is_at_end()) {
+      if (match(TokenType::CLASS, TokenType::FUN, TokenType::VAR,
+                TokenType::FOR, TokenType::IF, TokenType::WHILE,
+                TokenType::PRINT, TokenType::RETURN)) {
+        return;
+      }
+
+      advance();
+
+      if (match(TokenType::SEMICOLON)) {
+        return;
+      }
+    }
+  }
+
+  std::vector<Token const> const& tokens_;
   std::size_t current_;
 };
 
-// Forward declare expression
+class ParserError : public std::exception {
+ public:
+  ParserError() = default;
+
+  auto what() const noexcept -> char const* final { return "Parser error"; }
+
+ private:
+  std::vector<Token> tokens_;
+};
+
+auto error(Token const& token, std::string message) -> void {
+  if (token.type_ == TokenType::EOFF) {
+    report(token.line_, "at the end", message);
+  } else {
+    report(token.line_, " at '" + token.lexeme_ + "'", message);
+  }
+}
+
+auto expect(TokenCursor& tc, TokenType const& type) -> void {
+  if (tc.match(type)) {
+    tc.advance();
+    return;
+  }
+
+  error(tc.peek(), "Expected" + std::string{magic_enum::enum_name(type)});
+  throw ParserError{};
+}
+
+// Forward declare expression()
 auto expression(TokenCursor&) -> Expression;
 
 auto primary(TokenCursor& tc) -> Expression {
@@ -54,15 +102,17 @@ auto primary(TokenCursor& tc) -> Expression {
     return LiteralExpression{std::monostate{}};
   }
   if (tc.match(TokenType::NUMBER, TokenType::STRING)) {
-    return LiteralExpression{tc.take().literal()};
+    return LiteralExpression{tc.take().literal_};
   }
   if (tc.match(TokenType::LEFT_PAREN)) {
     auto const expr = expression(tc);
-    // TODO await right parantheses, compare to consume()
+    expect(tc, TokenType::RIGHT_PAREN);
+    // expect() may throw, in this case unrecoverably
     return GroupingExpression{expr};
   }
 
-  return LiteralExpression{std::monostate{}};  // TODO check this
+  error(tc.peek(), "Expect expression.");
+  throw ParserError{};
 }
 
 auto unary(TokenCursor& tc) -> Expression {
@@ -71,6 +121,7 @@ auto unary(TokenCursor& tc) -> Expression {
     auto const right = unary(tc);
     return UnaryExpression{op, right};
   }
+
   return primary(tc);
 }
 
@@ -106,5 +157,16 @@ auto equality(TokenCursor& tc) -> Expression {
 };
 
 auto expression(TokenCursor& tc) -> Expression { return equality(tc); };
-
 }  // namespace
+
+namespace Parser {
+auto parse(std::vector<Token const> const& tokens) -> Expression {
+  TokenCursor tc(tokens);
+
+  try {
+    return expression(tc);
+  } catch (ParserError const&) {
+    return LiteralExpression{std::monostate{}};
+  }
+}
+}  // namespace Parser

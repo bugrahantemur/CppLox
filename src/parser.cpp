@@ -166,7 +166,7 @@ auto parse(std::vector<Token const> const& tokens) -> Expression {
   try {
     return expression(tc);
   } catch (ParserError const&) {
-    return LiteralExpression{std::monostate{}};
+    return std::monostate{};
   }
 }
 }  // namespace Parser

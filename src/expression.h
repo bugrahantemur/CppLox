@@ -12,8 +12,9 @@ struct LiteralExpression {
 };
 
 using Expression =
-    std::variant<LiteralExpression, Box<struct BinaryExpression>,
-                 Box<struct UnaryExpression>, Box<struct GroupingExpression>>;
+    std::variant<std::monostate, LiteralExpression,
+                 Box<struct BinaryExpression>, Box<struct UnaryExpression>,
+                 Box<struct GroupingExpression>>;
 
 struct BinaryExpression {
   Expression left_;

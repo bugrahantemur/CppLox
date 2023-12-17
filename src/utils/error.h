@@ -2,7 +2,17 @@
 #define LOX_UTILS_ERROR
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
+
+#include "../token.h"
+
+struct RuntimeError : public std::runtime_error {
+  RuntimeError(Token const& token, std::string const& message)
+      : token_(token), std::runtime_error(message) {}
+
+  Token token_;
+};
 
 inline auto report(std::size_t const line, std::string const& where,
                    std::string const& message) -> void {

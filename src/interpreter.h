@@ -7,9 +7,21 @@
 #include "expression.h"
 #include "token.h"
 #include "utils/box.h"
+#include "utils/error.h"
 namespace {
 
 using Object = std::variant<std::monostate, bool, double, std::string>;
+
+template <typename... Objects>
+auto check_number_operand(Token const& token, Objects... operands) -> void {
+  if (std::all_of(std::begin(operands...), std::end(operands...),
+                  [](Object const& obj) {
+                    return !std::holds_alternative<double>(obj);
+                  })) {
+    throw RuntimeError{token, "Operand must be a number."};
+  }
+}
+
 struct Interpreter {
   auto operator()(LiteralExpression const& expr) -> Object {
     return expr.value_;
@@ -22,9 +34,11 @@ struct Interpreter {
   auto operator()(Box<UnaryExpression> const& expr) -> Object {
     Object const right = std::visit(*this, expr->right_);
 
-    TokenType const op = expr->op_.type_;
+    Token const& op = expr->op_;
+    TokenType const& op_type = op.type_;
 
-    if (op == TokenType::MINUS) {
+    if (op_type == TokenType::MINUS) {
+      check_number_operand(op, right);
       return -std::get<double>(right);
     }
 
@@ -40,7 +54,7 @@ struct Interpreter {
       return true;
     };
 
-    if (op == TokenType::BANG) {
+    if (op_type == TokenType::BANG) {
       return !is_truthy(right);
     }
 
@@ -51,18 +65,22 @@ struct Interpreter {
     Object const left = std::visit(*this, expr->left_);
     Object const right = std::visit(*this, expr->right_);
 
-    TokenType const op = expr->op_.type_;
+    Token const& op = expr->op_;
+    TokenType const& op_type = op.type_;
 
-    if (op == TokenType::MINUS) {
+    if (op_type == TokenType::MINUS) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) - std::get<double>(right);
     }
-    if (op == TokenType::SLASH) {
+    if (op_type == TokenType::SLASH) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) / std::get<double>(right);
     }
-    if (op == TokenType::STAR) {
+    if (op_type == TokenType::STAR) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) * std::get<double>(right);
     }
-    if (op == TokenType::PLUS) {
+    if (op_type == TokenType::PLUS) {
       if (std::holds_alternative<double>(left) &&
           std::holds_alternative<double>(right)) {
         return std::get<double>(left) + std::get<double>(right);
@@ -71,25 +89,31 @@ struct Interpreter {
           std::holds_alternative<std::string>(right)) {
         return std::get<std::string>(left) + std::get<std::string>(right);
       }
+      throw RuntimeError{op, "Operands must be two numbers or two strings."};
     }
-    if (op == TokenType::GREATER) {
+    if (op_type == TokenType::GREATER) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) > std::get<double>(right);
     }
-    if (op == TokenType::GREATER_EQUAL) {
+    if (op_type == TokenType::GREATER_EQUAL) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) >= std::get<double>(right);
     }
-    if (op == TokenType::LESS) {
+    if (op_type == TokenType::LESS) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) < std::get<double>(right);
     }
-    if (op == TokenType::LESS_EQUAL) {
+    if (op_type == TokenType::LESS_EQUAL) {
+      check_number_operand(op, left, right);
       return std::get<double>(left) <= std::get<double>(right);
     }
-    if (op == TokenType::BANG_EQUAL) {
+    if (op_type == TokenType::BANG_EQUAL) {
       return left != right;
     }
-    if (op == TokenType::EQUAL_EQUAL) {
+    if (op_type == TokenType::EQUAL_EQUAL) {
       return left == right;
     }
+    // Unreachable
     return std::monostate{};
   }
 };

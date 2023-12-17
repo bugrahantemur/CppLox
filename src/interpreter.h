@@ -18,7 +18,9 @@ auto check_number_operand(Token const& token, Objects... operands) -> void {
                   [](Object const& obj) {
                     return !std::holds_alternative<double>(obj);
                   })) {
-    throw RuntimeError{token, "Operand must be a number."};
+    throw RuntimeError{token, sizeof...(operands) > 1
+                                  ? "Operands must be numbers."
+                                  : "Operand must be a number."};
   }
 }
 

@@ -14,6 +14,10 @@ struct RuntimeError : public std::runtime_error {
   Token token_;
 };
 
+inline auto report(RuntimeError const& e) -> void {
+  std::cerr << "[line " << e.token_.line_ << "] " << e.what() << '\n';
+}
+
 inline auto report(std::size_t const line, std::string const& where,
                    std::string const& message) -> void {
   std::cerr << "[line " << line << "] Error: " << where << ": " << message

@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <iostream>
 #include <vector>
 
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
@@ -84,7 +85,7 @@ auto expect(TokenCursor& tc, TokenType const& type) -> void {
     return;
   }
 
-  error(tc.peek(), "Expected" + std::string{magic_enum::enum_name(type)});
+  error(tc.peek(), "Expected " + std::string{magic_enum::enum_name(type)});
   throw ParserError{};
 }
 
@@ -93,18 +94,22 @@ auto expression(TokenCursor&) -> Expression;
 
 auto primary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::FALSE)) {
+    tc.advance();
     return LiteralExpression{false};
   }
   if (tc.match(TokenType::TRUE)) {
+    tc.advance();
     return LiteralExpression{true};
   }
   if (tc.match(TokenType::NIL)) {
+    tc.advance();
     return LiteralExpression{std::monostate{}};
   }
   if (tc.match(TokenType::NUMBER, TokenType::STRING)) {
     return LiteralExpression{tc.take().literal_};
   }
   if (tc.match(TokenType::LEFT_PAREN)) {
+    tc.advance();
     auto const expr = expression(tc);
     expect(tc, TokenType::RIGHT_PAREN);
     // expect() may throw, in this case unrecoverably
@@ -163,10 +168,13 @@ namespace Parser {
 auto parse(std::vector<Token const> const& tokens) -> Expression {
   TokenCursor tc(tokens);
 
-  try {
-    return expression(tc);
-  } catch (ParserError const&) {
-    return std::monostate{};
+  Expression const expr = expression(tc);
+
+  if (!tc.is_at_end()) {
+    error(tc.peek(), "Expected end of expression.");
+    throw ParserError{};
   }
+
+  return expr;
 }
 }  // namespace Parser

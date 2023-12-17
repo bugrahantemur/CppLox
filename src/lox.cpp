@@ -1,8 +1,8 @@
-#include <cstdlib>
 #include <iostream>
 #include <string>
 
 #include "expression.h"
+#include "interpreter.h"
 #include "parser.h"
 #include "scanner.h"
 #include "token.h"
@@ -18,7 +18,11 @@ class Lox {
     run(file_contents);
 
     if (had_error) {
-      std::exit(EXIT_FAILURE);
+      std::exit(65);
+    }
+
+    if (had_runtime_error) {
+      std::exit(70);
     }
   }
 
@@ -34,15 +38,25 @@ class Lox {
 
  private:
   auto run(std::string const &contents) -> void {
+    Expression expr;
     try {
       std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
-      Expression expr = Parser::parse(tokens);
+      expr = Parser::parse(tokens);
     } catch (std::exception const &e) {
       had_error = true;
+      return;
+    }
+
+    try {
+      Interpreter::interpret(expr);
+    } catch (RuntimeError const &e) {
+      had_runtime_error = true;
+      return;
     }
   }
 
   bool had_error{false};
+  bool had_runtime_error{false};
 };
 
 auto main(int argc, char *argv[]) -> int {
@@ -56,5 +70,5 @@ auto main(int argc, char *argv[]) -> int {
       lox.run_prompt();
     }
   }
-  return EXIT_SUCCESS;
+  return 0;
 }

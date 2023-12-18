@@ -5,6 +5,7 @@
 
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
 #include "expression.h"
+#include "statement.h"
 #include "token.h"
 #include "utils/error.h"
 
@@ -162,19 +163,39 @@ auto equality(TokenCursor& tc) -> Expression {
 };
 
 auto expression(TokenCursor& tc) -> Expression { return equality(tc); };
+
+auto print_statement(TokenCursor& tc) -> Statement {
+  Expression const value = expression(tc);
+  expect(tc, TokenType::SEMICOLON);
+  return PrintStatement{value};
+}
+
+auto expression_statement(TokenCursor& tc) -> Statement {
+  Expression const expr = expression(tc);
+  expect(tc, TokenType::SEMICOLON);
+  return ExpressionStatement{expr};
+}
+
+auto statement(TokenCursor& tc) -> Statement {
+  if (tc.match(TokenType::PRINT)) {
+    tc.advance();
+    return print_statement(tc);
+  }
+
+  return expression_statement(tc);
+}
 }  // namespace
 
 namespace Parser {
-auto parse(std::vector<Token const> const& tokens) -> Expression {
+auto parse(std::vector<Token const> const& tokens) -> std::vector<Statement> {
   TokenCursor tc(tokens);
 
-  Expression const expr = expression(tc);
+  std::vector<Statement> statements{};
 
-  if (!tc.is_at_end()) {
-    error(tc.peek(), "Expected end of expression.");
-    throw ParserError{};
+  while (!tc.is_at_end()) {
+    statements.push_back(statement(tc));
   }
 
-  return expr;
+  return statements;
 }
 }  // namespace Parser

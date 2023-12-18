@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "expression.h"
+#include "statement.h"
 #include "token.h"
 namespace Parser {
-auto parse(std::vector<Token const> const& tokens) -> Expression;
+auto parse(std::vector<Token const> const& tokens) -> std::vector<Statement>;
 }  // namespace Parser
 
 #endif

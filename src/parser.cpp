@@ -8,6 +8,17 @@
 #include "statement.h"
 #include "token.h"
 #include "utils/error.h"
+namespace Parser {
+
+Error::Error(std::size_t const line, std::string const& where,
+             std::string const& message)
+    : line_(line), where_(where), message_(message), tokens_{} {}
+
+auto Error::report() const -> void {
+  std::cerr << "[line " << line_ << "] Parsing error: " << where_ << ": "
+            << message_ << '\n';
+}
+}  // namespace Parser
 
 namespace {
 
@@ -33,7 +44,9 @@ class TokenCursor {
 
   auto advance() -> void { current_++; }
 
-  [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
+  [[nodiscard]] auto peek() const -> Token const& {
+    return tokens_.at(current_);
+  }
 
   [[nodiscard]] auto is_at_end() const -> bool {
     return peek().type_ == TokenType::EOFF;
@@ -62,22 +75,12 @@ class TokenCursor {
   std::size_t current_;
 };
 
-class ParserError : public std::exception {
- public:
-  ParserError() = default;
-
-  auto what() const noexcept -> char const* final { return "Parser error"; }
-
- private:
-  std::vector<Token> tokens_;
-};
-
 auto error(Token const& token, std::string message) -> void {
-  if (token.type_ == TokenType::EOFF) {
-    report(token.line_, "at the end", message);
-  } else {
-    report(token.line_, " at '" + token.lexeme_ + "'", message);
-  }
+  throw Parser::Error{token.line_,
+                      token.type_ == TokenType::EOFF
+                          ? "at the end"
+                          : " at '" + token.lexeme_ + "'",
+                      message};
 }
 
 auto expect(TokenCursor& tc, TokenType const& type) -> void {
@@ -86,8 +89,8 @@ auto expect(TokenCursor& tc, TokenType const& type) -> void {
     return;
   }
 
+  auto const& token = tc.peek();
   error(tc.peek(), "Expected " + std::string{magic_enum::enum_name(type)});
-  throw ParserError{};
 }
 
 // Forward declare expression()
@@ -113,12 +116,11 @@ auto primary(TokenCursor& tc) -> Expression {
     tc.advance();
     auto const expr = expression(tc);
     expect(tc, TokenType::RIGHT_PAREN);
-    // expect() may throw, in this case unrecoverably
     return GroupingExpression{expr};
   }
 
-  error(tc.peek(), "Expect expression.");
-  throw ParserError{};
+  error(tc.peek(), "Expected expression.");
+  return std::monostate{};
 }
 
 auto unary(TokenCursor& tc) -> Expression {

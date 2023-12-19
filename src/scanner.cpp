@@ -7,8 +7,18 @@
 #include <vector>
 
 #include "token.h"
-#include "utils/error.h"
 
+namespace Scanner {
+
+Error::Error(std::size_t const line, std::string const& message)
+    : line_(line), message_(message) {}
+
+auto Error::report() const -> void {
+  std::cerr << "[line " << line_ << "] Scanning error: "
+            << ": " << message_ << '\n';
+}
+
+}  // namespace Scanner
 namespace {
 
 [[nodiscard]] auto is_word_char(char const c) -> bool {
@@ -65,15 +75,8 @@ class Cursor {
   std::size_t line_;
 };
 
-class ScannerError : public std::exception {
- public:
-  ScannerError() = default;
-
-  auto what() const noexcept -> char const* final { return "Scanner error"; }
-};
-
-auto error(Cursor& cursor, std::string const& message) -> void {
-  report(cursor.at_line(), "", message);
+auto error(std::size_t const line, std::string message) -> void {
+  throw Scanner::Error{line, message};
 }
 
 [[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
@@ -93,8 +96,7 @@ auto error(Cursor& cursor, std::string const& message) -> void {
 
   if (cursor.is_at_end()) {
     auto const message = "Unterminated string literal";
-    error(cursor, message);
-    throw ScannerError{};
+    error(cursor.at_line(), message);
   }
 
   // Closing double quotes
@@ -247,8 +249,8 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
   }
 
   auto const message = "Unexpected character '" + std::string(1, c) + "'";
-  error(cursor, message);
-  throw ScannerError{};
+  error(cursor.at_line(), message);
+  return std::nullopt;
 }
 }  // namespace
 

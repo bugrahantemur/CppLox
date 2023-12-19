@@ -44,11 +44,13 @@ class Lox {
       std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
       std::vector<Statement const> const statements = Parser::parse(tokens);
       Interpreter::interpret(statements);
-    } catch (SyntaxError const &e) {
-      had_error = true;
-      return;
     } catch (RuntimeError const &e) {
       had_runtime_error = true;
+      e.report();
+      return;
+    } catch (LoxError const &e) {
+      had_error = true;
+      e.report();
       return;
     }
   }

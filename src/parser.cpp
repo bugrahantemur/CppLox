@@ -187,10 +187,11 @@ auto statement(TokenCursor& tc) -> Statement {
 }  // namespace
 
 namespace Parser {
-auto parse(std::vector<Token const> const& tokens) -> std::vector<Statement> {
+auto parse(std::vector<Token const> const& tokens)
+    -> std::vector<Statement const> {
   TokenCursor tc(tokens);
 
-  std::vector<Statement> statements{};
+  std::vector<Statement const> statements{};
 
   while (!tc.is_at_end()) {
     statements.push_back(statement(tc));

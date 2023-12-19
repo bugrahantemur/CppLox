@@ -5,6 +5,7 @@
 #include "interpreter.h"
 #include "parser.h"
 #include "scanner.h"
+#include "statement.h"
 #include "token.h"
 #include "utils/error.h"
 #include "utils/printer.h"
@@ -41,14 +42,11 @@ class Lox {
     Expression expr;
     try {
       std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
-      expr = Parser::parse(tokens);
-    } catch (std::exception const &e) {
+      std::vector<Statement const> const statements = Parser::parse(tokens);
+      Interpreter::interpret(statements);
+    } catch (SyntaxError const &e) {
       had_error = true;
       return;
-    }
-
-    try {
-      Interpreter::interpret(expr);
     } catch (RuntimeError const &e) {
       had_runtime_error = true;
       return;

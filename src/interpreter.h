@@ -2,8 +2,11 @@
 #ifndef LOX_INTERPRETER
 #define LOX_INTERPRETER
 
-#include "expression.h"
+#include <vector>
+
+#include "statement.h"
+
 namespace Interpreter {
-auto interpret(Expression const& expr) -> void;
+auto interpret(std::vector<Statement const> const& statements) -> void;
 }
 #endif

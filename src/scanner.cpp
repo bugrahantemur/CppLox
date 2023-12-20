@@ -82,7 +82,7 @@ auto error(std::size_t const line, std::string message) -> void {
 [[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
                               Token::Literal const& literal = std::monostate{})
     -> Token {
-  auto const text = cursor.peek_word();
+  std::string const text = cursor.peek_word();
   return Token{token_type, text, literal, cursor.at_line()};
 }
 
@@ -95,17 +95,16 @@ auto error(std::size_t const line, std::string message) -> void {
   }
 
   if (cursor.is_at_end()) {
-    auto const message = "Unterminated string literal";
-    error(cursor.at_line(), message);
+    error(cursor.at_line(), "Unterminated string literal");
   }
 
   // Closing double quotes
   cursor.advance();
 
-  auto const text = cursor.peek_word();
+  std::string const text = cursor.peek_word();
 
   // Trim the surrounding quotes
-  auto const value = text.substr(1, text.size() - 2);
+  std::string const value = text.substr(1, text.size() - 2);
 
   return make_token(cursor, TokenType::STRING, value);
 }
@@ -135,7 +134,7 @@ auto error(std::size_t const line, std::string message) -> void {
 
   std::string text = cursor.peek_word();
   // Text is either a reserved keyword, or a regular user-defined identifier
-  auto const token_type =
+  TokenType const token_type =
       match_keyword_token_type(text).value_or(TokenType::IDENTIFIER);
   return make_token(cursor, token_type);
 }
@@ -143,13 +142,13 @@ auto error(std::size_t const line, std::string message) -> void {
 [[nodiscard]] auto build_special_character_token(Cursor& cursor, char const c)
     -> std::optional<Token> {
   // For chars that definitely make a single char token
-  auto const single_char = [&cursor](auto const token_type) {
+  auto const single_char = [&cursor](TokenType const token_type) {
     return make_token(cursor, token_type);
   };
 
   // For characters that may make a double char token when followed by '='
-  auto const single_or_double_char = [&cursor](auto const with_equal,
-                                               auto const without_equal) {
+  auto const single_or_double_char = [&cursor](TokenType const with_equal,
+                                               TokenType const without_equal) {
     if (cursor.match('=')) {
       cursor.advance();
       return make_token(cursor, with_equal);
@@ -217,7 +216,7 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
 }
 
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
-  auto const c = cursor.take();
+  char const c = cursor.take();
 
   // whitespace
   if (c == ' ' || c == '\r' || c == '\t') {
@@ -248,8 +247,7 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
     return sp_char_token.value();
   }
 
-  auto const message = "Unexpected character '" + std::string(1, c) + "'";
-  error(cursor.at_line(), message);
+  error(cursor.at_line(), "Unexpected character '" + std::string{c} + "'");
   return std::nullopt;
 }
 }  // namespace
@@ -262,7 +260,7 @@ namespace Scanner {
 
   while (!cursor.is_at_end()) {
     cursor.advance_word();
-    if (auto const token = scan_token(cursor)) {
+    if (std::optional<Token> const token = scan_token(cursor)) {
       tokens.push_back(token.value());
     }
   }

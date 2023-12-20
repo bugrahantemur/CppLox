@@ -60,10 +60,10 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
-    Object const right = std::visit(*this, expr->right_);
+    Object const right{std::visit(*this, expr->right_)};
 
-    Token const& op = expr->op_;
-    TokenType const& op_type = op.type_;
+    Token const& op{expr->op_};
+    TokenType const& op_type{op.type_};
 
     if (op_type == TokenType::MINUS) {
       check_number_operand(op, right);
@@ -90,11 +90,11 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(Box<BinaryExpression> const& expr) -> Object {
-    Object const left = std::visit(*this, expr->left_);
-    Object const right = std::visit(*this, expr->right_);
+    Object const left{std::visit(*this, expr->left_)};
+    Object const right{std::visit(*this, expr->right_)};
 
-    Token const& op = expr->op_;
-    TokenType const& op_type = op.type_;
+    Token const& op{expr->op_};
+    TokenType const& op_type{op.type_};
 
     if (op_type == TokenType::MINUS) {
       check_number_operand(op, left, right);
@@ -154,7 +154,7 @@ struct StatementExecutor {
     static_cast<void>(std::visit(ExpressionEvaluator{}, stmt.expression_));
   }
   auto operator()(PrintStatement const& stmt) -> void {
-    Object const value = std::visit(ExpressionEvaluator{}, stmt.expression_);
+    Object const value{std::visit(ExpressionEvaluator{}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
   }
 };

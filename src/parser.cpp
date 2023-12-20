@@ -37,16 +37,14 @@ class TokenCursor {
   }
 
   [[nodiscard]] auto take() -> Token {
-    auto const tmp = peek();
+    Token const tmp{peek()};
     advance();
     return tmp;
   }
 
   auto advance() -> void { current_++; }
 
-  [[nodiscard]] auto peek() const -> Token const& {
-    return tokens_.at(current_);
-  }
+  [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
 
   [[nodiscard]] auto is_at_end() const -> bool {
     return peek().type_ == TokenType::EOFF;
@@ -89,7 +87,6 @@ auto expect(TokenCursor& tc, TokenType const& type) -> void {
     return;
   }
 
-  auto const& token = tc.peek();
   error(tc.peek(), "Expected " + std::string{magic_enum::enum_name(type)});
 }
 
@@ -114,7 +111,7 @@ auto primary(TokenCursor& tc) -> Expression {
   }
   if (tc.match(TokenType::LEFT_PAREN)) {
     tc.advance();
-    auto const expr = expression(tc);
+    Expression const expr{expression(tc)};
     expect(tc, TokenType::RIGHT_PAREN);
     return GroupingExpression{expr};
   }
@@ -125,8 +122,8 @@ auto primary(TokenCursor& tc) -> Expression {
 
 auto unary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::BANG, TokenType::MINUS)) {
-    auto const op = tc.take();
-    auto const right = unary(tc);
+    Token const& op{tc.take()};
+    Expression const right{unary(tc)};
     return UnaryExpression{op, right};
   }
 
@@ -135,11 +132,11 @@ auto unary(TokenCursor& tc) -> Expression {
 
 template <typename F, typename... Types>
 auto sequence(TokenCursor& tc, F const& f, Types... types) -> Expression {
-  auto expr = f(tc);
+  Expression expr{f(tc)};
 
   while (tc.match(types...)) {
-    auto const op = tc.take();
-    auto const right = f(tc);
+    Token const op{tc.take()};
+    Expression const right{f(tc)};
     expr = BinaryExpression{expr, op, right};
   }
 
@@ -167,13 +164,13 @@ auto equality(TokenCursor& tc) -> Expression {
 auto expression(TokenCursor& tc) -> Expression { return equality(tc); };
 
 auto print_statement(TokenCursor& tc) -> Statement {
-  Expression const value = expression(tc);
+  Expression const value{expression(tc)};
   expect(tc, TokenType::SEMICOLON);
   return PrintStatement{value};
 }
 
 auto expression_statement(TokenCursor& tc) -> Statement {
-  Expression const expr = expression(tc);
+  Expression const expr{expression(tc)};
   expect(tc, TokenType::SEMICOLON);
   return ExpressionStatement{expr};
 }

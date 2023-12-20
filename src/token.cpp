@@ -6,14 +6,16 @@
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
 
 auto Token::to_string() const -> std::string {
-  auto const type_name = std::string{magic_enum::enum_name(type_)};
+  std::string const type_name{magic_enum::enum_name(type_)};
 
   struct ToString {
-    std::string operator()(std::string const& str) { return str; }
+    auto operator()(std::string const& str) const -> std::string { return str; }
 
-    std::string operator()(double number) { return std::to_string(number); }
+    auto operator()(double const number) const -> std::string {
+      return std::to_string(number);
+    }
 
-    std::string operator()(std::monostate const& none) { return ""; }
+    auto operator()(std::monostate) const -> std::string { return ""; }
   };
 
   return type_name + " " + lexeme_ + " " + std::visit(ToString{}, literal_) +

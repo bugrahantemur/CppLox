@@ -11,8 +11,12 @@ struct LiteralExpression {
   Token::Literal value_;
 };
 
+struct VariableExpression {
+  Token name_;
+};
+
 using Expression =
-    std::variant<std::monostate, LiteralExpression,
+    std::variant<std::monostate, LiteralExpression, VariableExpression,
                  Box<struct BinaryExpression>, Box<struct UnaryExpression>,
                  Box<struct GroupingExpression>>;
 

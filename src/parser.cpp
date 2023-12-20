@@ -22,6 +22,14 @@ auto Error::report() const -> void {
 
 namespace {
 
+auto error(Token const& token, std::string message) -> void {
+  throw Parser::Error{token.line_,
+                      token.type_ == TokenType::EOFF
+                          ? "at the end"
+                          : " at '" + token.lexeme_ + "'",
+                      message};
+}
+
 class TokenCursor {
  public:
   explicit TokenCursor(std::vector<Token const> const& tokens)
@@ -50,7 +58,16 @@ class TokenCursor {
     return peek().type_ == TokenType::EOFF;
   }
 
- private:
+  auto expect(TokenType const& type) -> Token {
+    if (match(type)) {
+      return take();
+    }
+
+    error(peek(), "Expected " + std::string{magic_enum::enum_name(type)});
+    // Unreachable
+    return Token{};
+  }
+
   auto synchronize() -> void {
     advance();
 
@@ -69,26 +86,10 @@ class TokenCursor {
     }
   }
 
+ private:
   std::vector<Token const> const& tokens_;
   std::size_t current_;
 };
-
-auto error(Token const& token, std::string message) -> void {
-  throw Parser::Error{token.line_,
-                      token.type_ == TokenType::EOFF
-                          ? "at the end"
-                          : " at '" + token.lexeme_ + "'",
-                      message};
-}
-
-auto expect(TokenCursor& tc, TokenType const& type) -> void {
-  if (tc.match(type)) {
-    tc.advance();
-    return;
-  }
-
-  error(tc.peek(), "Expected " + std::string{magic_enum::enum_name(type)});
-}
 
 // Forward declare expression()
 auto expression(TokenCursor&) -> Expression;
@@ -112,11 +113,15 @@ auto primary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::LEFT_PAREN)) {
     tc.advance();
     Expression const expr{expression(tc)};
-    expect(tc, TokenType::RIGHT_PAREN);
+    tc.expect(TokenType::RIGHT_PAREN);
     return GroupingExpression{expr};
+  }
+  if (tc.match(TokenType::IDENTIFIER)) {
+    return VariableExpression{tc.take()};
   }
 
   error(tc.peek(), "Expected expression.");
+  // Unreachable
   return std::monostate{};
 }
 
@@ -165,13 +170,13 @@ auto expression(TokenCursor& tc) -> Expression { return equality(tc); };
 
 auto print_statement(TokenCursor& tc) -> Statement {
   Expression const value{expression(tc)};
-  expect(tc, TokenType::SEMICOLON);
+  tc.expect(TokenType::SEMICOLON);
   return PrintStatement{value};
 }
 
 auto expression_statement(TokenCursor& tc) -> Statement {
   Expression const expr{expression(tc)};
-  expect(tc, TokenType::SEMICOLON);
+  tc.expect(TokenType::SEMICOLON);
   return ExpressionStatement{expr};
 }
 
@@ -183,6 +188,32 @@ auto statement(TokenCursor& tc) -> Statement {
 
   return expression_statement(tc);
 }
+
+auto variable_declaration(TokenCursor& tc) -> Statement {
+  Token const name{tc.expect(TokenType::IDENTIFIER)};
+
+  Expression initializer{std::monostate{}};
+  if (tc.match(TokenType::EQUAL)) {
+    initializer = expression(tc);
+  }
+
+  tc.expect(TokenType::SEMICOLON);
+
+  return VariableStatement{name, initializer};
+}
+
+auto declaration(TokenCursor& tc) -> Statement {
+  try {
+    if (tc.match(TokenType::VAR)) {
+      tc.advance();
+      return variable_declaration(tc);
+    }
+    return statement(tc);
+  } catch (Parser::Error const& e) {
+    tc.synchronize();
+    return std::monostate{};
+  }
+}
 }  // namespace
 
 namespace Parser {
@@ -193,7 +224,7 @@ auto parse(std::vector<Token const> const& tokens)
   std::vector<Statement const> statements{};
 
   while (!tc.is_at_end()) {
-    statements.push_back(statement(tc));
+    statements.push_back(declaration(tc));
   }
 
   return statements;

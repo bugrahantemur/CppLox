@@ -14,7 +14,12 @@ struct PrintStatement {
   Expression expression_;
 };
 
-using Statement =
-    std::variant<std::monostate, ExpressionStatement, PrintStatement>;
+struct VariableStatement {
+  Token name_;
+  Expression initializer_;
+};
+
+using Statement = std::variant<std::monostate, ExpressionStatement,
+                               PrintStatement, VariableStatement>;
 
 #endif

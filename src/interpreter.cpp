@@ -55,6 +55,10 @@ struct ExpressionEvaluator {
     return expr.value_;
   }
 
+  [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
+    return std::monostate{};  // TODO
+  }
+
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
     return std::visit(*this, expr->expression_);
   }
@@ -153,9 +157,14 @@ struct StatementExecutor {
   auto operator()(ExpressionStatement const& stmt) -> void {
     static_cast<void>(std::visit(ExpressionEvaluator{}, stmt.expression_));
   }
+
   auto operator()(PrintStatement const& stmt) -> void {
     Object const value{std::visit(ExpressionEvaluator{}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
+  }
+
+  auto operator()(VariableStatement const& stmt) -> void {
+    // TODO
   }
 };
 }  // namespace

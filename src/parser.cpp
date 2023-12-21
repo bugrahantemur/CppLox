@@ -4,12 +4,11 @@
 #include <vector>
 
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
-#include "expression.h"
-#include "statement.h"
+#include "./types/expression.h"
+#include "./types/statement.h"
 #include "token.h"
 #include "utils/error.h"
 namespace Parser {
-
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
     : line_(line), where_(where), message_(message), tokens_{} {}
@@ -21,7 +20,6 @@ auto Error::report() const -> void {
 }  // namespace Parser
 
 namespace {
-
 auto error(Token const& token, std::string message) -> void {
   throw Parser::Error{token.line_,
                       token.type_ == TokenType::EOFF
@@ -127,7 +125,7 @@ auto primary(TokenCursor& tc) -> Expression {
 
 auto unary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::BANG, TokenType::MINUS)) {
-    Token const& op{tc.take()};
+    Token const op{tc.take()};
     Expression const right{unary(tc)};
     return UnaryExpression{op, right};
   }
@@ -194,12 +192,13 @@ auto variable_declaration(TokenCursor& tc) -> Statement {
 
   Expression initializer{std::monostate{}};
   if (tc.match(TokenType::EQUAL)) {
+    tc.advance();
     initializer = expression(tc);
   }
 
   tc.expect(TokenType::SEMICOLON);
 
-  return VariableStatement{name, initializer};
+  return VariableStatement{name.lexeme_, initializer};
 }
 
 auto declaration(TokenCursor& tc) -> Statement {

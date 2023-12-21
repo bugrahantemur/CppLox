@@ -1,16 +1,16 @@
+#include "./interpreter.h"
 
 #include <string>
 #include <variant>
 
-#include "expression.h"
-#include "statement.h"
+#include "./types/expression.h"
+#include "./types/object.h"
+#include "./types/statement.h"
 #include "token.h"
 #include "utils/box.h"
 #include "utils/error.h"
 
 namespace {
-
-using Object = std::variant<std::monostate, bool, double, std::string>;
 
 template <typename... Objects>
 auto check_number_operand(Token const& token, Objects... operands) -> void {
@@ -49,6 +49,9 @@ struct Put {
 };
 
 struct ExpressionEvaluator {
+  explicit ExpressionEvaluator(Interpreter& interpreter)
+      : interpreter_{interpreter} {}
+
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
   [[nodiscard]] auto operator()(LiteralExpression const& expr) -> Object {
@@ -56,7 +59,15 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
-    return std::monostate{};  // TODO
+    if (std::optional<Object> const value =
+            interpreter_.environment_.get(expr.name_.lexeme_)) {
+      return *value;
+    }
+
+    throw RuntimeError{expr.name_.line_,
+                       "Undefined variable '" + expr.name_.lexeme_ + "'."};
+    // Unreachable
+    return std::monostate{};
   }
 
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
@@ -149,30 +160,43 @@ struct ExpressionEvaluator {
     // Unreachable
     return std::monostate{};
   }
+
+  Interpreter& interpreter_;
 };
 
 struct StatementExecutor {
+  explicit StatementExecutor(Interpreter& interpreter)
+      : interpreter_{interpreter} {}
+
   auto operator()(std::monostate) -> void {}
 
   auto operator()(ExpressionStatement const& stmt) -> void {
-    static_cast<void>(std::visit(ExpressionEvaluator{}, stmt.expression_));
+    static_cast<void>(
+        std::visit(ExpressionEvaluator{interpreter_}, stmt.expression_));
   }
 
   auto operator()(PrintStatement const& stmt) -> void {
-    Object const value{std::visit(ExpressionEvaluator{}, stmt.expression_)};
+    Object const value{
+        std::visit(ExpressionEvaluator{interpreter_}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
   }
 
   auto operator()(VariableStatement const& stmt) -> void {
-    // TODO
+    Object const value{
+        !std::holds_alternative<std::monostate>(stmt.initializer_)
+            ? std::visit(ExpressionEvaluator{interpreter_}, stmt.initializer_)
+            : std::monostate{}};
+
+    interpreter_.environment_.define(stmt.name_, value);
   }
+
+  Interpreter& interpreter_;
 };
 }  // namespace
 
-namespace Interpreter {
-auto interpret(std::vector<Statement const> const& statements) -> void {
+auto Interpreter::interpret(std::vector<Statement const> const& statements)
+    -> void {
   for (auto const& stmt : statements) {
-    std::visit(StatementExecutor{}, stmt);
+    std::visit(StatementExecutor{*this}, stmt);
   }
 }
-}  // namespace Interpreter

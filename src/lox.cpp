@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 
-#include "expression.h"
+#include "./types/expression.h"
+#include "./types/statement.h"
 #include "interpreter.h"
 #include "parser.h"
 #include "scanner.h"
-#include "statement.h"
 #include "token.h"
 #include "utils/error.h"
 #include "utils/printer.h"
@@ -43,7 +43,7 @@ class Lox {
     try {
       std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
       std::vector<Statement const> const statements = Parser::parse(tokens);
-      Interpreter::interpret(statements);
+      interpreter.interpret(statements);
     } catch (RuntimeError const &e) {
       had_runtime_error = true;
       e.report();
@@ -54,6 +54,8 @@ class Lox {
       return;
     }
   }
+
+  Interpreter interpreter;
 
   bool had_error{false};
   bool had_runtime_error{false};

@@ -2,6 +2,7 @@
 #ifndef LOX_STATEMENT
 #define LOX_STATEMENT
 
+#include <string>
 #include <variant>
 
 #include "expression.h"
@@ -15,7 +16,7 @@ struct PrintStatement {
 };
 
 struct VariableStatement {
-  Token name_;
+  std::string name_;
   Expression initializer_;
 };
 

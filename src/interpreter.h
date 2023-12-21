@@ -1,12 +1,16 @@
-
 #ifndef LOX_INTERPRETER
 #define LOX_INTERPRETER
 
 #include <vector>
 
-#include "statement.h"
+#include "./types/statement.h"
+#include "environment.h"
 
-namespace Interpreter {
-auto interpret(std::vector<Statement const> const& statements) -> void;
-}
+struct Interpreter {
+ public:
+  auto interpret(std::vector<Statement const> const& statements) -> void;
+
+  Environment environment_;
+};
+
 #endif

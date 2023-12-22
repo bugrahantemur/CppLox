@@ -23,6 +23,7 @@ auto match_keyword_token_type(std::string const& text)
   if (text == "and") return TokenType::AND;
   if (text == "class") return TokenType::CLASS;
   if (text == "else") return TokenType::ELSE;
+  if (text == "false") return TokenType::FALSE;
   if (text == "for") return TokenType::FOR;
   if (text == "fun") return TokenType::FUN;
   if (text == "if") return TokenType::IF;

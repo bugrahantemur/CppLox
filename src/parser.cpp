@@ -14,7 +14,7 @@ Error::Error(std::size_t const line, std::string const& where,
     : line_(line), where_(where), message_(message), tokens_{} {}
 
 auto Error::report() const -> void {
-  std::cerr << "[line " << line_ << "] Parsing error: " << where_ << ": "
+  std::cerr << "[line " << line_ << "] Parsing error " << where_ << ": "
             << message_ << '\n';
 }
 }  // namespace Parser
@@ -53,7 +53,7 @@ class TokenCursor {
   [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
 
   [[nodiscard]] auto is_at_end() const -> bool {
-    return peek().type_ == TokenType::EOFF;
+    return (current_ >= tokens_.size()) || (peek().type_ == TokenType::EOFF);
   }
 
   auto consume(TokenType const& type) -> Token {
@@ -65,8 +65,6 @@ class TokenCursor {
   }
 
   auto synchronize() -> void {
-    advance();
-
     while (!is_at_end()) {
       if (match(TokenType::CLASS, TokenType::FUN, TokenType::VAR,
                 TokenType::FOR, TokenType::IF, TokenType::WHILE,
@@ -129,43 +127,62 @@ auto unary(TokenCursor& tc) -> Expression {
   return primary(tc);
 }
 
-template <typename F, typename... Types>
+template <typename F, typename Result, typename... Types>
 auto sequence(TokenCursor& tc, F const& f, Types... types) -> Expression {
   Expression expr{f(tc)};
 
   while (tc.match(types...)) {
-    Token const op{tc.take()};
-    Expression const right{f(tc)};
-    expr = BinaryExpression{expr, op, right};
+    expr = Result{expr, tc.take(), f(tc)};
   }
 
   return expr;
 }
 
+template <typename F, typename... Types>
+auto binary_expression(TokenCursor& tc, F const& f, Types... types)
+    -> Expression {
+  return sequence<F, BinaryExpression, Types...>(tc, f, types...);
+}
+
+template <typename F, typename... Types>
+auto logical_expression(TokenCursor& tc, F const& f, Types... types)
+    -> Expression {
+  return sequence<F, LogicalExpression, Types...>(tc, f, types...);
+}
+
 auto factor(TokenCursor& tc) -> Expression {
-  return sequence(tc, unary, TokenType::SLASH, TokenType::STAR);
-};
+  return binary_expression(tc, unary, TokenType::SLASH, TokenType::STAR);
+}
 
 auto term(TokenCursor& tc) -> Expression {
-  return sequence(tc, factor, TokenType::MINUS, TokenType::PLUS);
+  return binary_expression(tc, factor, TokenType::MINUS, TokenType::PLUS);
 }
 
 auto comparison(TokenCursor& tc) -> Expression {
-  return sequence(tc, term, TokenType::GREATER_EQUAL, TokenType::GREATER,
-                  TokenType::LESS_EQUAL, TokenType::LESS);
-};
+  return binary_expression(tc, term, TokenType::GREATER_EQUAL,
+                           TokenType::GREATER, TokenType::LESS_EQUAL,
+                           TokenType::LESS);
+}
 
 auto equality(TokenCursor& tc) -> Expression {
-  return sequence(tc, comparison, TokenType::BANG_EQUAL,
-                  TokenType::EQUAL_EQUAL);
-};
+  return binary_expression(tc, comparison, TokenType::BANG_EQUAL,
+                           TokenType::EQUAL_EQUAL);
+}
+
+auto and_expr(TokenCursor& tc) -> Expression {
+  return logical_expression(tc, equality, TokenType::AND);
+}
+
+auto or_expr(TokenCursor& tc) -> Expression {
+  return logical_expression(tc, and_expr, TokenType::OR);
+}
 
 auto assignment(TokenCursor& tc) -> Expression {
-  Expression const expr{equality(tc)};
+  Expression const expr{or_expr(tc)};
 
   if (tc.match(TokenType::EQUAL)) {
     Token const equals{tc.take()};
-    Expression const value{assignment(tc)};
+    Expression const value{or_expr(tc)};
 
     if (auto const var{std::get_if<VariableExpression>(&expr)}) {
       return AssignmentExpression{var->name_, value};
@@ -265,6 +282,7 @@ auto declaration(TokenCursor& tc) -> Statement {
     }
     return statement(tc);
   } catch (Parser::Error const& e) {
+    e.report();
     tc.synchronize();
     return std::monostate{};
   }

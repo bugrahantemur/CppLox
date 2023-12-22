@@ -19,7 +19,8 @@ using Expression =
     std::variant<std::monostate, LiteralExpression, VariableExpression,
                  Box<struct BinaryExpression>, Box<struct UnaryExpression>,
                  Box<struct GroupingExpression>,
-                 Box<struct AssignmentExpression>>;
+                 Box<struct AssignmentExpression>,
+                 Box<struct LogicalExpression>>;
 
 struct BinaryExpression {
   Expression left_;
@@ -39,6 +40,12 @@ struct GroupingExpression {
 struct AssignmentExpression {
   Token name_;
   Expression value_;
+};
+
+struct LogicalExpression {
+  Expression left_;
+  Token op_;
+  Expression right_;
 };
 
 #endif

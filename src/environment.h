@@ -41,8 +41,7 @@ class Environment {
   }
 
  private:
-  char const* out_of_range_message{
-      "Not found in current or enclosing environments."};
+  char const* out_of_range_message{"Environment map"};
 
   Environment* enclosing_;
 

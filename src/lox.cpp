@@ -52,7 +52,11 @@ class Lox {
       had_error = true;
       e.report();
       return;
-    }
+    } /*catch (std::exception const &e) {
+      had_error = true;
+      std::cerr << "Unhandled exception: " << e.what() << '\n';
+      return;
+    }*/
   }
 
   Interpreter interpreter;

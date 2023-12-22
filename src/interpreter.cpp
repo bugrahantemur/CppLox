@@ -72,10 +72,6 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
-    if (std::optional<Object> const value =
-            interpreter_.environment_.get(expr.name_.lexeme_)) {
-      return *value;
-    }
     try {
       return interpreter_.environment_.get(expr.name_.lexeme_);
     } catch (std::out_of_range const&) {
@@ -174,6 +170,21 @@ struct ExpressionEvaluator {
       throw RuntimeError(expr->name_.line_,
                          "Undefined variable '" + expr->name_.lexeme_ + "'.");
     }
+  }
+
+  [[nodiscard]] auto operator()(Box<LogicalExpression> const& expr) -> Object {
+    Object const left{std::visit(*this, expr->left_)};
+
+    if (expr->op_.type_ == TokenType::OR) {
+      if (is_truthy(left)) {
+        return left;
+      }
+    } else {
+      if (!is_truthy(left)) {
+        return left;
+      }
+    }
+    return std::visit(*this, expr->right_);
   }
 
   Interpreter& interpreter_;

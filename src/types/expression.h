@@ -1,11 +1,11 @@
-#ifndef LOX_EXPRESSION
-#define LOX_EXPRESSION
+#ifndef LOX_TYPES_EXPRESSION
+#define LOX_TYPES_EXPRESSION
 
 #include <string>
 #include <variant>
 
-#include "../token.h"
 #include "../utils/box.h"
+#include "./token.h"
 
 struct LiteralExpression {
   Token::Literal value_;

@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "token.h"
-#include "utils/error.h"
+#include "./types/token.h"
+#include "./utils/error.h"
 
 namespace Scanner {
 struct Error : LoxError {

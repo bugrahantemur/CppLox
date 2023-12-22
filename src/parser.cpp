@@ -6,8 +6,8 @@
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
 #include "./types/expression.h"
 #include "./types/statement.h"
-#include "token.h"
-#include "utils/error.h"
+#include "./types/token.h"
+#include "./utils/error.h"
 namespace Parser {
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)

@@ -4,10 +4,10 @@
 #include <vector>
 
 #include "./types/statement.h"
-#include "token.h"
-#include "utils/error.h"
-namespace Parser {
+#include "./types/token.h"
+#include "./utils/error.h"
 
+namespace Parser {
 struct Error : LoxError {
   Error(std::size_t line, std::string const& where, std::string const& message);
 

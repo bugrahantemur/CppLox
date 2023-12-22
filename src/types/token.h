@@ -1,7 +1,6 @@
-#ifndef LOX_TOKEN
-#define LOX_TOKEN
+#ifndef LOX_TYPES_TOKEN
+#define LOX_TYPES_TOKEN
 
-#include <optional>
 #include <string>
 #include <variant>
 
@@ -54,15 +53,10 @@ enum class TokenType {
 struct Token {
   using Literal = std::variant<std::monostate, bool, double, std::string>;
 
-  auto to_string() const -> std::string;
-
   TokenType type_;
   std::string lexeme_;
   Literal literal_;
   std::size_t line_;
 };
-
-auto match_keyword_token_type(std::string const& text)
-    -> std::optional<TokenType>;
 
 #endif

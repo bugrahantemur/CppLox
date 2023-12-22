@@ -3,8 +3,8 @@
 
 #include <vector>
 
+#include "./environment.h"
 #include "./types/statement.h"
-#include "environment.h"
 
 struct Interpreter {
  public:

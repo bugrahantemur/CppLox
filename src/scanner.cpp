@@ -6,10 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "token.h"
+#include "./types/token.h"
 
 namespace Scanner {
-
 Error::Error(std::size_t const line, std::string const& message)
     : line_(line), message_(message) {}
 
@@ -17,9 +16,28 @@ auto Error::report() const -> void {
   std::cerr << "[line " << line_ << "] Scanning error: "
             << ": " << message_ << '\n';
 }
-
 }  // namespace Scanner
 namespace {
+auto match_keyword_token_type(std::string const& text)
+    -> std::optional<TokenType> {
+  if (text == "and") return TokenType::AND;
+  if (text == "class") return TokenType::CLASS;
+  if (text == "else") return TokenType::ELSE;
+  if (text == "for") return TokenType::FOR;
+  if (text == "fun") return TokenType::FUN;
+  if (text == "if") return TokenType::IF;
+  if (text == "nil") return TokenType::NIL;
+  if (text == "or") return TokenType::OR;
+  if (text == "print") return TokenType::PRINT;
+  if (text == "return") return TokenType::RETURN;
+  if (text == "super") return TokenType::SUPER;
+  if (text == "this") return TokenType::THIS;
+  if (text == "true") return TokenType::TRUE;
+  if (text == "var") return TokenType::VAR;
+  if (text == "while") return TokenType::WHILE;
+
+  return std::nullopt;
+}
 
 [[nodiscard]] auto is_word_char(char const c) -> bool {
   return std::isalnum(c) || c == '_';

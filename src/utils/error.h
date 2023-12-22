@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "../token.h"
+#include "../types/token.h"
 
 struct LoxError {
   virtual auto report() const -> void = 0;

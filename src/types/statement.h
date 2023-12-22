@@ -1,11 +1,11 @@
 
-#ifndef LOX_STATEMENT
-#define LOX_STATEMENT
+#ifndef LOX_TYPES_STATEMENT
+#define LOX_TYPES_STATEMENT
 
 #include <string>
 #include <variant>
 
-#include "expression.h"
+#include "./expression.h"
 
 struct ExpressionStatement {
   Expression expression_;

@@ -6,12 +6,11 @@
 #include "./types/expression.h"
 #include "./types/object.h"
 #include "./types/statement.h"
-#include "token.h"
-#include "utils/box.h"
-#include "utils/error.h"
+#include "./types/token.h"
+#include "./utils/box.h"
+#include "./utils/error.h"
 
 namespace {
-
 template <typename... Objects>
 auto check_number_operand(Token const& token, Objects... operands) -> void {
   std::array const ops{operands...};

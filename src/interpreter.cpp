@@ -204,28 +204,17 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
-    // Create new environment with the current environement as its enclosing
+    // Create new environment with the current environment as its enclosing
     // environment
-    decltype(interpreter_.environment_) const env{interpreter_.environment_};
+    decltype(interpreter_.environment_) env{&interpreter_.environment_};
 
-    // Store the current environment as previous
-    auto const previous = interpreter_.environment_;
+    // Create interpreter for the block with the new environment
+    Interpreter block_interpreter{env};
 
-    // Update the environment in the interpreter to the new environment
-    interpreter_.environment_ = env;
-
-    try {
-      // Execute statements in the block
-      for (Statement const& statement : stmt->statements_) {
-        std::visit(StatementExecutor{interpreter_}, statement);
-      }
-    } catch (std::exception const& e) {
-      // Roll back the environment even if an exception is thrown
-      interpreter_.environment_ = previous;
-      throw e;
+    // Execute statements in the block with the new environment
+    for (Statement const& statement : stmt->statements_) {
+      std::visit(StatementExecutor{block_interpreter}, statement);
     }
-    // Roll back the environment
-    interpreter_.environment_ = previous;
   }
 
   Interpreter& interpreter_;

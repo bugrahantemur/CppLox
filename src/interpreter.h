@@ -10,6 +10,11 @@
 
 struct Interpreter {
  public:
+  Interpreter() = default;
+
+  explicit Interpreter(Environment<std::string, Object> const& environment)
+      : environment_{environment} {}
+
   auto interpret(std::vector<Statement const> const& statements) -> void;
 
   Environment<std::string, Object> environment_;

@@ -47,6 +47,20 @@ struct Put {
   OStream& out_;
 };
 
+auto is_truthy(Object const& obj) -> bool {
+  struct Truth {
+    auto operator()(std::monostate) -> bool { return false; }
+
+    auto operator()(bool b) -> bool { return b; }
+
+    auto operator()(double number) -> bool { return true; }
+
+    auto operator()(std::string const& str) -> bool { return true; }
+  };
+
+  return std::visit(Truth{}, obj);
+}
+
 struct ExpressionEvaluator {
   explicit ExpressionEvaluator(Interpreter& interpreter)
       : interpreter_{interpreter} {}
@@ -84,18 +98,6 @@ struct ExpressionEvaluator {
       check_number_operand(op, right);
       return -std::get<double>(right);
     }
-
-    auto const is_truthy = [](Object const& obj) {
-      if (std::holds_alternative<std::monostate>(obj)) {
-        return false;
-      }
-
-      if (std::holds_alternative<bool>(obj)) {
-        return std::get<bool>(obj);
-      }
-
-      return true;
-    };
 
     if (op_type == TokenType::BANG) {
       return !is_truthy(right);
@@ -214,6 +216,15 @@ struct StatementExecutor {
     // Execute statements in the block with the new environment
     for (Statement const& statement : stmt->statements_) {
       std::visit(StatementExecutor{block_interpreter}, statement);
+    }
+  }
+
+  auto operator()(Box<IfStatement> const& stmt) -> void {
+    if (is_truthy(
+            std::visit(ExpressionEvaluator{interpreter_}, stmt->condition_))) {
+      std::visit(*this, stmt->then_branch_);
+    } else {
+      std::visit(*this, stmt->else_branch_);
     }
   }
 

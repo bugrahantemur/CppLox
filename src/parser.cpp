@@ -207,6 +207,25 @@ auto block_statement(TokenCursor& tc) -> Statement {
   return BlockStatement{statements};
 }
 
+// Forward declare statement
+auto statement(TokenCursor& tc) -> Statement;
+
+auto if_statement(TokenCursor& tc) -> Statement {
+  tc.consume(TokenType::LEFT_PAREN);
+  Expression const condition{expression(tc)};
+  tc.consume(TokenType::RIGHT_PAREN);
+
+  Statement const then_branch{statement(tc)};
+
+  Statement else_branch{std::monostate{}};
+  if (tc.match(TokenType::ELSE)) {
+    tc.advance();
+    else_branch = statement(tc);
+  }
+
+  return IfStatement{condition, then_branch, else_branch};
+}
+
 auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::PRINT)) {
     tc.advance();
@@ -215,6 +234,10 @@ auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::LEFT_BRACE)) {
     tc.advance();
     return block_statement(tc);
+  }
+  if (tc.match(TokenType::IF)) {
+    tc.advance();
+    return if_statement(tc);
   }
 
   return expression_statement(tc);

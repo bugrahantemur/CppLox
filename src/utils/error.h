@@ -7,7 +7,7 @@
 
 #include "../types/token.h"
 
-struct LoxError {
+struct LoxError : std::exception {
   virtual auto report() const -> void = 0;
 };
 

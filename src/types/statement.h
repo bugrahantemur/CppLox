@@ -5,6 +5,7 @@
 #include <string>
 #include <variant>
 
+#include "../utils/box.h"
 #include "./expression.h"
 
 struct ExpressionStatement {
@@ -20,7 +21,12 @@ struct VariableStatement {
   Expression initializer_;
 };
 
-using Statement = std::variant<std::monostate, ExpressionStatement,
-                               PrintStatement, VariableStatement>;
+using Statement =
+    std::variant<std::monostate, ExpressionStatement, PrintStatement,
+                 VariableStatement, Box<struct BlockStatement>>;
+
+struct BlockStatement {
+  std::vector<Statement> statements_;
+};
 
 #endif

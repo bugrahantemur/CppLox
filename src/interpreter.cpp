@@ -203,6 +203,31 @@ struct StatementExecutor {
     interpreter_.environment_.define(stmt.name_, value);
   }
 
+  auto operator()(Box<BlockStatement> const& stmt) -> void {
+    // Create new environment with the current environement as its enclosing
+    // environment
+    decltype(interpreter_.environment_) const env{interpreter_.environment_};
+
+    // Store the current environment as previous
+    auto const previous = interpreter_.environment_;
+
+    // Update the environment in the interpreter to the new environment
+    interpreter_.environment_ = env;
+
+    try {
+      // Execute statements in the block
+      for (Statement const& statement : stmt->statements_) {
+        std::visit(StatementExecutor{interpreter_}, statement);
+      }
+    } catch (std::exception const& e) {
+      // Roll back the environment even if an exception is thrown
+      interpreter_.environment_ = previous;
+      throw e;
+    }
+    // Roll back the environment
+    interpreter_.environment_ = previous;
+  }
+
   Interpreter& interpreter_;
 };
 }  // namespace

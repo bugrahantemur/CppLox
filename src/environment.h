@@ -2,23 +2,51 @@
 #define LOX_ENVIRONMENT
 
 #include <map>
-#include <string>
 
-template <typename T>
+template <typename Key, typename Value>
 class Environment {
  public:
-  auto define(std::string const& name, T const& value) -> void {
-    values_[name] = value;
+  Environment() : enclosing_(nullptr) {}
+
+  Environment(Environment* enclosing) : enclosing_(enclosing) {}
+
+  auto define(Key const& name, Value const& value) -> void {
+    map_[name] = value;
   }
 
-  auto get(std::string const& name) const -> T { return values_.at(name); }
+  auto get(Key const& name) const -> Value {
+    if (auto const found = map_.find(name); found != map_.end()) {
+      return found->second;
+    }
 
-  auto assign(std::string const& name, T const& value) -> void {
-    values_.at(name) = value;
+    if (enclosing_) {
+      return enclosing_->get(name);
+    }
+
+    throw std::out_of_range{out_of_range_message};
+  }
+
+  auto assign(Key const& name, Value const& value) -> void {
+    if (auto const found = map_.find(name); found != map_.end()) {
+      found->second = value;
+      return;
+    }
+
+    if (enclosing_) {
+      enclosing_->assign(name, value);
+      return;
+    }
+
+    throw std::out_of_range{out_of_range_message};
   }
 
  private:
-  std::map<std::string, T> values_;
+  char const* out_of_range_message{
+      "Not found in current or enclosing environments."};
+
+  Environment* enclosing_;
+
+  std::map<Key, Value> map_;
 };
 
 #endif

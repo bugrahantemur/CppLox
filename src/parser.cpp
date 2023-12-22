@@ -56,7 +56,7 @@ class TokenCursor {
     return peek().type_ == TokenType::EOFF;
   }
 
-  auto expect(TokenType const& type) -> Token {
+  auto consume(TokenType const& type) -> Token {
     if (match(type)) {
       return take();
     }
@@ -109,7 +109,7 @@ auto primary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::LEFT_PAREN)) {
     tc.advance();
     Expression const expr{expression(tc)};
-    tc.expect(TokenType::RIGHT_PAREN);
+    tc.consume(TokenType::RIGHT_PAREN);
     return GroupingExpression{expr};
   }
   if (tc.match(TokenType::IDENTIFIER)) {
@@ -182,14 +182,29 @@ auto expression(TokenCursor& tc) -> Expression { return assignment(tc); };
 
 auto print_statement(TokenCursor& tc) -> Statement {
   Expression const value{expression(tc)};
-  tc.expect(TokenType::SEMICOLON);
+  tc.consume(TokenType::SEMICOLON);
   return PrintStatement{value};
 }
 
 auto expression_statement(TokenCursor& tc) -> Statement {
   Expression const expr{expression(tc)};
-  tc.expect(TokenType::SEMICOLON);
+  tc.consume(TokenType::SEMICOLON);
   return ExpressionStatement{expr};
+}
+
+// Forward declare declaration
+auto declaration(TokenCursor& tc) -> Statement;
+
+auto block_statement(TokenCursor& tc) -> Statement {
+  std::vector<Statement> statements{};
+
+  while (!tc.match(TokenType::RIGHT_BRACE)) {
+    statements.push_back(declaration(tc));
+  }
+
+  tc.consume(TokenType::RIGHT_BRACE);
+
+  return BlockStatement{statements};
 }
 
 auto statement(TokenCursor& tc) -> Statement {
@@ -197,12 +212,16 @@ auto statement(TokenCursor& tc) -> Statement {
     tc.advance();
     return print_statement(tc);
   }
+  if (tc.match(TokenType::LEFT_BRACE)) {
+    tc.advance();
+    return block_statement(tc);
+  }
 
   return expression_statement(tc);
 }
 
 auto variable_declaration(TokenCursor& tc) -> Statement {
-  Token const name{tc.expect(TokenType::IDENTIFIER)};
+  Token const name{tc.consume(TokenType::IDENTIFIER)};
 
   Expression initializer{std::monostate{}};
   if (tc.match(TokenType::EQUAL)) {
@@ -210,7 +229,7 @@ auto variable_declaration(TokenCursor& tc) -> Statement {
     initializer = expression(tc);
   }
 
-  tc.expect(TokenType::SEMICOLON);
+  tc.consume(TokenType::SEMICOLON);
 
   return VariableStatement{name.lexeme_, initializer};
 }

@@ -3,14 +3,15 @@
 
 #include <vector>
 
-#include "./environment.h"
+#include "./types/object.h"
 #include "./types/statement.h"
+#include "environment.h"
 
 struct Interpreter {
  public:
   auto interpret(std::vector<Statement const> const& statements) -> void;
 
-  Environment environment_;
+  Environment<Object> environment_;
 };
 
 #endif

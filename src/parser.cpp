@@ -20,12 +20,12 @@ auto Error::report() const -> void {
 }  // namespace Parser
 
 namespace {
-auto error(Token const& token, std::string message) -> void {
-  throw Parser::Error{token.line_,
-                      token.type_ == TokenType::EOFF
-                          ? "at the end"
-                          : " at '" + token.lexeme_ + "'",
-                      message};
+auto error(Token const& token, std::string message) -> Parser::Error {
+  return Parser::Error{token.line_,
+                       token.type_ == TokenType::EOFF
+                           ? "at the end"
+                           : " at '" + token.lexeme_ + "'",
+                       message};
 }
 
 class TokenCursor {
@@ -61,9 +61,7 @@ class TokenCursor {
       return take();
     }
 
-    error(peek(), "Expected " + std::string{magic_enum::enum_name(type)});
-    // Unreachable
-    return Token{};
+    throw error(peek(), "Expected " + std::string{magic_enum::enum_name(type)});
   }
 
   auto synchronize() -> void {
@@ -118,9 +116,7 @@ auto primary(TokenCursor& tc) -> Expression {
     return VariableExpression{tc.take()};
   }
 
-  error(tc.peek(), "Expected expression.");
-  // Unreachable
-  return std::monostate{};
+  throw error(tc.peek(), "Expected expression.");
 }
 
 auto unary(TokenCursor& tc) -> Expression {
@@ -164,7 +160,25 @@ auto equality(TokenCursor& tc) -> Expression {
                   TokenType::EQUAL_EQUAL);
 };
 
-auto expression(TokenCursor& tc) -> Expression { return equality(tc); };
+auto assignment(TokenCursor& tc) -> Expression {
+  Expression const expr{equality(tc)};
+
+  if (tc.match(TokenType::EQUAL)) {
+    Token const equals{tc.take()};
+    Expression const value{assignment(tc)};
+
+    if (auto const var{std::get_if<VariableExpression>(&expr)}) {
+      return AssignmentExpression{var->name_, value};
+    }
+
+    // Do not throw, just report the error
+    error(equals, "Invalid assignment target.").report();
+  }
+
+  return expr;
+}
+
+auto expression(TokenCursor& tc) -> Expression { return assignment(tc); };
 
 auto print_statement(TokenCursor& tc) -> Statement {
   Expression const value{expression(tc)};

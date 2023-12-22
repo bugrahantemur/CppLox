@@ -18,7 +18,8 @@ struct VariableExpression {
 using Expression =
     std::variant<std::monostate, LiteralExpression, VariableExpression,
                  Box<struct BinaryExpression>, Box<struct UnaryExpression>,
-                 Box<struct GroupingExpression>>;
+                 Box<struct GroupingExpression>,
+                 Box<struct AssignmentExpression>>;
 
 struct BinaryExpression {
   Expression left_;
@@ -33,6 +34,11 @@ struct UnaryExpression {
 
 struct GroupingExpression {
   Expression expression_;
+};
+
+struct AssignmentExpression {
+  Token name_;
+  Expression value_;
 };
 
 #endif

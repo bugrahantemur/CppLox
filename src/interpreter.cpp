@@ -62,11 +62,12 @@ struct ExpressionEvaluator {
             interpreter_.environment_.get(expr.name_.lexeme_)) {
       return *value;
     }
-
-    throw RuntimeError{expr.name_.line_,
-                       "Undefined variable '" + expr.name_.lexeme_ + "'."};
-    // Unreachable
-    return std::monostate{};
+    try {
+      return interpreter_.environment_.get(expr.name_.lexeme_);
+    } catch (std::out_of_range const&) {
+      throw RuntimeError{expr.name_.line_,
+                         "Undefined variable '" + expr.name_.lexeme_ + "'."};
+    }
   }
 
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
@@ -158,6 +159,19 @@ struct ExpressionEvaluator {
     }
     // Unreachable
     return std::monostate{};
+  }
+
+  [[nodiscard]] auto operator()(Box<AssignmentExpression> const& expr)
+      -> Object {
+    Object const value = std::visit(*this, expr->value_);
+
+    try {
+      interpreter_.environment_.assign(expr->name_.lexeme_, value);
+      return value;
+    } catch (std::out_of_range const&) {
+      throw RuntimeError(expr->name_.line_,
+                         "Undefined variable '" + expr->name_.lexeme_ + "'.");
+    }
   }
 
   Interpreter& interpreter_;

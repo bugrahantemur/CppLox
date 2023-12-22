@@ -4,16 +4,21 @@
 #include <map>
 #include <string>
 
-#include "./types/object.h"
-
+template <typename T>
 class Environment {
  public:
-  auto define(std::string const& name, Object const& value) -> void;
+  auto define(std::string const& name, T const& value) -> void {
+    values_[name] = value;
+  }
 
-  auto get(std::string const& name) const -> std::optional<Object>;
+  auto get(std::string const& name) const -> T { return values_.at(name); }
+
+  auto assign(std::string const& name, T const& value) -> void {
+    values_.at(name) = value;
+  }
 
  private:
-  std::map<std::string, Object> values_;
+  std::map<std::string, T> values_;
 };
 
 #endif

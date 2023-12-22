@@ -24,7 +24,7 @@ struct VariableStatement {
 using Statement =
     std::variant<std::monostate, ExpressionStatement, PrintStatement,
                  VariableStatement, Box<struct BlockStatement>,
-                 Box<struct IfStatement>>;
+                 Box<struct IfStatement>, Box<struct WhileStatement>>;
 
 struct BlockStatement {
   std::vector<Statement> statements_;
@@ -34,6 +34,11 @@ struct IfStatement {
   Expression condition_;
   Statement then_branch_;
   Statement else_branch_;
+};
+
+struct WhileStatement {
+  Expression condition_;
+  Statement body_;
 };
 
 #endif

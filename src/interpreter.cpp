@@ -239,6 +239,13 @@ struct StatementExecutor {
     }
   }
 
+  auto operator()(Box<WhileStatement> const& stmt) -> void {
+    while (is_truthy(
+        std::visit(ExpressionEvaluator{interpreter_}, stmt->condition_))) {
+      std::visit(*this, stmt->body_);
+    }
+  }
+
   Interpreter& interpreter_;
 };
 }  // namespace

@@ -120,8 +120,7 @@ auto primary(TokenCursor& tc) -> Expression {
 auto unary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::BANG, TokenType::MINUS)) {
     Token const op{tc.take()};
-    Expression const right{unary(tc)};
-    return UnaryExpression{op, right};
+    return UnaryExpression{op, unary(tc)};
   }
 
   return primary(tc);
@@ -243,6 +242,62 @@ auto if_statement(TokenCursor& tc) -> Statement {
   return IfStatement{condition, then_branch, else_branch};
 }
 
+auto while_statement(TokenCursor& tc) -> Statement {
+  tc.consume(TokenType::LEFT_PAREN);
+  Expression const condition{expression(tc)};
+  tc.consume(TokenType::RIGHT_PAREN);
+
+  return WhileStatement{condition, statement(tc)};
+}
+
+// Forward declare
+auto variable_declaration(TokenCursor& tc) -> Statement;
+auto expression_statement(TokenCursor& tc) -> Statement;
+
+auto for_statement(TokenCursor& tc) -> Statement {
+  tc.consume(TokenType::LEFT_PAREN);
+
+  Statement initializer{std::monostate{}};
+  if (tc.match(TokenType::SEMICOLON)) {
+    tc.advance();
+  } else if (tc.match(TokenType::VAR)) {
+    tc.advance();
+    initializer = variable_declaration(tc);
+  } else {
+    initializer = expression_statement(tc);
+  }
+
+  Expression condition{std::monostate{}};
+  if (!tc.match(TokenType::SEMICOLON)) {
+    condition = expression(tc);
+  }
+  tc.consume(TokenType::SEMICOLON);
+
+  Expression increment{std::monostate{}};
+  if (!tc.match(TokenType::RIGHT_PAREN)) {
+    increment = expression(tc);
+  }
+  tc.consume(TokenType::RIGHT_PAREN);
+
+  Statement body{statement(tc)};
+
+  if (!std::holds_alternative<std::monostate>(increment)) {
+    body = BlockStatement{{body, ExpressionStatement{increment}}};
+  }
+
+  if (std::holds_alternative<std::monostate>(condition)) {
+    condition = LiteralExpression{true};
+  }
+
+  body = WhileStatement{condition, body};
+
+  if (!std::holds_alternative<std::monostate>(initializer)) {
+    body = BlockStatement{{initializer, body}};
+  }
+
+  return body;
+}
+
 auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::PRINT)) {
     tc.advance();
@@ -255,6 +310,14 @@ auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::IF)) {
     tc.advance();
     return if_statement(tc);
+  }
+  if (tc.match(TokenType::WHILE)) {
+    tc.advance();
+    return while_statement(tc);
+  }
+  if (tc.match(TokenType::FOR)) {
+    tc.advance();
+    return for_statement(tc);
   }
 
   return expression_statement(tc);

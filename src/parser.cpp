@@ -117,9 +117,22 @@ auto primary(TokenCursor& tc) -> Expression {
   throw error(tc.peek(), "Expected expression.");
 }
 
-auto finish_call(Expression const& callee) -> Expression {
-  // TODO
-  return std::monostate{};
+auto parse_args(TokenCursor& tc) -> std::vector<Expression> {
+  std::vector<Expression> args{};
+
+  if (!tc.match(TokenType::RIGHT_PAREN)) {
+    args.push_back(expression(tc));
+    while (tc.match(TokenType::COMMA)) {
+      tc.advance();
+      args.push_back(expression(tc));
+    }
+  }
+
+  if (args.size() >= 255) {
+    error(tc.peek(), "Can't have more than 255 arguments.").report();
+  }
+
+  return args;
 }
 
 auto call(TokenCursor& tc) -> Expression {
@@ -128,7 +141,8 @@ auto call(TokenCursor& tc) -> Expression {
   while (true) {
     if (tc.match(TokenType::LEFT_PAREN)) {
       tc.advance();
-      expr = finish_call(expr);
+      std::vector<Expression> const arg{parse_args(tc)};
+      return CallExpression{expr, tc.consume(TokenType::RIGHT_PAREN), arg};
     } else {
       break;
     }

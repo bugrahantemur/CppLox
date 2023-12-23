@@ -68,20 +68,33 @@ concept LoxCallable = requires(T t) {
   t.to_string();
 };
 
+struct UncallableError {};
+
 struct Call {
   template <LoxCallable T>
-  auto operator()(T const& t) -> Object {
+  [[nodiscard]] auto operator()(T const& t) -> Object {
     return t.call(interpreter_, args_);
   }
 
   template <typename T>
-  auto operator()(T const& t) -> Object {
-    throw RuntimeError{line_, "Not callable"};
+  [[nodiscard]] auto operator()(T const& t) -> Object {
+    throw UncallableError{};
   }
 
   Interpreter& interpreter_;
   std::vector<Object>& args_;
-  std::size_t const& line_;
+};
+
+struct Arity {
+  template <LoxCallable T>
+  auto operator()(T const& t) -> std::size_t {
+    return t.arity();
+  }
+
+  template <typename T>
+  auto operator()(T const& t) -> std::size_t {
+    throw UncallableError{};
+  }
 };
 
 struct ExpressionEvaluator {
@@ -181,7 +194,19 @@ struct ExpressionEvaluator {
       args.push_back(std::visit(*this, arg));
     }
 
-    return std::visit(Call{interpreter_, args, expr->paren_.line_}, callee);
+    try {
+      std::size_t const arity{std::visit(Arity{}, callee)};
+      if (args.size() != arity) {
+        throw RuntimeError{expr->paren_.line_,
+                           "Expected " + std::to_string(arity) +
+                               " arguments but got " +
+                               std::to_string(args.size()) + "."};
+      }
+      return std::visit(Call{interpreter_, args}, callee);
+    } catch (UncallableError const& e) {
+      throw RuntimeError{expr->paren_.line_,
+                         "Can only call functions and classes."};
+    }
   }
 
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {

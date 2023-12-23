@@ -68,7 +68,7 @@ concept LoxCallable = requires(T t) {
   t.to_string();
 };
 
-struct UncallableError {};
+struct UncallableError : public std::exception {};
 
 struct Call {
   template <LoxCallable T>

@@ -61,6 +61,29 @@ auto is_truthy(Object const& obj) -> bool {
   return std::visit(Truth{}, obj);
 }
 
+template <typename T>
+concept LoxCallable = requires(T t) {
+  t.call();
+  t.arity();
+  t.to_string();
+};
+
+struct Call {
+  template <LoxCallable T>
+  auto operator()(T const& t) -> Object {
+    return t.call(interpreter_, args_);
+  }
+
+  template <typename T>
+  auto operator()(T const& t) -> Object {
+    throw RuntimeError{line_, "Not callable"};
+  }
+
+  Interpreter& interpreter_;
+  std::vector<Object>& args_;
+  std::size_t const& line_;
+};
+
 struct ExpressionEvaluator {
   explicit ExpressionEvaluator(Interpreter& interpreter)
       : interpreter_{interpreter} {}
@@ -151,8 +174,16 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(Box<CallExpression> const& expr) -> Object {
-    return std::monostate{};
+    Object const callee{std::visit(*this, expr->callee_)};
+
+    std::vector<Object> args{};
+    for (auto const& arg : expr->arguments_) {
+      args.push_back(std::visit(*this, arg));
+    }
+
+    return std::visit(Call{interpreter_, args, expr->paren_.line_}, callee);
   }
+
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
     return std::visit(*this, expr->expression_);
   }
@@ -220,8 +251,8 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
-    // Create new environment with the current environment as its enclosing
-    // environment
+    // Create new environment with the current environment as its
+    // enclosing environment
     decltype(interpreter_.environment_) env{&interpreter_.environment_};
 
     // Create interpreter for the block with the new environment

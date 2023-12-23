@@ -13,7 +13,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(TARGET_SRC src/lox.cpp src/scanner.cpp src/parser.cpp src/interpreter.cpp)
+set(TARGET_SRC src/lox.cpp src/scanner.cpp src/parser.cpp src/interpreter.cpp
+               src/globals.cpp)
 add_executable(lox ${TARGET_SRC})
 
 # TESTING

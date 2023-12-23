@@ -1,13 +1,13 @@
-#include "parser.h"
+#include "parser.hpp"
 
 #include <iostream>
 #include <vector>
 
 #include "../magic_enum/include/magic_enum/magic_enum.hpp"
-#include "./types/expression.h"
-#include "./types/statement.h"
-#include "./types/token.h"
-#include "./utils/error.h"
+#include "./types/expression.hpp"
+#include "./types/statement.hpp"
+#include "./types/token.hpp"
+#include "./utils/error.hpp"
 namespace Parser {
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)

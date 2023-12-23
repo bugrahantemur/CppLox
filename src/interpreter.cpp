@@ -1,14 +1,14 @@
-#include "./interpreter.h"
+#include "./interpreter.hpp"
 
 #include <string>
 #include <variant>
 
-#include "./types/expression.h"
-#include "./types/object.h"
-#include "./types/statement.h"
-#include "./types/token.h"
-#include "./utils/box.h"
-#include "./utils/error.h"
+#include "./types/expression.hpp"
+#include "./types/object.hpp"
+#include "./types/statement.hpp"
+#include "./types/token.hpp"
+#include "./utils/box.hpp"
+#include "./utils/error.hpp"
 
 namespace {
 template <typename... Objects>

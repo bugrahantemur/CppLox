@@ -1,4 +1,4 @@
-#include "scanner.h"
+#include "scanner.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "./types/token.h"
+#include "./types/token.hpp"
 
 namespace Scanner {
 Error::Error(std::size_t const line, std::string const& message)

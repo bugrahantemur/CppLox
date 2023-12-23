@@ -5,8 +5,8 @@
 #include <string>
 #include <variant>
 
-#include "../utils/box.h"
-#include "./expression.h"
+#include "../utils/box.hpp"
+#include "./expression.hpp"
 
 struct ExpressionStatement {
   Expression expression_;

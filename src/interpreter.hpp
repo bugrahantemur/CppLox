@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "./types/object.h"
-#include "./types/statement.h"
-#include "environment.h"
+#include "./types/object.hpp"
+#include "./types/statement.hpp"
+#include "environment.hpp"
 
 struct Interpreter {
  public:

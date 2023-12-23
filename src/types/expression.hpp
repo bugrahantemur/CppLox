@@ -4,8 +4,8 @@
 #include <string>
 #include <variant>
 
-#include "../utils/box.h"
-#include "./token.h"
+#include "../utils/box.hpp"
+#include "./token.hpp"
 
 struct LiteralExpression {
   Token::Literal value_;

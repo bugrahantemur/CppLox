@@ -1,15 +1,15 @@
 #include <iostream>
 #include <string>
 
-#include "./interpreter.h"
-#include "./parser.h"
-#include "./scanner.h"
-#include "./types/expression.h"
-#include "./types/statement.h"
-#include "./types/token.h"
-#include "./utils/error.h"
-#include "./utils/printer.h"
-#include "./utils/reader.h"
+#include "./interpreter.hpp"
+#include "./parser.hpp"
+#include "./scanner.hpp"
+#include "./types/expression.hpp"
+#include "./types/statement.hpp"
+#include "./types/token.hpp"
+#include "./utils/error.hpp"
+#include "./utils/printer.hpp"
+#include "./utils/reader.hpp"
 
 class Lox {
  public:

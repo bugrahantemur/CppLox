@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "./types/statement.h"
-#include "./types/token.h"
-#include "./utils/error.h"
+#include "./types/statement.hpp"
+#include "./types/token.hpp"
+#include "./utils/error.hpp"
 
 namespace Parser {
 struct Error : LoxError {

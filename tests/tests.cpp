@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include "../src/utils/reader.h"
+#include "../src/utils/reader.hpp"
 
 TEST(ReadFileTest, FileExists) {
   // Arrange

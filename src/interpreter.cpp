@@ -1,8 +1,10 @@
 #include "./interpreter.hpp"
 
+#include <concepts>
 #include <string>
 #include <variant>
 
+#include "./builtins.hpp"
 #include "./types/expression.hpp"
 #include "./types/object.hpp"
 #include "./types/statement.hpp"
@@ -63,17 +65,16 @@ auto is_truthy(Object const& obj) -> bool {
 
 template <typename T>
 concept LoxCallable = requires(T t) {
-  t.call();
   t.arity();
   t.to_string();
-};
+} && std::invocable<T, Interpreter&, std::vector<Object>&>;
 
 struct UncallableError : public std::exception {};
 
 struct Call {
   template <LoxCallable T>
   [[nodiscard]] auto operator()(T const& t) -> Object {
-    return t.call(interpreter_, args_);
+    return t(interpreter_, args_);
   }
 
   template <typename T>
@@ -308,6 +309,16 @@ struct StatementExecutor {
   Interpreter& interpreter_;
 };
 }  // namespace
+
+Interpreter::Interpreter() : Interpreter{Environment<std::string, Object>{}} {}
+
+Interpreter::Interpreter(Environment<std::string, Object> const& environment)
+    : environment_{environment} {
+  // Add built-in functions
+  for (auto const& [name, function] : builtins()) {
+    environment_.define(name, function);
+  }
+}
 
 auto Interpreter::interpret(std::vector<Statement const> const& statements)
     -> void {

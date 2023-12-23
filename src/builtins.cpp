@@ -1,10 +1,12 @@
-#include "globals.hpp"
+#include "./builtins.hpp"
 
 #include <chrono>
 
 consteval auto Clock::arity() -> std::size_t { return 0; }
 
-auto Clock::call(Interpreter& interpreter, std::vector<Object>& args)
+consteval auto Clock::to_string() const -> std::string_view { return "Clock"; }
+
+auto Clock::operator()(Interpreter& interpreter, std::vector<Object>& args)
     -> Object {
   static_cast<void>(interpreter);
   static_cast<void>(args);
@@ -15,4 +17,7 @@ auto Clock::call(Interpreter& interpreter, std::vector<Object>& args)
           .count());
 }
 
-auto Clock::to_string() const -> std::string { return "Clock"; }
+auto builtins() -> std::map<std::string, Object> {
+  // TODO
+  return {};
+}

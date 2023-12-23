@@ -117,13 +117,33 @@ auto primary(TokenCursor& tc) -> Expression {
   throw error(tc.peek(), "Expected expression.");
 }
 
+auto finish_call(Expression const& callee) -> Expression {
+  // TODO
+  return std::monostate{};
+}
+
+auto call(TokenCursor& tc) -> Expression {
+  Expression expr{primary(tc)};
+
+  while (true) {
+    if (tc.match(TokenType::LEFT_PAREN)) {
+      tc.advance();
+      expr = finish_call(expr);
+    } else {
+      break;
+    }
+  }
+
+  return expr;
+}
+
 auto unary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::BANG, TokenType::MINUS)) {
     Token const op{tc.take()};
     return UnaryExpression{op, unary(tc)};
   }
 
-  return primary(tc);
+  return call(tc);
 }
 
 template <typename F, typename Result, typename... Types>

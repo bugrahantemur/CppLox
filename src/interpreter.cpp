@@ -80,26 +80,17 @@ struct ExpressionEvaluator {
     }
   }
 
-  [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
-    return std::visit(*this, expr->expression_);
-  }
+  [[nodiscard]] auto operator()(Box<AssignmentExpression> const& expr)
+      -> Object {
+    Object const value = std::visit(*this, expr->value_);
 
-  [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
-    Object const right{std::visit(*this, expr->right_)};
-
-    Token const& op{expr->op_};
-    TokenType const& op_type{op.type_};
-
-    if (op_type == TokenType::MINUS) {
-      check_number_operand(op, right);
-      return -std::get<double>(right);
+    try {
+      interpreter_.environment_.assign(expr->name_.lexeme_, value);
+      return value;
+    } catch (std::out_of_range const&) {
+      throw RuntimeError(expr->name_.line_,
+                         "Undefined variable '" + expr->name_.lexeme_ + "'.");
     }
-
-    if (op_type == TokenType::BANG) {
-      return !is_truthy(right);
-    }
-
-    return std::monostate{};
   }
 
   [[nodiscard]] auto operator()(Box<BinaryExpression> const& expr) -> Object {
@@ -159,17 +150,11 @@ struct ExpressionEvaluator {
     return std::monostate{};
   }
 
-  [[nodiscard]] auto operator()(Box<AssignmentExpression> const& expr)
-      -> Object {
-    Object const value = std::visit(*this, expr->value_);
-
-    try {
-      interpreter_.environment_.assign(expr->name_.lexeme_, value);
-      return value;
-    } catch (std::out_of_range const&) {
-      throw RuntimeError(expr->name_.line_,
-                         "Undefined variable '" + expr->name_.lexeme_ + "'.");
-    }
+  [[nodiscard]] auto operator()(Box<CallExpression> const& expr) -> Object {
+    return std::monostate{};
+  }
+  [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
+    return std::visit(*this, expr->expression_);
   }
 
   [[nodiscard]] auto operator()(Box<LogicalExpression> const& expr) -> Object {
@@ -185,6 +170,24 @@ struct ExpressionEvaluator {
       }
     }
     return std::visit(*this, expr->right_);
+  }
+
+  [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
+    Object const right{std::visit(*this, expr->right_)};
+
+    Token const& op{expr->op_};
+    TokenType const& op_type{op.type_};
+
+    if (op_type == TokenType::MINUS) {
+      check_number_operand(op, right);
+      return -std::get<double>(right);
+    }
+
+    if (op_type == TokenType::BANG) {
+      return !is_truthy(right);
+    }
+
+    return std::monostate{};
   }
 
   Interpreter& interpreter_;

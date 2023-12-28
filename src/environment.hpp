@@ -3,12 +3,15 @@
 
 #include <map>
 
-template <typename Key, typename Value>
-class Environment {
- public:
-  Environment() : enclosing_(nullptr) {}
+#include "./types/object.hpp"
 
-  Environment(Environment* enclosing) : enclosing_(enclosing) {}
+namespace {
+template <typename Key, typename Value>
+class env {
+ public:
+  env(env* enclosing) : enclosing_(enclosing) {}
+
+  env() : env(nullptr) {}
 
   auto define(Key const& name, Value const& value) -> void {
     map_[name] = value;
@@ -43,9 +46,12 @@ class Environment {
  private:
   char const* out_of_range_message{"Environment map"};
 
-  Environment* enclosing_;
+  env* enclosing_;
 
   std::map<Key, Value> map_;
 };
+}  // namespace
+
+using Environment = env<std::string const, Object>;
 
 #endif

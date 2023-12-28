@@ -273,8 +273,8 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
 
 namespace Scanner {
 [[nodiscard]] auto scan_tokens(std::string const& contents)
-    -> std::vector<Token const> {
-  std::vector<Token const> tokens;
+    -> std::vector<Token> {
+  std::vector<Token> tokens;
   Cursor cursor(contents);
 
   while (!cursor.is_at_end()) {

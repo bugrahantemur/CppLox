@@ -6,14 +6,13 @@
 #include <string_view>
 #include <vector>
 
-#include "./environment.hpp"
 #include "./interpreter.hpp"
 #include "./types/object.hpp"
 
 struct Clock {
   consteval auto arity() -> std::size_t;
 
-  consteval auto to_string() const -> std::string_view;
+  consteval auto to_string() const -> std::string;
 
   auto operator()(Interpreter& interpreter, std::vector<Object>& args)
       -> Object;

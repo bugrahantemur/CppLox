@@ -18,7 +18,7 @@ struct Error : LoxError {
 };
 
 [[nodiscard]] auto scan_tokens(std::string const& contents)
-    -> std::vector<Token const>;
+    -> std::vector<Token>;
 }  // namespace Scanner
 
 #endif

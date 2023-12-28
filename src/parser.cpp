@@ -30,7 +30,7 @@ auto error(Token const& token, std::string message) -> Parser::Error {
 
 class TokenCursor {
  public:
-  explicit TokenCursor(std::vector<Token const> const& tokens)
+  explicit TokenCursor(std::vector<Token> const& tokens)
       : tokens_(tokens), current_(0){};
 
   template <typename Type>
@@ -42,21 +42,15 @@ class TokenCursor {
     return match(type) || match(types...);
   }
 
-  [[nodiscard]] auto take() -> Token {
-    Token const tmp{peek()};
-    advance();
-    return tmp;
-  }
-
-  auto advance() -> void { current_++; }
-
   [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
 
   [[nodiscard]] auto is_at_end() const -> bool {
     return (current_ >= tokens_.size()) || (peek().type_ == TokenType::EOFF);
   }
 
-  auto consume(TokenType const& type) -> Token {
+  auto take() -> Token { return tokens_.at(current_++); }
+
+  auto take(TokenType const& type) -> Token {
     if (match(type)) {
       return take();
     }
@@ -72,7 +66,7 @@ class TokenCursor {
         return;
       }
 
-      advance();
+      take();
 
       if (match(TokenType::SEMICOLON)) {
         return;
@@ -81,7 +75,7 @@ class TokenCursor {
   }
 
  private:
-  std::vector<Token const> const& tokens_;
+  std::vector<Token> const& tokens_;
   std::size_t current_;
 };
 
@@ -90,24 +84,24 @@ auto expression(TokenCursor&) -> Expression;
 
 auto primary(TokenCursor& tc) -> Expression {
   if (tc.match(TokenType::FALSE)) {
-    tc.advance();
+    tc.take();
     return LiteralExpression{false};
   }
   if (tc.match(TokenType::TRUE)) {
-    tc.advance();
+    tc.take();
     return LiteralExpression{true};
   }
   if (tc.match(TokenType::NIL)) {
-    tc.advance();
+    tc.take();
     return LiteralExpression{std::monostate{}};
   }
   if (tc.match(TokenType::NUMBER, TokenType::STRING)) {
     return LiteralExpression{tc.take().literal_};
   }
   if (tc.match(TokenType::LEFT_PAREN)) {
-    tc.advance();
+    tc.take();
     Expression const expr{expression(tc)};
-    tc.consume(TokenType::RIGHT_PAREN);
+    tc.take(TokenType::RIGHT_PAREN);
     return GroupingExpression{expr};
   }
   if (tc.match(TokenType::IDENTIFIER)) {
@@ -117,22 +111,33 @@ auto primary(TokenCursor& tc) -> Expression {
   throw error(tc.peek(), "Expected expression.");
 }
 
-auto parse_args(TokenCursor& tc) -> std::vector<Expression> {
-  std::vector<Expression> args{};
+template <typename T, typename F>
+auto parse_parenthesized_list(TokenCursor& tc, F const& f) -> std::vector<T> {
+  std::vector<T> list{};
 
   if (!tc.match(TokenType::RIGHT_PAREN)) {
-    args.push_back(expression(tc));
+    list.push_back(f(tc));
     while (tc.match(TokenType::COMMA)) {
-      tc.advance();
-      args.push_back(expression(tc));
+      tc.take();
+      list.push_back(f(tc));
     }
   }
 
-  if (args.size() >= 255) {
-    error(tc.peek(), "Can't have more than 255 arguments.").report();
+  if (list.size() >= 255) {
+    error(tc.peek(), "Can't have more than 255 constituents.").report();
   }
 
-  return args;
+  return list;
+}
+
+auto parse_args(TokenCursor& tc) -> std::vector<Expression> {
+  return parse_parenthesized_list<Expression>(tc, expression);
+}
+
+auto parse_params(TokenCursor& tc) -> std::vector<std::string> {
+  return parse_parenthesized_list<std::string>(tc, [](TokenCursor& tc) {
+    return tc.take(TokenType::IDENTIFIER).lexeme_;
+  });
 }
 
 auto call(TokenCursor& tc) -> Expression {
@@ -140,9 +145,9 @@ auto call(TokenCursor& tc) -> Expression {
 
   while (true) {
     if (tc.match(TokenType::LEFT_PAREN)) {
-      tc.advance();
-      std::vector<Expression> const arg{parse_args(tc)};
-      return CallExpression{expr, tc.consume(TokenType::RIGHT_PAREN), arg};
+      tc.take();
+      std::vector<Expression> const args{parse_args(tc)};
+      return CallExpression{expr, tc.take(TokenType::RIGHT_PAREN), args};
     } else {
       break;
     }
@@ -232,13 +237,13 @@ auto expression(TokenCursor& tc) -> Expression { return assignment(tc); };
 
 auto print_statement(TokenCursor& tc) -> Statement {
   Expression const value{expression(tc)};
-  tc.consume(TokenType::SEMICOLON);
+  tc.take(TokenType::SEMICOLON);
   return PrintStatement{value};
 }
 
 auto expression_statement(TokenCursor& tc) -> Statement {
   Expression const expr{expression(tc)};
-  tc.consume(TokenType::SEMICOLON);
+  tc.take(TokenType::SEMICOLON);
   return ExpressionStatement{expr};
 }
 
@@ -252,7 +257,7 @@ auto block_statement(TokenCursor& tc) -> Statement {
     statements.push_back(declaration(tc));
   }
 
-  tc.consume(TokenType::RIGHT_BRACE);
+  tc.take(TokenType::RIGHT_BRACE);
 
   return BlockStatement{statements};
 }
@@ -261,15 +266,15 @@ auto block_statement(TokenCursor& tc) -> Statement {
 auto statement(TokenCursor& tc) -> Statement;
 
 auto if_statement(TokenCursor& tc) -> Statement {
-  tc.consume(TokenType::LEFT_PAREN);
+  tc.take(TokenType::LEFT_PAREN);
   Expression const condition{expression(tc)};
-  tc.consume(TokenType::RIGHT_PAREN);
+  tc.take(TokenType::RIGHT_PAREN);
 
   Statement const then_branch{statement(tc)};
 
   Statement else_branch{std::monostate{}};
   if (tc.match(TokenType::ELSE)) {
-    tc.advance();
+    tc.take();
     else_branch = statement(tc);
   }
 
@@ -277,9 +282,9 @@ auto if_statement(TokenCursor& tc) -> Statement {
 }
 
 auto while_statement(TokenCursor& tc) -> Statement {
-  tc.consume(TokenType::LEFT_PAREN);
+  tc.take(TokenType::LEFT_PAREN);
   Expression const condition{expression(tc)};
-  tc.consume(TokenType::RIGHT_PAREN);
+  tc.take(TokenType::RIGHT_PAREN);
 
   return WhileStatement{condition, statement(tc)};
 }
@@ -289,13 +294,13 @@ auto variable_declaration(TokenCursor& tc) -> Statement;
 auto expression_statement(TokenCursor& tc) -> Statement;
 
 auto for_statement(TokenCursor& tc) -> Statement {
-  tc.consume(TokenType::LEFT_PAREN);
+  tc.take(TokenType::LEFT_PAREN);
 
   Statement initializer{std::monostate{}};
   if (tc.match(TokenType::SEMICOLON)) {
-    tc.advance();
+    tc.take();
   } else if (tc.match(TokenType::VAR)) {
-    tc.advance();
+    tc.take();
     initializer = variable_declaration(tc);
   } else {
     initializer = expression_statement(tc);
@@ -305,13 +310,13 @@ auto for_statement(TokenCursor& tc) -> Statement {
   if (!tc.match(TokenType::SEMICOLON)) {
     condition = expression(tc);
   }
-  tc.consume(TokenType::SEMICOLON);
+  tc.take(TokenType::SEMICOLON);
 
   Expression increment{std::monostate{}};
   if (!tc.match(TokenType::RIGHT_PAREN)) {
     increment = expression(tc);
   }
-  tc.consume(TokenType::RIGHT_PAREN);
+  tc.take(TokenType::RIGHT_PAREN);
 
   Statement body{statement(tc)};
 
@@ -334,47 +339,67 @@ auto for_statement(TokenCursor& tc) -> Statement {
 
 auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::PRINT)) {
-    tc.advance();
+    tc.take();
     return print_statement(tc);
   }
   if (tc.match(TokenType::LEFT_BRACE)) {
-    tc.advance();
+    tc.take();
     return block_statement(tc);
   }
   if (tc.match(TokenType::IF)) {
-    tc.advance();
+    tc.take();
     return if_statement(tc);
   }
   if (tc.match(TokenType::WHILE)) {
-    tc.advance();
+    tc.take();
     return while_statement(tc);
   }
   if (tc.match(TokenType::FOR)) {
-    tc.advance();
+    tc.take();
     return for_statement(tc);
   }
 
   return expression_statement(tc);
 }
 
+auto function_declaration(TokenCursor& tc) -> Statement {
+  Token const name{tc.take(TokenType::IDENTIFIER)};
+
+  tc.take(TokenType::LEFT_PAREN);
+
+  std::vector<std::string> const parameters{parse_params(tc)};
+
+  tc.take(TokenType::RIGHT_PAREN);
+
+  tc.take(TokenType::LEFT_BRACE);
+
+  std::vector<Statement> const body{block_statement(tc)};
+
+  return FunctionStatement{name.lexeme_, parameters, body};
+}
+
 auto variable_declaration(TokenCursor& tc) -> Statement {
-  Token const name{tc.consume(TokenType::IDENTIFIER)};
+  Token const name{tc.take(TokenType::IDENTIFIER)};
 
   Expression initializer{std::monostate{}};
   if (tc.match(TokenType::EQUAL)) {
-    tc.advance();
+    tc.take();
     initializer = expression(tc);
   }
 
-  tc.consume(TokenType::SEMICOLON);
+  tc.take(TokenType::SEMICOLON);
 
   return VariableStatement{name.lexeme_, initializer};
 }
 
 auto declaration(TokenCursor& tc) -> Statement {
   try {
+    if (tc.match(TokenType::FUN)) {
+      tc.take();
+      return function_declaration(tc);
+    }
     if (tc.match(TokenType::VAR)) {
-      tc.advance();
+      tc.take();
       return variable_declaration(tc);
     }
     return statement(tc);
@@ -387,11 +412,10 @@ auto declaration(TokenCursor& tc) -> Statement {
 }  // namespace
 
 namespace Parser {
-auto parse(std::vector<Token const> const& tokens)
-    -> std::vector<Statement const> {
+auto parse(std::vector<Token> const& tokens) -> std::vector<Statement> {
   TokenCursor tc(tokens);
 
-  std::vector<Statement const> statements{};
+  std::vector<Statement> statements{};
 
   while (!tc.is_at_end()) {
     statements.push_back(declaration(tc));

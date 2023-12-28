@@ -41,8 +41,8 @@ class Lox {
   auto run(std::string const &contents) -> void {
     Expression expr;
     try {
-      std::vector<Token const> const tokens = Scanner::scan_tokens(contents);
-      std::vector<Statement const> const statements = Parser::parse(tokens);
+      std::vector<Token> const tokens = Scanner::scan_tokens(contents);
+      std::vector<Statement> const statements = Parser::parse(tokens);
       interpreter.interpret(statements);
     } catch (RuntimeError const &e) {
       had_runtime_error = true;

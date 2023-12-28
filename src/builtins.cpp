@@ -4,7 +4,7 @@
 
 consteval auto Clock::arity() -> std::size_t { return 0; }
 
-consteval auto Clock::to_string() const -> std::string_view { return "Clock"; }
+consteval auto Clock::to_string() const -> std::string { return "Clock"; }
 
 auto Clock::operator()(Interpreter& interpreter, std::vector<Object>& args)
     -> Object {
@@ -18,6 +18,11 @@ auto Clock::operator()(Interpreter& interpreter, std::vector<Object>& args)
 }
 
 auto builtins() -> std::map<std::string, Object> {
+  // TODO
+  return {};
+}
+
+auto global_env() -> Environment {
   // TODO
   return {};
 }

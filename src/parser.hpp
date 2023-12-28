@@ -21,8 +21,7 @@ struct Error : LoxError {
   std::vector<Token> tokens_;
 };
 
-auto parse(std::vector<Token const> const& tokens)
-    -> std::vector<Statement const>;
+auto parse(std::vector<Token> const& tokens) -> std::vector<Statement>;
 }  // namespace Parser
 
 #endif

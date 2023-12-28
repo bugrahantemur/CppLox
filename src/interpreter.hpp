@@ -4,19 +4,19 @@
 #include <string>
 #include <vector>
 
+#include "./environment.hpp"
 #include "./types/object.hpp"
 #include "./types/statement.hpp"
-#include "environment.hpp"
 
 struct Interpreter {
  public:
   Interpreter();
 
-  explicit Interpreter(Environment<std::string, Object> const& environment);
+  explicit Interpreter(Environment const& environment);
 
-  auto interpret(std::vector<Statement const> const& statements) -> void;
+  auto interpret(std::vector<Statement> const& statements) -> void;
 
-  Environment<std::string, Object> environment_;
+  Environment environment_;
 };
 
 #endif

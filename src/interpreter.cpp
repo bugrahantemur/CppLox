@@ -6,6 +6,7 @@
 
 #include "./builtins.hpp"
 #include "./types/expression.hpp"
+#include "./types/function.hpp"
 #include "./types/object.hpp"
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
@@ -25,6 +26,28 @@ auto check_number_operand(Token const& token, Objects... operands) -> void {
   }
 }
 
+struct Equality {
+  auto operator()(std::monostate, std::monostate) -> bool { return true; }
+  auto operator()(bool left, bool right) -> bool { return left == right; }
+  auto operator()(double left, double right) -> bool { return left == right; }
+  auto operator()(std::string const& left, std::string const& right) -> bool {
+    return left == right;
+  }
+  auto operator()(LoxFunction const& left, LoxFunction const& right) -> bool {
+    // TODO
+    return false;
+  }
+
+  template <typename T, typename U>
+  auto operator()(T const& left, U const& right) -> bool {
+    return false;
+  }
+};
+
+auto is_equal(Object const& left, Object const& right) -> bool {
+  return std::visit(Equality{}, left, right);
+}
+
 template <typename OStream>
 struct Put {
   Put(OStream& out) : out_{out} {}
@@ -35,6 +58,10 @@ struct Put {
 
   auto operator()(bool const b) -> OStream& {
     return b ? put("true") : put("false");
+  }
+
+  auto operator()(LoxFunction const& func) -> OStream& {
+    return put(func.to_string());
   }
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
@@ -58,23 +85,27 @@ auto is_truthy(Object const& obj) -> bool {
     auto operator()(double number) -> bool { return true; }
 
     auto operator()(std::string const& str) -> bool { return true; }
+
+    auto operator()(LoxFunction const& func) -> bool { return true; }
   };
 
   return std::visit(Truth{}, obj);
 }
 
-template <typename T>
-concept LoxCallable = requires(T t) {
-  t.arity();
-  t.to_string();
-} && std::invocable<T, Interpreter&, std::vector<Object>&>;
-
 struct UncallableError : public std::exception {};
 
 struct Call {
-  template <LoxCallable T>
-  [[nodiscard]] auto operator()(T const& t) -> Object {
-    return t(interpreter_, args_);
+  [[nodiscard]] auto operator()(LoxFunction const& func) -> Object {
+    Environment env{};
+
+    for (std::size_t i = 0; i < func.arity(); ++i) {
+      env.define(func.declaration_.params_.at(i), args_.at(i));
+    }
+
+    Interpreter interpreter{env};
+    interpreter.interpret(func.declaration_.body_);
+
+    return std::monostate{};
   }
 
   template <typename T>
@@ -83,13 +114,12 @@ struct Call {
   }
 
   Interpreter& interpreter_;
-  std::vector<Object>& args_;
+  std::vector<Object> const& args_;
 };
 
 struct Arity {
-  template <LoxCallable T>
-  auto operator()(T const& t) -> std::size_t {
-    return t.arity();
+  auto operator()(LoxFunction const& func) -> std::size_t {
+    return func.arity();
   }
 
   template <typename T>
@@ -105,7 +135,17 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
   [[nodiscard]] auto operator()(LiteralExpression const& expr) -> Object {
-    return expr.value_;
+    if (std::holds_alternative<bool>(expr.value_)) {
+      return std::get<bool>(expr.value_);
+    }
+    if (std::holds_alternative<double>(expr.value_)) {
+      return std::get<double>(expr.value_);
+    }
+    if (std::holds_alternative<std::string>(expr.value_)) {
+      return std::get<std::string>(expr.value_);
+    }
+
+    return std::monostate{};
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
@@ -178,10 +218,10 @@ struct ExpressionEvaluator {
       return std::get<double>(left) <= std::get<double>(right);
     }
     if (op_type == TokenType::BANG_EQUAL) {
-      return left != right;
+      return !is_equal(left, right);
     }
     if (op_type == TokenType::EQUAL_EQUAL) {
-      return left == right;
+      return is_equal(left, right);
     }
     // Unreachable
     return std::monostate{};
@@ -290,6 +330,11 @@ struct StatementExecutor {
     }
   }
 
+  auto operator()(Box<FunctionStatement> const& stmt) -> void {
+    LoxFunction const f{*stmt};
+    interpreter_.environment_.define(stmt->name_, f);
+  }
+
   auto operator()(Box<IfStatement> const& stmt) -> void {
     if (is_truthy(
             std::visit(ExpressionEvaluator{interpreter_}, stmt->condition_))) {
@@ -310,18 +355,12 @@ struct StatementExecutor {
 };
 }  // namespace
 
-Interpreter::Interpreter() : Interpreter{Environment<std::string, Object>{}} {}
+Interpreter::Interpreter() : Interpreter{Environment{}} {}
 
-Interpreter::Interpreter(Environment<std::string, Object> const& environment)
-    : environment_{environment} {
-  // Add built-in functions
-  for (auto const& [name, function] : builtins()) {
-    environment_.define(name, function);
-  }
-}
+Interpreter::Interpreter(Environment const& environment)
+    : environment_{environment} {}
 
-auto Interpreter::interpret(std::vector<Statement const> const& statements)
-    -> void {
+auto Interpreter::interpret(std::vector<Statement> const& statements) -> void {
   for (auto const& stmt : statements) {
     std::visit(StatementExecutor{*this}, stmt);
   }

@@ -24,10 +24,17 @@ struct VariableStatement {
 using Statement =
     std::variant<std::monostate, ExpressionStatement, PrintStatement,
                  VariableStatement, Box<struct BlockStatement>,
-                 Box<struct IfStatement>, Box<struct WhileStatement>>;
+                 Box<struct FunctionStatement>, Box<struct IfStatement>,
+                 Box<struct WhileStatement>>;
 
 struct BlockStatement {
   std::vector<Statement> statements_;
+};
+
+struct FunctionStatement {
+  std::string name_;
+  std::vector<std::string> params_;
+  std::vector<Statement> body_;
 };
 
 struct IfStatement {

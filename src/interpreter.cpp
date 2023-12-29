@@ -100,7 +100,7 @@ struct UncallableError : public std::exception {};
 
 struct Call {
   [[nodiscard]] auto operator()(LoxFunction const& func) -> Object {
-    Environment env{&interpreter_.environment_};
+    Environment env{&environment_};
 
     for (std::size_t i = 0; i < func.arity(); ++i) {
       env.define(func.declaration_.params_.at(i), args_.at(i));
@@ -121,7 +121,7 @@ struct Call {
     throw UncallableError{};
   }
 
-  Interpreter& interpreter_;
+  Environment& environment_;
   std::vector<Object> const& args_;
 };
 
@@ -137,8 +137,7 @@ struct Arity {
 };
 
 struct ExpressionEvaluator {
-  explicit ExpressionEvaluator(Interpreter& interpreter)
-      : interpreter_{interpreter} {}
+  Environment& environment_;
 
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
@@ -158,7 +157,7 @@ struct ExpressionEvaluator {
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
     try {
-      return interpreter_.environment_.get(expr.name_.lexeme_);
+      return environment_.get(expr.name_.lexeme_);
     } catch (std::out_of_range const&) {
       throw RuntimeError{expr.name_.line_,
                          "Undefined variable '" + expr.name_.lexeme_ + "'."};
@@ -170,7 +169,7 @@ struct ExpressionEvaluator {
     Object const value = std::visit(*this, expr->value_);
 
     try {
-      interpreter_.environment_.assign(expr->name_.lexeme_, value);
+      environment_.assign(expr->name_.lexeme_, value);
       return value;
     } catch (std::out_of_range const&) {
       throw RuntimeError(expr->name_.line_,
@@ -251,7 +250,7 @@ struct ExpressionEvaluator {
                                " arguments but got " +
                                std::to_string(args.size()) + "."};
       }
-      return std::visit(Call{interpreter_, args}, callee);
+      return std::visit(Call{environment_, args}, callee);
     } catch (UncallableError const& e) {
       throw RuntimeError{expr->paren_.line_,
                          "Can only call functions and classes."};
@@ -294,31 +293,28 @@ struct ExpressionEvaluator {
 
     return std::monostate{};
   }
-
-  Interpreter& interpreter_;
 };
 
 struct StatementExecutor {
-  explicit StatementExecutor(Interpreter& interpreter)
-      : interpreter_{interpreter} {}
+  Environment& environment_;
 
   auto operator()(std::monostate) -> void {}
 
   auto operator()(ExpressionStatement const& stmt) -> void {
     static_cast<void>(
-        std::visit(ExpressionEvaluator{interpreter_}, stmt.expression_));
+        std::visit(ExpressionEvaluator{environment_}, stmt.expression_));
   }
 
   auto operator()(PrintStatement const& stmt) -> void {
     Object const value{
-        std::visit(ExpressionEvaluator{interpreter_}, stmt.expression_)};
+        std::visit(ExpressionEvaluator{environment_}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
   }
 
   auto operator()(ReturnStatement const& stmt) -> void {
     Object const value{
         !std::holds_alternative<std::monostate>(stmt.value_)
-            ? std::visit(ExpressionEvaluator{interpreter_}, stmt.value_)
+            ? std::visit(ExpressionEvaluator{environment_}, stmt.value_)
             : std::monostate{}};
 
     throw Return{value};
@@ -327,34 +323,31 @@ struct StatementExecutor {
   auto operator()(VariableStatement const& stmt) -> void {
     Object const value{
         !std::holds_alternative<std::monostate>(stmt.initializer_)
-            ? std::visit(ExpressionEvaluator{interpreter_}, stmt.initializer_)
+            ? std::visit(ExpressionEvaluator{environment_}, stmt.initializer_)
             : std::monostate{}};
 
-    interpreter_.environment_.define(stmt.name_, value);
+    environment_.define(stmt.name_, value);
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
     // Create new environment with the current environment as its
     // enclosing environment
-    decltype(interpreter_.environment_) env{&interpreter_.environment_};
-
-    // Create interpreter for the block with the new environment
-    Interpreter block_interpreter{env};
+    Environment env{&environment_};
 
     // Execute statements in the block with the new environment
     for (Statement const& statement : stmt->statements_) {
-      std::visit(StatementExecutor{block_interpreter}, statement);
+      std::visit(StatementExecutor{env}, statement);
     }
   }
 
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
     LoxFunction const f{*stmt};
-    interpreter_.environment_.define(stmt->name_, f);
+    environment_.define(stmt->name_, f);
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
     if (is_truthy(
-            std::visit(ExpressionEvaluator{interpreter_}, stmt->condition_))) {
+            std::visit(ExpressionEvaluator{environment_}, stmt->condition_))) {
       std::visit(*this, stmt->then_branch_);
     } else {
       std::visit(*this, stmt->else_branch_);
@@ -363,12 +356,10 @@ struct StatementExecutor {
 
   auto operator()(Box<WhileStatement> const& stmt) -> void {
     while (is_truthy(
-        std::visit(ExpressionEvaluator{interpreter_}, stmt->condition_))) {
+        std::visit(ExpressionEvaluator{environment_}, stmt->condition_))) {
       std::visit(*this, stmt->body_);
     }
   }
-
-  Interpreter& interpreter_;
 };
 }  // namespace
 
@@ -379,6 +370,6 @@ Interpreter::Interpreter(Environment const& environment)
 
 auto Interpreter::interpret(std::vector<Statement> const& statements) -> void {
   for (auto const& stmt : statements) {
-    std::visit(StatementExecutor{*this}, stmt);
+    std::visit(StatementExecutor{environment_}, stmt);
   }
 }

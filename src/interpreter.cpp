@@ -65,7 +65,7 @@ struct Put {
   }
 
   auto operator()(LoxFunction const& func) -> OStream& {
-    return put(func.to_string());
+    return put("<fn " + func.declaration_.name_ + ">");
   }
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
@@ -97,12 +97,24 @@ auto is_truthy(Object const& obj) -> bool {
 }
 
 struct UncallableError : public std::exception {};
+struct Arity {
+  auto operator()(LoxFunction const& func) -> std::size_t {
+    return func.declaration_.params_.size();
+  }
+
+  template <typename T>
+  auto operator()(T const& t) -> std::size_t {
+    throw UncallableError{};
+  }
+};
 
 struct Call {
   [[nodiscard]] auto operator()(LoxFunction const& func) -> Object {
     Environment env{&environment_};
 
-    for (std::size_t i = 0; i < func.arity(); ++i) {
+    std::size_t const arity{std::visit(Arity{}, Object{func})};
+
+    for (std::size_t i = 0; i < arity; ++i) {
       env.define(func.declaration_.params_.at(i), args_.at(i));
     }
 
@@ -123,17 +135,6 @@ struct Call {
 
   Environment& environment_;
   std::vector<Object> const& args_;
-};
-
-struct Arity {
-  auto operator()(LoxFunction const& func) -> std::size_t {
-    return func.arity();
-  }
-
-  template <typename T>
-  auto operator()(T const& t) -> std::size_t {
-    throw UncallableError{};
-  }
 };
 
 struct ExpressionEvaluator {

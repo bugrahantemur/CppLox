@@ -7,6 +7,7 @@
 
 #include "../utils/box.hpp"
 #include "./expression.hpp"
+#include "./token.hpp"
 
 struct ExpressionStatement {
   Expression expression_;
@@ -16,6 +17,11 @@ struct PrintStatement {
   Expression expression_;
 };
 
+struct ReturnStatement {
+  Token keyword_;
+  Expression value_;
+};
+
 struct VariableStatement {
   std::string name_;
   Expression initializer_;
@@ -23,7 +29,7 @@ struct VariableStatement {
 
 using Statement =
     std::variant<std::monostate, ExpressionStatement, PrintStatement,
-                 VariableStatement, Box<struct BlockStatement>,
+                 ReturnStatement, VariableStatement, Box<struct BlockStatement>,
                  Box<struct FunctionStatement>, Box<struct IfStatement>,
                  Box<struct WhileStatement>>;
 

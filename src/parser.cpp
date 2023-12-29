@@ -337,6 +337,14 @@ auto for_statement(TokenCursor& tc) -> Statement {
   return body;
 }
 
+auto return_statement(TokenCursor& tc) -> Statement {
+  Token const keyword{tc.take()};
+  Expression const value{tc.match(TokenType::SEMICOLON) ? std::monostate{}
+                                                        : expression(tc)};
+  tc.take(TokenType::SEMICOLON);
+  return ReturnStatement{keyword, value};
+}
+
 auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::PRINT)) {
     tc.take();
@@ -349,6 +357,9 @@ auto statement(TokenCursor& tc) -> Statement {
   if (tc.match(TokenType::IF)) {
     tc.take();
     return if_statement(tc);
+  }
+  if (tc.match(TokenType::RETURN)) {
+    return return_statement(tc);
   }
   if (tc.match(TokenType::WHILE)) {
     tc.take();

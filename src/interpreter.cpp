@@ -14,6 +14,10 @@
 #include "./utils/error.hpp"
 
 namespace {
+struct Return {
+  Object value_;
+};
+
 template <typename... Objects>
 auto check_number_operand(Token const& token, Objects... operands) -> void {
   std::array const ops{operands...};
@@ -96,14 +100,18 @@ struct UncallableError : public std::exception {};
 
 struct Call {
   [[nodiscard]] auto operator()(LoxFunction const& func) -> Object {
-    Environment env{};
+    Environment env{&interpreter_.environment_};
 
     for (std::size_t i = 0; i < func.arity(); ++i) {
       env.define(func.declaration_.params_.at(i), args_.at(i));
     }
 
-    Interpreter interpreter{env};
-    interpreter.interpret(func.declaration_.body_);
+    try {
+      Interpreter interpreter{env};
+      interpreter.interpret(func.declaration_.body_);
+    } catch (Return const& ret) {
+      return ret.value_;
+    }
 
     return std::monostate{};
   }
@@ -305,6 +313,15 @@ struct StatementExecutor {
     Object const value{
         std::visit(ExpressionEvaluator{interpreter_}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
+  }
+
+  auto operator()(ReturnStatement const& stmt) -> void {
+    Object const value{
+        !std::holds_alternative<std::monostate>(stmt.value_)
+            ? std::visit(ExpressionEvaluator{interpreter_}, stmt.value_)
+            : std::monostate{}};
+
+    throw Return{value};
   }
 
   auto operator()(VariableStatement const& stmt) -> void {

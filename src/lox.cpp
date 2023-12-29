@@ -2,7 +2,7 @@
 #include <string>
 
 #include "./interpreter.hpp"
-#include "./parser.hpp"
+#include "./parser/parser.hpp"
 #include "./scanner.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"

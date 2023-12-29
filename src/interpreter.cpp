@@ -37,7 +37,8 @@ struct Equality {
   auto operator()(std::string const& left, std::string const& right) -> bool {
     return left == right;
   }
-  auto operator()(LoxFunction const& left, LoxFunction const& right) -> bool {
+  auto operator()(Box<LoxFunction> const& left, LoxFunction const& right)
+      -> bool {
     // TODO
     return false;
   }
@@ -64,8 +65,8 @@ struct Put {
     return b ? put("true") : put("false");
   }
 
-  auto operator()(LoxFunction const& func) -> OStream& {
-    return put("<fn " + func.declaration_.name_ + ">");
+  auto operator()(Box<LoxFunction> const& func) -> OStream& {
+    return put("<fn " + func->declaration_.name_ + ">");
   }
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
@@ -90,7 +91,7 @@ auto is_truthy(Object const& obj) -> bool {
 
     auto operator()(std::string const& str) -> bool { return true; }
 
-    auto operator()(LoxFunction const& func) -> bool { return true; }
+    auto operator()(Box<LoxFunction> const& func) -> bool { return true; }
   };
 
   return std::visit(Truth{}, obj);
@@ -98,8 +99,8 @@ auto is_truthy(Object const& obj) -> bool {
 
 struct UncallableError : public std::exception {};
 struct Arity {
-  auto operator()(LoxFunction const& func) -> std::size_t {
-    return func.declaration_.params_.size();
+  auto operator()(Box<LoxFunction> const& func) -> std::size_t {
+    return func->declaration_.params_.size();
   }
 
   template <typename T>
@@ -109,18 +110,18 @@ struct Arity {
 };
 
 struct Call {
-  [[nodiscard]] auto operator()(LoxFunction const& func) -> Object {
-    Environment env{&environment_};
+  [[nodiscard]] auto operator()(Box<LoxFunction>& func) -> Object {
+    auto const env{std::make_shared<Environment>(func->closure_)};
 
     std::size_t const arity{std::visit(Arity{}, Object{func})};
 
     for (std::size_t i = 0; i < arity; ++i) {
-      env.define(func.declaration_.params_.at(i), args_.at(i));
+      env->define(func->declaration_.params_.at(i), args_.at(i));
     }
 
     try {
       Interpreter interpreter{env};
-      interpreter.interpret(func.declaration_.body_);
+      interpreter.interpret(func->declaration_.body_);
     } catch (Return const& ret) {
       return ret.value_;
     }
@@ -133,12 +134,12 @@ struct Call {
     throw UncallableError{};
   }
 
-  Environment& environment_;
+  std::shared_ptr<Environment> environment_;
   std::vector<Object> const& args_;
 };
 
 struct ExpressionEvaluator {
-  Environment& environment_;
+  std::shared_ptr<Environment> environment_;
 
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
@@ -158,7 +159,7 @@ struct ExpressionEvaluator {
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
     try {
-      return environment_.get(expr.name_.lexeme_);
+      return environment_->get(expr.name_.lexeme_);
     } catch (std::out_of_range const&) {
       throw RuntimeError{expr.name_.line_,
                          "Undefined variable '" + expr.name_.lexeme_ + "'."};
@@ -170,7 +171,7 @@ struct ExpressionEvaluator {
     Object const value = std::visit(*this, expr->value_);
 
     try {
-      environment_.assign(expr->name_.lexeme_, value);
+      environment_->assign(expr->name_.lexeme_, value);
       return value;
     } catch (std::out_of_range const&) {
       throw RuntimeError(expr->name_.line_,
@@ -236,7 +237,7 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(Box<CallExpression> const& expr) -> Object {
-    Object const callee{std::visit(*this, expr->callee_)};
+    Object callee{std::visit(*this, expr->callee_)};
 
     std::vector<Object> args{};
     for (auto const& arg : expr->arguments_) {
@@ -297,7 +298,7 @@ struct ExpressionEvaluator {
 };
 
 struct StatementExecutor {
-  Environment& environment_;
+  std::shared_ptr<Environment> environment_;
 
   auto operator()(std::monostate) -> void {}
 
@@ -327,13 +328,13 @@ struct StatementExecutor {
             ? std::visit(ExpressionEvaluator{environment_}, stmt.initializer_)
             : std::monostate{}};
 
-    environment_.define(stmt.name_, value);
+    environment_->define(stmt.name_, value);
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
     // Create new environment with the current environment as its
     // enclosing environment
-    Environment env{&environment_};
+    auto const env{std::make_shared<Environment>(environment_)};
 
     // Execute statements in the block with the new environment
     for (Statement const& statement : stmt->statements_) {
@@ -342,8 +343,8 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
-    LoxFunction const f{*stmt};
-    environment_.define(stmt->name_, f);
+    LoxFunction f{*stmt, environment_};
+    environment_->define(stmt->name_, Box{f});
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
@@ -364,9 +365,9 @@ struct StatementExecutor {
 };
 }  // namespace
 
-Interpreter::Interpreter() : Interpreter{Environment{}} {}
+Interpreter::Interpreter() : Interpreter{std::make_shared<Environment>()} {}
 
-Interpreter::Interpreter(Environment const& environment)
+Interpreter::Interpreter(std::shared_ptr<Environment> const& environment)
     : environment_{environment} {}
 
 auto Interpreter::interpret(std::vector<Statement> const& statements) -> void {

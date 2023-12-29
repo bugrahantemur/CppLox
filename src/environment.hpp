@@ -2,6 +2,7 @@
 #define LOX_ENVIRONMENT
 
 #include <map>
+#include <memory>
 
 #include "./types/object.hpp"
 
@@ -9,7 +10,7 @@ namespace {
 template <typename Key, typename Value>
 class env {
  public:
-  env(env* enclosing) : enclosing_(enclosing) {}
+  env(std::shared_ptr<env> const& enclosing) : enclosing_(enclosing) {}
 
   env() : env(nullptr) {}
 
@@ -46,12 +47,12 @@ class env {
  private:
   char const* out_of_range_message{"Environment map"};
 
-  env* enclosing_;
+  std::shared_ptr<env> enclosing_;
 
   std::map<Key, Value> map_;
 };
 }  // namespace
 
-using Environment = env<std::string const, Object>;
+using Environment = env<std::string, Object>;
 
 #endif

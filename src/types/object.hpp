@@ -5,9 +5,8 @@
 #include <variant>
 
 #include "../utils/box.hpp"
-#include "./function.hpp"
 
-using Object =
-    std::variant<std::monostate, bool, double, std::string, LoxFunction>;
+using Object = std::variant<std::monostate, bool, double, std::string,
+                            Box<struct LoxFunction>>;
 
 #endif

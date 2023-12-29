@@ -1,6 +1,7 @@
 #ifndef LOX_INTERPRETER
 #define LOX_INTERPRETER
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -12,11 +13,11 @@ struct Interpreter {
  public:
   Interpreter();
 
-  explicit Interpreter(Environment const& environment);
+  explicit Interpreter(std::shared_ptr<Environment> const& environment);
 
   auto interpret(std::vector<Statement> const& statements) -> void;
 
-  Environment environment_;
+  std::shared_ptr<Environment> environment_;
 };
 
 #endif

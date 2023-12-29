@@ -5,6 +5,7 @@
 #include "./parser.hpp"
 #include "./scanner.hpp"
 #include "./types/expression.hpp"
+#include "./types/function.hpp"
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
 #include "./utils/error.hpp"

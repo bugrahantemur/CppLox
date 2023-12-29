@@ -16,55 +16,25 @@ class Cursor {
   std::size_t current_;
 
  public:
-  explicit Cursor(std::vector<Token> const& tokens)
-      : tokens_(tokens), current_(0){};
+  explicit Cursor(std::vector<Token> const& tokens);
 
   template <typename Type>
-  [[nodiscard]] auto match(Type type) const -> bool {
-    return !is_at_end() && peek().type_ == type;
-  }
+  [[nodiscard]] auto match(Type type) const -> bool;
 
   template <typename Type, typename... Types>
-  [[nodiscard]] auto match(Type type, Types... types) const -> bool {
-    return match(type) || match(types...);
-  }
+  [[nodiscard]] auto match(Type type, Types... types) const -> bool;
 
-  [[nodiscard]] auto peek() const -> Token { return tokens_.at(current_); }
+  [[nodiscard]] auto peek() const -> Token;
 
-  [[nodiscard]] auto is_at_end() const -> bool {
-    return (current_ >= tokens_.size()) || (peek().type_ == TokenType::EOFF);
-  }
+  [[nodiscard]] auto is_at_end() const -> bool;
 
-  auto take() -> Token { return tokens_.at(current_++); }
+  auto take() -> Token;
 
-  auto take(TokenType const& type) -> Token {
-    if (match(type)) {
-      return take();
-    }
+  auto take(TokenType const& type) -> Token;
 
-    throw error(peek(), "Expected " + std::string{magic_enum::enum_name(type)});
-  }
+  auto previous() -> Token;
 
-  auto previous() -> Token {
-    assert(current_ > 0);
-    return tokens_.at(current_ - 1);
-  }
-
-  auto synchronize() -> void {
-    while (!is_at_end()) {
-      if (match(TokenType::CLASS, TokenType::FUN, TokenType::VAR,
-                TokenType::FOR, TokenType::IF, TokenType::WHILE,
-                TokenType::PRINT, TokenType::RETURN)) {
-        return;
-      }
-
-      take();
-
-      if (match(TokenType::SEMICOLON)) {
-        return;
-      }
-    }
-  }
+  auto synchronize() -> void;
 };
 }  // namespace Parser
 

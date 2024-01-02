@@ -151,21 +151,20 @@ auto statement(Cursor& cursor) -> Statement {
   return expression_statement(cursor);
 }
 
-auto parse_params(Cursor& cursor) -> std::vector<std::string> {
-  return Utils::parse_parenthesized_list<std::string>(
-      cursor, [](Cursor& cursor) {
-        return cursor.take(TokenType::IDENTIFIER).lexeme_;
-      });
+auto parse_params(Cursor& cursor) -> std::vector<Token> {
+  return Utils::parse_parenthesized_list<Token>(cursor, [](Cursor& cursor) {
+    return cursor.take(TokenType::IDENTIFIER);
+  });
 }
 
 auto function_declaration(Cursor& cursor) -> Statement {
   Token const name{cursor.take(TokenType::IDENTIFIER)};
 
-  std::vector<std::string> const parameters{parse_params(cursor)};
+  std::vector<Token> const parameters{parse_params(cursor)};
 
   std::vector<Statement> const body{block_statement(cursor)};
 
-  return FunctionStatement{name.lexeme_, parameters, body};
+  return FunctionStatement{name, parameters, body};
 }
 
 auto variable_declaration(Cursor& cursor) -> Statement {
@@ -179,7 +178,7 @@ auto variable_declaration(Cursor& cursor) -> Statement {
 
   cursor.take(TokenType::SEMICOLON);
 
-  return VariableStatement{name.lexeme_, initializer};
+  return VariableStatement{name, initializer};
 }
 
 auto declaration(Cursor& cursor) -> Statement {

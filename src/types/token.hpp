@@ -57,6 +57,19 @@ struct Token {
   std::string lexeme_;
   Literal literal_;
   std::size_t line_;
+
+  auto operator<(Token const& other) const -> bool {
+    if (type_ != other.type_) {
+      return type_ < other.type_;
+    }
+    if (lexeme_ != other.lexeme_) {
+      return lexeme_ < other.lexeme_;
+    }
+    if (literal_ != other.literal_) {
+      return literal_ < other.literal_;
+    }
+    return line_ < other.line_;
+  }
 };
 
 #endif

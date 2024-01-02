@@ -8,6 +8,7 @@
 #include "./environment.hpp"
 #include "./types/object.hpp"
 #include "./types/statement.hpp"
+#include "./types/token.hpp"
 
 struct Interpreter {
  public:
@@ -17,6 +18,9 @@ struct Interpreter {
 
   auto interpret(std::vector<Statement> const& statements) -> void;
 
+  auto resolve(Token const& name, std::size_t distance) -> void;
+
+ private:
   std::shared_ptr<Environment> environment_;
 };
 

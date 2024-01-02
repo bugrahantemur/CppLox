@@ -66,7 +66,7 @@ struct Put {
   }
 
   auto operator()(Box<LoxFunction> const& func) -> OStream& {
-    return put("<fn " + func->declaration_.name_ + ">");
+    return put("<fn " + func->declaration_.name_.lexeme_ + ">");
   }
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
@@ -159,7 +159,7 @@ struct ExpressionEvaluator {
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
     try {
-      return environment_->get(expr.name_.lexeme_);
+      return environment_->get(expr.name_);
     } catch (std::out_of_range const&) {
       throw RuntimeError{expr.name_.line_,
                          "Undefined variable '" + expr.name_.lexeme_ + "'."};
@@ -171,7 +171,7 @@ struct ExpressionEvaluator {
     Object const value = std::visit(*this, expr->value_);
 
     try {
-      environment_->assign(expr->name_.lexeme_, value);
+      environment_->assign(expr->name_, value);
       return value;
     } catch (std::out_of_range const&) {
       throw RuntimeError(expr->name_.line_,
@@ -374,4 +374,8 @@ auto Interpreter::interpret(std::vector<Statement> const& statements) -> void {
   for (auto const& stmt : statements) {
     std::visit(StatementExecutor{environment_}, stmt);
   }
+}
+
+auto Interpreter::resolve(Token const& name, std::size_t distance) -> void {
+  environment_->resolve(name, distance);
 }

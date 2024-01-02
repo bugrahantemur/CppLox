@@ -3,15 +3,41 @@
 
 #include "./interpreter.hpp"
 #include "./types/statement.hpp"
+#include "./utils/error.hpp"
+
+namespace Resolve {
+struct Error : LoxError {
+  std::size_t line_;
+  std::string message_;
+
+  auto report() const -> void final {
+    std::cerr << "[line " << line_ << "] Resolver error: " << message_ << '\n';
+  }
+};
+
+auto error(std::size_t line, std::string const& message) -> Error {
+  return Error{line, message};
+}
+}  // namespace Resolve
 
 class Resolver {
  public:
+  Resolver(Interpreter& interpreter) : interpreter_{interpreter}, scopes_{} {}
+
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(Box<BlockStatement> const& stmt) -> void {
-    begin_scope();
-    resolve(stmt);
-    end_scope();
+  auto operator()(ExpressionStatement const& stmt) -> void {
+    resolve(stmt.expression_);
+  }
+
+  auto operator()(PrintStatement const& stmt) -> void {
+    resolve(stmt.expression_);
+  }
+
+  auto operator()(ReturnStatement const& stmt) -> void {
+    if (!std::holds_alternative<std::monostate>(stmt.value_)) {
+      resolve(stmt.value_);
+    }
   }
 
   auto operator()(VariableStatement const& stmt) -> void {
@@ -20,12 +46,72 @@ class Resolver {
     define(stmt.name_);
   }
 
+  auto operator()(Box<BlockStatement> const& stmt) -> void {
+    begin_scope();
+    resolve(stmt);
+    end_scope();
+  }
+
+  auto operator()(Box<FunctionStatement> const& stmt) -> void {
+    declare(stmt->name_);
+    define(stmt->name_);
+
+    resolve_function(*stmt);
+  }
+
+  auto operator()(Box<IfStatement> const& stmt) -> void {
+    resolve(stmt->condition_);
+    resolve(stmt->then_branch_);
+    if (!std::holds_alternative<std::monostate>(stmt->else_branch_)) {
+      resolve(stmt->else_branch_);
+    }
+  }
+
+  auto operator()(Box<WhileStatement> const& stmt) -> void {
+    resolve(stmt->condition_);
+    resolve(stmt->body_);
+  }
+
+  auto operator()(LiteralExpression const& expr) -> void {}
+
   auto operator()(VariableExpression const& expr) -> void {
     if (!scopes_.empty() && !scopes_.back()[expr.name_.lexeme_]) {
-      error(expr.name_, "Can't read local variable in its own initializer.");
+      throw Resolve::error(expr.name_.line_,
+                           "Can't read local variable in its own initializer.");
     }
 
-    resolve_local(expr, expr.name_.lexeme_);
+    resolve_local(expr.name_);
+  }
+
+  auto operator()(Box<AssignmentExpression> const& expr) -> void {
+    resolve(expr->value_);
+    resolve_local(expr->name_);
+  }
+
+  auto operator()(Box<BinaryExpression> const& expr) -> void {
+    resolve(expr->left_);
+    resolve(expr->right_);
+  }
+
+  auto operator()(Box<CallExpression> const& expr) -> void {
+    resolve(expr->callee_);
+
+    for (Expression const& argument : expr->arguments_) {
+      resolve(argument);
+    }
+  }
+
+  auto operator()(Box<GroupingExpression> const& expr) -> void {
+    resolve(expr->expression_);
+  }
+
+  auto operator()(Box<LogicalExpression> const& expr) -> void {
+    resolve(expr->left_);
+    resolve(expr->right_);
+  }
+
+  auto operator()(Box<UnaryExpression> const& expr) -> void {
+    resolve(expr->right_);
   }
 
  private:
@@ -45,10 +131,9 @@ class Resolver {
     }
   }
 
-  template <typename T>
-  auto resolve(T const& t) -> void {
-    std::visit(*this, t);
-  }
+  auto resolve(Expression const& expr) -> void { std::visit(*this, expr); }
+
+  auto resolve(Statement const& stmt) -> void { std::visit(*this, stmt); }
 
   auto resolve(std::vector<Statement> const& statements) -> void {
     for (auto const& statement : statements) {
@@ -56,15 +141,26 @@ class Resolver {
     }
   }
 
-  auto resolve_local(Expression const& expr, std::string const& name) -> void {
+  auto resolve_local(Token const& name) -> void {
     for (auto scope = scopes_.crbegin(); scope != scopes_.crend(); ++scope) {
-      if (scope->find(name) != scope->end()) {
-        interpreter_.resolve(expr, std::distance(scopes_.crbegin(), scope));
+      if (scope->find(name.lexeme_) != scope->end()) {
+        interpreter_.resolve(name, std::distance(scopes_.crbegin(), scope));
         return;
       }
     }
   }
 
-  Interpreter const& interpreter_;
+  auto resolve_function(FunctionStatement const& stmt) -> void {
+    begin_scope();
+
+    for (std::string const& param : stmt.params_) {
+      declare(param);
+      define(param);
+    }
+    resolve(stmt.body_);
+    end_scope();
+  }
+
+  Interpreter& interpreter_;
   std::vector<std::unordered_map<std::string, bool>> scopes_;
 };

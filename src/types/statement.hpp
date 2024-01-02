@@ -23,7 +23,7 @@ struct ReturnStatement {
 };
 
 struct VariableStatement {
-  std::string name_;
+  Token name_;
   Expression initializer_;
 };
 
@@ -38,8 +38,8 @@ struct BlockStatement {
 };
 
 struct FunctionStatement {
-  std::string name_;
-  std::vector<std::string> params_;
+  Token name_;
+  std::vector<Token> params_;
   std::vector<Statement> body_;
 };
 

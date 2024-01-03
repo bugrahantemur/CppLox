@@ -3,6 +3,7 @@
 
 #include "./interpreter.hpp"
 #include "./parser/parser.hpp"
+#include "./resolver.hpp"
 #include "./scanner.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"
@@ -44,13 +45,19 @@ class Lox {
     try {
       std::vector<Token> const tokens = Scanner::scan_tokens(contents);
       std::vector<Statement> const statements = Parser::parse(tokens);
-      interpreter.interpret(statements);
-    } catch (RuntimeError const &e) {
-      had_runtime_error = true;
+      std::map<Token, std::size_t> const resolution =
+          Resolver::resolve(statements);
+
+      for (auto const &res : resolution) {
+        std::cout << res.first.lexeme_ << " -> " << res.second << '\n';
+      }
+      interpreter.interpret(statements, resolution);
+    } catch (CompileTimeError const &e) {
+      had_error = true;
       e.report();
       return;
-    } catch (LoxError const &e) {
-      had_error = true;
+    } catch (RuntimeError const &e) {
+      had_runtime_error = true;
       e.report();
       return;
     } catch (std::exception const &e) {

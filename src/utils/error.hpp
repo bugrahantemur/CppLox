@@ -7,18 +7,18 @@
 
 #include "../types/token.hpp"
 
-struct LoxError : std::exception {
+struct CompileTimeError : std::exception {
   virtual auto report() const -> void = 0;
 };
 
-struct RuntimeError : LoxError {
+struct RuntimeError : std::exception {
   RuntimeError(std::size_t line, std::string const& message)
       : line_(line), message_(message) {}
 
   std::size_t line_;
   std::string message_;
 
-  auto report() const -> void final {
+  auto report() const -> void {
     std::cerr << "[line " << line_ << "] " << message_ << '\n';
   }
 };

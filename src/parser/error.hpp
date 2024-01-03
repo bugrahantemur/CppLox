@@ -8,7 +8,7 @@
 #include "../utils/error.hpp"
 
 namespace Parser {
-struct Error : LoxError {
+struct Error : CompileTimeError {
   Error(std::size_t line, std::string const& where, std::string const& message);
 
   std::size_t line_;

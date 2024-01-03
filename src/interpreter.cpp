@@ -116,12 +116,12 @@ struct Call {
     std::size_t const arity{std::visit(Arity{}, Object{func})};
 
     for (std::size_t i = 0; i < arity; ++i) {
-      env->define(func->declaration_.params_.at(i), args_.at(i));
+      env->define(func->declaration_.params_.at(i).lexeme_, args_.at(i));
     }
 
     try {
       Interpreter interpreter{env};
-      interpreter.interpret(func->declaration_.body_);
+      interpreter.interpret(func->declaration_.body_, resolution_);
     } catch (Return const& ret) {
       return ret.value_;
     }
@@ -135,11 +135,13 @@ struct Call {
   }
 
   std::shared_ptr<Environment> environment_;
+  std::map<Token, std::size_t> const& resolution_;
   std::vector<Object> const& args_;
 };
 
 struct ExpressionEvaluator {
   std::shared_ptr<Environment> environment_;
+  std::map<Token, std::size_t> const& resolution_;
 
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
@@ -158,25 +160,27 @@ struct ExpressionEvaluator {
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
-    try {
-      return environment_->get(expr.name_);
-    } catch (std::out_of_range const&) {
-      throw RuntimeError{expr.name_.line_,
-                         "Undefined variable '" + expr.name_.lexeme_ + "'."};
+    if (auto const found{resolution_.find(expr.name_)};
+        found != resolution_.end()) {
+      std::size_t const distance = found->second;
+      return environment_->get_at(expr.name_.lexeme_, distance);
+    } else {
+      throw std::runtime_error{expr.name_.lexeme_ + " is not defined"};
     }
   }
 
   [[nodiscard]] auto operator()(Box<AssignmentExpression> const& expr)
       -> Object {
-    Object const value = std::visit(*this, expr->value_);
-
-    try {
-      environment_->assign(expr->name_, value);
-      return value;
-    } catch (std::out_of_range const&) {
-      throw RuntimeError(expr->name_.line_,
-                         "Undefined variable '" + expr->name_.lexeme_ + "'.");
+    Object const value{std::visit(*this, expr->value_)};
+    if (auto const found{resolution_.find(expr->name_)};
+        found != resolution_.end()) {
+      std::size_t const distance = found->second;
+      environment_->assign_at(expr->name_.lexeme_, value, distance);
+    } else {
+      throw std::runtime_error{expr->name_.lexeme_ + " is not defined"};
     }
+
+    return value;
   }
 
   [[nodiscard]] auto operator()(Box<BinaryExpression> const& expr) -> Object {
@@ -252,7 +256,7 @@ struct ExpressionEvaluator {
                                " arguments but got " +
                                std::to_string(args.size()) + "."};
       }
-      return std::visit(Call{environment_, args}, callee);
+      return std::visit(Call{environment_, resolution_, args}, callee);
     } catch (UncallableError const& e) {
       throw RuntimeError{expr->paren_.line_,
                          "Can only call functions and classes."};
@@ -299,24 +303,26 @@ struct ExpressionEvaluator {
 
 struct StatementExecutor {
   std::shared_ptr<Environment> environment_;
+  std::map<Token, std::size_t> const& resolution_;
 
   auto operator()(std::monostate) -> void {}
 
   auto operator()(ExpressionStatement const& stmt) -> void {
-    static_cast<void>(
-        std::visit(ExpressionEvaluator{environment_}, stmt.expression_));
+    static_cast<void>(std::visit(ExpressionEvaluator{environment_, resolution_},
+                                 stmt.expression_));
   }
 
   auto operator()(PrintStatement const& stmt) -> void {
-    Object const value{
-        std::visit(ExpressionEvaluator{environment_}, stmt.expression_)};
+    Object const value{std::visit(
+        ExpressionEvaluator{environment_, resolution_}, stmt.expression_)};
     std::visit(Put{std::cout}, value);
   }
 
   auto operator()(ReturnStatement const& stmt) -> void {
     Object const value{
         !std::holds_alternative<std::monostate>(stmt.value_)
-            ? std::visit(ExpressionEvaluator{environment_}, stmt.value_)
+            ? std::visit(ExpressionEvaluator{environment_, resolution_},
+                         stmt.value_)
             : std::monostate{}};
 
     throw Return{value};
@@ -325,10 +331,11 @@ struct StatementExecutor {
   auto operator()(VariableStatement const& stmt) -> void {
     Object const value{
         !std::holds_alternative<std::monostate>(stmt.initializer_)
-            ? std::visit(ExpressionEvaluator{environment_}, stmt.initializer_)
+            ? std::visit(ExpressionEvaluator{environment_, resolution_},
+                         stmt.initializer_)
             : std::monostate{}};
 
-    environment_->define(stmt.name_, value);
+    environment_->define(stmt.name_.lexeme_, value);
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
@@ -338,18 +345,18 @@ struct StatementExecutor {
 
     // Execute statements in the block with the new environment
     for (Statement const& statement : stmt->statements_) {
-      std::visit(StatementExecutor{env}, statement);
+      std::visit(StatementExecutor{env, resolution_}, statement);
     }
   }
 
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
     LoxFunction f{*stmt, environment_};
-    environment_->define(stmt->name_, Box{f});
+    environment_->define(stmt->name_.lexeme_, Box{f});
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
-    if (is_truthy(
-            std::visit(ExpressionEvaluator{environment_}, stmt->condition_))) {
+    if (is_truthy(std::visit(ExpressionEvaluator{environment_, resolution_},
+                             stmt->condition_))) {
       std::visit(*this, stmt->then_branch_);
     } else {
       std::visit(*this, stmt->else_branch_);
@@ -357,8 +364,8 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<WhileStatement> const& stmt) -> void {
-    while (is_truthy(
-        std::visit(ExpressionEvaluator{environment_}, stmt->condition_))) {
+    while (is_truthy(std::visit(ExpressionEvaluator{environment_, resolution_},
+                                stmt->condition_))) {
       std::visit(*this, stmt->body_);
     }
   }
@@ -370,12 +377,10 @@ Interpreter::Interpreter() : Interpreter{std::make_shared<Environment>()} {}
 Interpreter::Interpreter(std::shared_ptr<Environment> const& environment)
     : environment_{environment} {}
 
-auto Interpreter::interpret(std::vector<Statement> const& statements) -> void {
+auto Interpreter::interpret(std::vector<Statement> const& statements,
+                            std::map<Token, std::size_t> const& resolution)
+    -> void {
   for (auto const& stmt : statements) {
-    std::visit(StatementExecutor{environment_}, stmt);
+    std::visit(StatementExecutor{environment_, resolution}, stmt);
   }
-}
-
-auto Interpreter::resolve(Token const& name, std::size_t distance) -> void {
-  environment_->resolve(name, distance);
 }

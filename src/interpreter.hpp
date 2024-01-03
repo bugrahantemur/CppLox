@@ -16,12 +16,12 @@ struct Interpreter {
 
   explicit Interpreter(std::shared_ptr<Environment> const& environment);
 
-  auto interpret(std::vector<Statement> const& statements) -> void;
+  auto interpret(std::vector<Statement> const& statements,
+                 std::map<Token, std::size_t> const& resolution) -> void;
 
-  auto resolve(Token const& name, std::size_t distance) -> void;
-
- private:
   std::shared_ptr<Environment> environment_;
+
+  std::shared_ptr<Environment> global_environment_;
 };
 
 #endif

@@ -120,8 +120,7 @@ struct Call {
     }
 
     try {
-      Interpreter interpreter{env};
-      interpreter.interpret(func->declaration_.body_, resolution_);
+      Interpreter::interpret(func->declaration_.body_, resolution_, env);
     } catch (Return const& ret) {
       return ret.value_;
     }
@@ -374,15 +373,18 @@ struct StatementExecutor {
 };
 }  // namespace
 
-Interpreter::Interpreter() : Interpreter{std::make_shared<Environment>()} {}
-
-Interpreter::Interpreter(std::shared_ptr<Environment> const& environment)
-    : environment_{environment} {}
+auto Interpreter::interpret(std::vector<Statement> const& statements,
+                            std::map<Token, std::size_t> const& resolution,
+                            std::shared_ptr<Environment> const& environment)
+    -> void {
+  for (auto const& stmt : statements) {
+    std::visit(StatementExecutor{environment, resolution}, stmt);
+  }
+}
 
 auto Interpreter::interpret(std::vector<Statement> const& statements,
                             std::map<Token, std::size_t> const& resolution)
     -> void {
-  for (auto const& stmt : statements) {
-    std::visit(StatementExecutor{environment_, resolution}, stmt);
-  }
+  auto const env{std::make_shared<Environment>()};
+  interpret(statements, resolution, env);
 }

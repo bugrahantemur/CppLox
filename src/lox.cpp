@@ -36,7 +36,7 @@ class Lox {
       std::vector<Statement> const statements = Parser::parse(tokens);
       std::map<Token, std::size_t> const resolution =
           Resolver::resolve(statements);
-      interpreter.interpret(statements, resolution);
+      Interpreter::interpret(statements, resolution);
     } catch (CompileTimeError const &e) {
       had_error = true;
       e.report();
@@ -51,8 +51,6 @@ class Lox {
       return;
     }
   }
-
-  Interpreter interpreter;
 
   bool had_error{false};
   bool had_runtime_error{false};

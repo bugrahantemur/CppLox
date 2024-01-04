@@ -10,16 +10,15 @@
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
 
-struct Interpreter {
- public:
-  Interpreter();
+namespace Interpreter {
 
-  explicit Interpreter(std::shared_ptr<Environment> const& environment);
+auto interpret(std::vector<Statement> const& statements,
+               std::map<Token, std::size_t> const& resolution,
+               std::shared_ptr<Environment> const& env) -> void;
 
-  auto interpret(std::vector<Statement> const& statements,
-                 std::map<Token, std::size_t> const& resolution) -> void;
+auto interpret(std::vector<Statement> const& statements,
+               std::map<Token, std::size_t> const& resolution) -> void;
 
-  std::shared_ptr<Environment> environment_;
-};
+}  // namespace Interpreter
 
 #endif

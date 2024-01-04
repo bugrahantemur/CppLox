@@ -48,9 +48,6 @@ class Lox {
       std::map<Token, std::size_t> const resolution =
           Resolver::resolve(statements);
 
-      for (auto const &res : resolution) {
-        std::cout << res.first.lexeme_ << " -> " << res.second << '\n';
-      }
       interpreter.interpret(statements, resolution);
     } catch (CompileTimeError const &e) {
       had_error = true;

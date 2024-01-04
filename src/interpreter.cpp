@@ -165,7 +165,8 @@ struct ExpressionEvaluator {
       std::size_t const distance = found->second;
       return environment_->get_at(expr.name_.lexeme_, distance);
     } else {
-      throw std::runtime_error{expr.name_.lexeme_ + " is not defined"};
+      throw RuntimeError{expr.name_.line_,
+                         expr.name_.lexeme_ + " is not defined"};
     }
   }
 
@@ -177,7 +178,8 @@ struct ExpressionEvaluator {
       std::size_t const distance = found->second;
       environment_->assign_at(expr->name_.lexeme_, value, distance);
     } else {
-      throw std::runtime_error{expr->name_.lexeme_ + " is not defined"};
+      throw RuntimeError{expr->name_.line_,
+                         expr->name_.lexeme_ + " is not defined"};
     }
 
     return value;

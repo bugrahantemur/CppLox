@@ -29,7 +29,7 @@ class NameResolver {
  public:
   NameResolver(std::map<Token, std::size_t>& resolution)
       : resolution_{resolution},
-        scopes_{},
+        scopes_{{}},  // TODO add global names here
         current_function_type_{FunctionType::NONE} {}
 
   auto resolve(Expression const& expr) -> void { std::visit(*this, expr); }

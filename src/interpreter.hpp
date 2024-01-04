@@ -20,8 +20,6 @@ struct Interpreter {
                  std::map<Token, std::size_t> const& resolution) -> void;
 
   std::shared_ptr<Environment> environment_;
-
-  std::shared_ptr<Environment> global_environment_;
 };
 
 #endif

@@ -10,15 +10,14 @@
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
 #include "./utils/error.hpp"
-#include "./utils/printer.hpp"
 #include "./utils/reader.hpp"
 
 class Lox {
  public:
-  auto run_file(std::string const &file_path) -> void {
+  auto run(std::string const &file_path) -> void {
     auto const file_contents = Reader::read_file(file_path);
 
-    run(file_contents);
+    do_run(file_contents);
 
     if (had_error) {
       std::exit(65);
@@ -29,25 +28,14 @@ class Lox {
     }
   }
 
-  auto run_prompt() -> void {
-    Printer::print_prompt_marker(std::cout);
-
-    for (std::string line; std::getline(std::cin, line);) {
-      run(line);
-      had_error = false;
-      Printer::print_prompt_marker(std::cout);
-    }
-  };
-
  private:
-  auto run(std::string const &contents) -> void {
+  auto do_run(std::string const &contents) -> void {
     Expression expr;
     try {
       std::vector<Token> const tokens = Scanner::scan_tokens(contents);
       std::vector<Statement> const statements = Parser::parse(tokens);
       std::map<Token, std::size_t> const resolution =
           Resolver::resolve(statements);
-
       interpreter.interpret(statements, resolution);
     } catch (CompileTimeError const &e) {
       had_error = true;
@@ -71,15 +59,11 @@ class Lox {
 };
 
 auto main(int argc, char *argv[]) -> int {
-  if (argc > 2) {
-    Printer::print_too_many_arguments(std::cout);
+  if (argc != 2) {
+    std::cout << "Wrong! Correct usage: cpplox [script]\n";
   } else {
     Lox lox;
-    if (argc == 2) {
-      lox.run_file(argv[1]);
-    } else {
-      lox.run_prompt();
-    }
+    lox.run(argv[1]);
   }
   return 0;
 }

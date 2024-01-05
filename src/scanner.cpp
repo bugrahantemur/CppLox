@@ -87,6 +87,8 @@ class Cursor {
     return true;
   }
 
+  [[nodiscard]] auto index() const -> std::size_t { return current_; }
+
  private:
   std::string const& source_;
   std::size_t start_;
@@ -102,7 +104,7 @@ auto error(std::size_t const line, std::string message) -> void {
                               Token::Literal const& literal = std::monostate{})
     -> Token {
   std::string const text = cursor.peek_word();
-  return Token{token_type, text, literal, cursor.at_line()};
+  return Token{token_type, text, literal, cursor.at_line(), cursor.index()};
 }
 
 [[nodiscard]] auto handle_string_literal(Cursor& cursor) -> Token {
@@ -284,8 +286,8 @@ namespace Scanner {
     }
   }
 
-  tokens.emplace_back(
-      Token{TokenType::EOFF, "", std::monostate{}, cursor.at_line()});
+  tokens.emplace_back(Token{TokenType::EOFF, "", std::monostate{},
+                            cursor.at_line(), cursor.index()});
 
   return tokens;
 }

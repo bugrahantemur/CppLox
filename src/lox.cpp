@@ -34,7 +34,7 @@ class Lox {
     try {
       std::vector<Token> const tokens = Scanner::scan_tokens(contents);
       std::vector<Statement> const statements = Parser::parse(tokens);
-      std::map<Token, std::size_t> const resolution =
+      std::unordered_map<Token, std::size_t> const resolution =
           Resolver::resolve(statements);
       Interpreter::interpret(statements, resolution);
     } catch (CompileTimeError const &e) {

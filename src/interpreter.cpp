@@ -134,13 +134,13 @@ struct Call {
   }
 
   std::shared_ptr<Environment> environment_;
-  std::map<Token, std::size_t> const& resolution_;
+  std::unordered_map<Token, std::size_t> const& resolution_;
   std::vector<Object> const& args_;
 };
 
 struct ExpressionEvaluator {
   std::shared_ptr<Environment> environment_;
-  std::map<Token, std::size_t> const& resolution_;
+  std::unordered_map<Token, std::size_t> const& resolution_;
 
   [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
 
@@ -304,7 +304,7 @@ struct ExpressionEvaluator {
 
 struct StatementExecutor {
   std::shared_ptr<Environment> environment_;
-  std::map<Token, std::size_t> const& resolution_;
+  std::unordered_map<Token, std::size_t> const& resolution_;
 
   auto operator()(std::monostate) -> void {}
 
@@ -373,18 +373,18 @@ struct StatementExecutor {
 };
 }  // namespace
 
-auto Interpreter::interpret(std::vector<Statement> const& statements,
-                            std::map<Token, std::size_t> const& resolution,
-                            std::shared_ptr<Environment> const& environment)
-    -> void {
+auto Interpreter::interpret(
+    std::vector<Statement> const& statements,
+    std::unordered_map<Token, std::size_t> const& resolution,
+    std::shared_ptr<Environment> const& environment) -> void {
   for (auto const& stmt : statements) {
     std::visit(StatementExecutor{environment, resolution}, stmt);
   }
 }
 
-auto Interpreter::interpret(std::vector<Statement> const& statements,
-                            std::map<Token, std::size_t> const& resolution)
-    -> void {
+auto Interpreter::interpret(
+    std::vector<Statement> const& statements,
+    std::unordered_map<Token, std::size_t> const& resolution) -> void {
   auto const env{std::make_shared<Environment>()};
   interpret(statements, resolution, env);
 }

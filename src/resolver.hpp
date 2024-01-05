@@ -1,5 +1,4 @@
 #include <iostream>
-#include <map>
 #include <unordered_map>
 #include <vector>
 
@@ -27,7 +26,7 @@ auto error(std::size_t line, std::string const& message) -> Error {
 
 class NameResolver {
  public:
-  NameResolver(std::map<Token, std::size_t>& resolution)
+  NameResolver(std::unordered_map<Token, std::size_t>& resolution)
       : resolution_{resolution},
         scopes_{{}},  // TODO add global names here
         current_function_type_{FunctionType::NONE} {}
@@ -193,13 +192,13 @@ class NameResolver {
   std::vector<std::unordered_map<std::string, bool>> scopes_;
   FunctionType current_function_type_;
 
-  std::map<Token, std::size_t>& resolution_;
+  std::unordered_map<Token, std::size_t>& resolution_;
 };
 
 namespace Resolver {
 auto resolve(std::vector<Statement> const& statements)
-    -> std::map<Token, std::size_t> {
-  std::map<Token, std::size_t> resolution;
+    -> std::unordered_map<Token, std::size_t> {
+  std::unordered_map<Token, std::size_t> resolution;
   NameResolver resolver{resolution};
 
   for (Statement const& statement : statements) {

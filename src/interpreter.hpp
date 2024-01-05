@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "./environment.hpp"
@@ -13,11 +14,12 @@
 namespace Interpreter {
 
 auto interpret(std::vector<Statement> const& statements,
-               std::map<Token, std::size_t> const& resolution,
+               std::unordered_map<Token, std::size_t> const& resolution,
                std::shared_ptr<Environment> const& env) -> void;
 
 auto interpret(std::vector<Statement> const& statements,
-               std::map<Token, std::size_t> const& resolution) -> void;
+               std::unordered_map<Token, std::size_t> const& resolution)
+    -> void;
 
 }  // namespace Interpreter
 

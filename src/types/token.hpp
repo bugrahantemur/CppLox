@@ -57,18 +57,17 @@ struct Token {
   std::string lexeme_;
   Literal literal_;
   std::size_t line_;
+  std::size_t token_id_;
 
-  auto operator<(Token const& other) const -> bool {
-    if (type_ != other.type_) {
-      return type_ < other.type_;
-    }
-    if (lexeme_ != other.lexeme_) {
-      return lexeme_ < other.lexeme_;
-    }
-    if (literal_ != other.literal_) {
-      return literal_ < other.literal_;
-    }
-    return line_ < other.line_;
+  auto operator==(Token const& other) const -> bool {
+    return token_id_ == other.token_id_;
+  }
+};
+
+template <>
+struct std::hash<Token> {
+  auto operator()(Token const& token) const -> std::size_t {
+    return token.token_id_;
   }
 };
 

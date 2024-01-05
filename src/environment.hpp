@@ -7,12 +7,13 @@
 
 #include "./types/object.hpp"
 #include "./types/token.hpp"
+#include "./utils/error.hpp"
 
 namespace {
 template <typename Key, typename Value>
 class env {
  public:
-  env(std::shared_ptr<env> const& enclosing) : enclosing_(enclosing) {}
+  explicit env(std::shared_ptr<env> const& enclosing) : enclosing_(enclosing) {}
 
   env() : enclosing_(nullptr) {}
 

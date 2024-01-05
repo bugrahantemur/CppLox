@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "./builtins.hpp"
+#include "./types/class.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"
 #include "./types/object.hpp"
@@ -69,6 +70,10 @@ struct Put {
     return put("<fn " + func->declaration_.name_.lexeme_ + ">");
   }
 
+  auto operator()(Box<LoxClass> const& klass) -> OStream& {
+    return put("<class " + klass->name_ + ">");
+  }
+
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
 
  private:
@@ -81,21 +86,18 @@ struct Put {
   OStream& out_;
 };
 
-auto is_truthy(Object const& obj) -> bool {
-  struct Truth {
-    auto operator()(std::monostate) -> bool { return false; }
+struct Truth {
+  auto operator()(std::monostate) -> bool { return false; }
 
-    auto operator()(bool b) -> bool { return b; }
+  auto operator()(bool b) -> bool { return b; }
 
-    auto operator()(double number) -> bool { return true; }
+  template <typename T>
+  auto operator()(T const& number) -> bool {
+    return true;
+  }
+};
 
-    auto operator()(std::string const& str) -> bool { return true; }
-
-    auto operator()(Box<LoxFunction> const& func) -> bool { return true; }
-  };
-
-  return std::visit(Truth{}, obj);
-}
+auto is_truthy(Object const& obj) -> bool { return std::visit(Truth{}, obj); }
 
 struct UncallableError : public std::exception {};
 struct Arity {
@@ -340,6 +342,12 @@ struct StatementExecutor {
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
     LoxFunction f{*stmt, environment_};
     environment_->define(stmt->name_.lexeme_, Box{f});
+  }
+
+  auto operator()(Box<ClassStatement> const& stmt) -> void {
+    environment_->define(stmt->name_.lexeme_, std::monostate{});
+    LoxClass klass{stmt->name_.lexeme_};
+    environment_->assign(stmt->name_.lexeme_, Box{klass});
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {

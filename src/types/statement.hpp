@@ -30,8 +30,8 @@ struct VariableStatement {
 using Statement =
     std::variant<std::monostate, ExpressionStatement, PrintStatement,
                  ReturnStatement, VariableStatement, Box<struct BlockStatement>,
-                 Box<struct FunctionStatement>, Box<struct IfStatement>,
-                 Box<struct WhileStatement>>;
+                 Box<struct FunctionStatement>, Box<struct ClassStatement>,
+                 Box<struct IfStatement>, Box<struct WhileStatement>>;
 
 struct BlockStatement {
   std::vector<Statement> statements_;
@@ -41,6 +41,11 @@ struct FunctionStatement {
   Token name_;
   std::vector<Token> params_;
   std::vector<Statement> body_;
+};
+
+struct ClassStatement {
+  Token name_;
+  std::vector<Box<FunctionStatement>> methods_;
 };
 
 struct IfStatement {

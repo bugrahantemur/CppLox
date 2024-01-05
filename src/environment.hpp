@@ -25,9 +25,15 @@ class env {
     return ancestor(distance)->map_.at(name);
   }
 
+  auto get(Key const& name) -> Value { return get_at(name, 0); }
+
   auto assign_at(Key const& name, Value const& value, std::size_t distance)
       -> void {
     ancestor(distance)->map_[name] = value;
+  }
+
+  auto assign(Key const& name, Value const& value) -> void {
+    assign_at(name, value, 0);
   }
 
  private:

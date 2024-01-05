@@ -7,6 +7,6 @@
 #include "../utils/box.hpp"
 
 using Object = std::variant<std::monostate, bool, double, std::string,
-                            Box<struct LoxFunction>>;
+                            Box<struct LoxFunction>, Box<struct LoxClass>>;
 
 #endif

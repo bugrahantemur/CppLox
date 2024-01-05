@@ -79,6 +79,11 @@ class NameResolver {
     resolve_function(*stmt, FunctionType::FUNCTION);
   }
 
+  auto operator()(Box<ClassStatement> const& stmt) -> void {
+    declare(stmt->name_);
+    define(stmt->name_);
+  }
+
   auto operator()(Box<IfStatement> const& stmt) -> void {
     resolve(stmt->condition_);
     resolve(stmt->then_branch_);

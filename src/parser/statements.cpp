@@ -11,6 +11,7 @@ namespace Parser::Statements {
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::PRINT);
+  static_cast<void>(keyword);
 
   Expression const value{Expressions::expression(cursor)};
 
@@ -28,6 +29,7 @@ auto expression_statement(Cursor& cursor) -> Statement {
 auto block_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::LEFT_BRACE);
+  static_cast<void>(keyword);
 
   std::vector<Statement> statements{};
 
@@ -37,12 +39,13 @@ auto block_statement(Cursor& cursor) -> Statement {
 
   cursor.take(TokenType::RIGHT_BRACE);
 
-  return BlockStatement{statements};
+  return Box{BlockStatement{statements}};
 }
 
 auto if_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::IF);
+  static_cast<void>(keyword);
 
   cursor.take(TokenType::LEFT_PAREN);
   Expression const condition{Expressions::expression(cursor)};
@@ -56,23 +59,25 @@ auto if_statement(Cursor& cursor) -> Statement {
     else_branch = statement(cursor);
   }
 
-  return IfStatement{condition, then_branch, else_branch};
+  return Box{IfStatement{condition, then_branch, else_branch}};
 }
 
 auto while_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::WHILE);
+  static_cast<void>(keyword);
 
   cursor.take(TokenType::LEFT_PAREN);
   Expression const condition{Expressions::expression(cursor)};
   cursor.take(TokenType::RIGHT_PAREN);
 
-  return WhileStatement{condition, statement(cursor)};
+  return Box{WhileStatement{condition, statement(cursor)}};
 }
 
 auto for_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::FOR);
+  static_cast<void>(keyword);
 
   cursor.take(TokenType::LEFT_PAREN);
 
@@ -99,12 +104,13 @@ auto for_statement(Cursor& cursor) -> Statement {
 
   Statement const body{statement(cursor)};
 
-  return BlockStatement{
+  return Box{BlockStatement{
       {initializer,
-       WhileStatement{std::holds_alternative<std::monostate>(condition)
-                          ? LiteralExpression{true}
-                          : condition,
-                      BlockStatement{{body, ExpressionStatement{increment}}}}}};
+       WhileStatement{
+           std::holds_alternative<std::monostate>(condition)
+               ? LiteralExpression{true}
+               : condition,
+           BlockStatement{{body, ExpressionStatement{increment}}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {
@@ -147,17 +153,50 @@ auto parse_params(Cursor& cursor) -> std::vector<Token> {
   });
 }
 
-auto function_declaration(Cursor& cursor) -> Statement {
+enum class FunctionType { Function, Method };
+
+auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
+  if (type == FunctionType::Function) {
+    Token const keyword{cursor.take()};
+    assert(keyword.type_ == TokenType::FUN);
+    static_cast<void>(keyword);
+  }
+
   Token const name{cursor.take(TokenType::IDENTIFIER)};
 
   std::vector<Token> const parameters{parse_params(cursor)};
 
   std::vector<Statement> const body{block_statement(cursor)};
 
-  return FunctionStatement{name, parameters, body};
+  return Box{FunctionStatement{name, parameters, body}};
+}
+
+auto class_declaration(Cursor& cursor) -> Statement {
+  Token const keyword{cursor.take()};
+  assert(keyword.type_ == TokenType::CLASS);
+  static_cast<void>(keyword);
+
+  Token const name{cursor.take(TokenType::IDENTIFIER)};
+
+  cursor.take(TokenType::LEFT_BRACE);
+
+  std::vector<Box<FunctionStatement>> methods{};
+
+  while (!cursor.match(TokenType::RIGHT_BRACE)) {
+    methods.emplace_back(*std::get<Box<FunctionStatement>>(
+        function_declaration(cursor, FunctionType::Method)));
+  }
+
+  cursor.take(TokenType::RIGHT_BRACE);
+
+  return Box{ClassStatement{name, methods}};
 }
 
 auto variable_declaration(Cursor& cursor) -> Statement {
+  Token const keyword{cursor.take()};
+  assert(keyword.type_ == TokenType::VAR);
+  static_cast<void>(keyword);
+
   Token const name{cursor.take(TokenType::IDENTIFIER)};
 
   Expression initializer{std::monostate{}};
@@ -174,11 +213,12 @@ auto variable_declaration(Cursor& cursor) -> Statement {
 auto declaration(Cursor& cursor) -> Statement {
   try {
     if (cursor.match(TokenType::FUN)) {
-      cursor.take();
-      return function_declaration(cursor);
+      return function_declaration(cursor, FunctionType::Function);
+    }
+    if (cursor.match(TokenType::CLASS)) {
+      return class_declaration(cursor);
     }
     if (cursor.match(TokenType::VAR)) {
-      cursor.take();
       return variable_declaration(cursor);
     }
     return statement(cursor);

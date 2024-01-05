@@ -92,29 +92,19 @@ auto for_statement(Cursor& cursor) -> Statement {
   }
   cursor.take(TokenType::SEMICOLON);
 
-  Expression increment{std::monostate{}};
-  if (!cursor.match(TokenType::RIGHT_PAREN)) {
-    increment = Expressions::expression(cursor);
-  }
+  Expression const increment{cursor.match(TokenType::RIGHT_PAREN)
+                                 ? std::monostate{}
+                                 : Expressions::expression(cursor)};
   cursor.take(TokenType::RIGHT_PAREN);
 
-  Statement body{statement(cursor)};
+  Statement const body{statement(cursor)};
 
-  if (!std::holds_alternative<std::monostate>(increment)) {
-    body = BlockStatement{{body, ExpressionStatement{increment}}};
-  }
-
-  if (std::holds_alternative<std::monostate>(condition)) {
-    condition = LiteralExpression{true};
-  }
-
-  body = WhileStatement{condition, body};
-
-  if (!std::holds_alternative<std::monostate>(initializer)) {
-    body = BlockStatement{{initializer, body}};
-  }
-
-  return body;
+  return BlockStatement{
+      {initializer,
+       WhileStatement{std::holds_alternative<std::monostate>(condition)
+                          ? LiteralExpression{true}
+                          : condition,
+                      BlockStatement{{body, ExpressionStatement{increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {

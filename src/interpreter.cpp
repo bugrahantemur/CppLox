@@ -142,20 +142,13 @@ struct ExpressionEvaluator {
   std::shared_ptr<Environment> environment_;
   std::unordered_map<Token, std::size_t> const& resolution_;
 
-  [[nodiscard]] auto operator()(std::monostate) -> Object { return {}; }
+  [[nodiscard]] auto operator()(std::monostate) -> Object {
+    return std::monostate{};
+  }
 
   [[nodiscard]] auto operator()(LiteralExpression const& expr) -> Object {
-    if (std::holds_alternative<bool>(expr.value_)) {
-      return std::get<bool>(expr.value_);
-    }
-    if (std::holds_alternative<double>(expr.value_)) {
-      return std::get<double>(expr.value_);
-    }
-    if (std::holds_alternative<std::string>(expr.value_)) {
-      return std::get<std::string>(expr.value_);
-    }
-
-    return std::monostate{};
+    return std::visit([](auto const& value) -> Object { return value; },
+                      expr.value_);
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
@@ -320,21 +313,15 @@ struct StatementExecutor {
   }
 
   auto operator()(ReturnStatement const& stmt) -> void {
-    Object const value{
-        !std::holds_alternative<std::monostate>(stmt.value_)
-            ? std::visit(ExpressionEvaluator{environment_, resolution_},
-                         stmt.value_)
-            : std::monostate{}};
+    Object const value{std::visit(
+        ExpressionEvaluator{environment_, resolution_}, stmt.value_)};
 
     throw Return{value};
   }
 
   auto operator()(VariableStatement const& stmt) -> void {
-    Object const value{
-        !std::holds_alternative<std::monostate>(stmt.initializer_)
-            ? std::visit(ExpressionEvaluator{environment_, resolution_},
-                         stmt.initializer_)
-            : std::monostate{}};
+    Object const value{std::visit(
+        ExpressionEvaluator{environment_, resolution_}, stmt.initializer_)};
 
     environment_->define(stmt.name_.lexeme_, value);
   }

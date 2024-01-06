@@ -129,6 +129,10 @@ class NameResolver {
     }
   }
 
+  auto operator()(Box<GetExpression> const& expr) -> void {
+    resolve(expr->object_);
+  }
+
   auto operator()(Box<GroupingExpression> const& expr) -> void {
     resolve(expr->expression_);
   }
@@ -136,6 +140,11 @@ class NameResolver {
   auto operator()(Box<LogicalExpression> const& expr) -> void {
     resolve(expr->left_);
     resolve(expr->right_);
+  }
+
+  auto operator()(Box<SetExpression> const& expr) -> void {
+    resolve(expr->value_);
+    resolve(expr->object_);
   }
 
   auto operator()(Box<UnaryExpression> const& expr) -> void {

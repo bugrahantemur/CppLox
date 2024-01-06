@@ -18,8 +18,9 @@ struct VariableExpression {
 using Expression =
     std::variant<std::monostate, LiteralExpression, VariableExpression,
                  Box<struct AssignmentExpression>, Box<struct BinaryExpression>,
-                 Box<struct CallExpression>, Box<struct GroupingExpression>,
-                 Box<struct LogicalExpression>, Box<struct UnaryExpression>>;
+                 Box<struct CallExpression>, Box<struct GetExpression>,
+                 Box<struct GroupingExpression>, Box<struct LogicalExpression>,
+                 Box<struct SetExpression>, Box<struct UnaryExpression>>;
 
 struct AssignmentExpression {
   Token name_;
@@ -38,6 +39,11 @@ struct CallExpression {
   std::vector<Expression> arguments_;
 };
 
+struct GetExpression {
+  Token name_;
+  Expression object_;
+};
+
 struct GroupingExpression {
   Expression expression_;
 };
@@ -46,6 +52,12 @@ struct LogicalExpression {
   Expression left_;
   Token op_;
   Expression right_;
+};
+
+struct SetExpression {
+  Token name_;
+  Expression object_;
+  Expression value_;
 };
 
 struct UnaryExpression {

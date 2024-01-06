@@ -74,6 +74,10 @@ struct Put {
     return put("<class " + klass->name_ + ">");
   }
 
+  auto operator()(Box<LoxInstance> const& instance) -> OStream& {
+    return put(instance->to_string());
+  }
+
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
 
  private:
@@ -105,6 +109,8 @@ struct Arity {
     return func->declaration_.params_.size();
   }
 
+  auto operator()(Box<LoxClass> const&) -> std::size_t { return 0; }
+
   template <typename T>
   auto operator()(T const& t) -> std::size_t {
     throw UncallableError{};
@@ -128,6 +134,10 @@ struct Call {
     }
 
     return std::monostate{};
+  }
+
+  [[nodiscard]] auto operator()(Box<LoxClass> const& klass) -> Object {
+    return Box{LoxInstance{*klass}};
   }
 
   template <typename T>
@@ -259,6 +269,16 @@ struct ExpressionEvaluator {
     }
   }
 
+  [[nodiscard]] auto operator()(Box<GetExpression> const& expr) -> Object {
+    Object const obj{std::visit(*this, expr->object_)};
+
+    if (auto const instance{std::get_if<Box<LoxInstance>>(&obj)}) {
+      return (*instance)->get(expr->name_);
+    }
+
+    throw RuntimeError{expr->name_.line_, "Only instances have properties."};
+  }
+
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
     return std::visit(*this, expr->expression_);
   }
@@ -278,6 +298,17 @@ struct ExpressionEvaluator {
     return std::visit(*this, expr->right_);
   }
 
+  [[nodiscard]] auto operator()(Box<SetExpression> const& expr) -> Object {
+    Object obj{std::visit(*this, expr->object_)};
+
+    if (auto const instance{std::get_if<Box<LoxInstance>>(&obj)}) {
+      Object const value{std::visit(*this, expr->value_)};
+      (*instance)->set(expr->name_, value);
+      return value;
+    }
+
+    throw RuntimeError{expr->name_.line_, "Only instances have properties."};
+  }
   [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
     Object const right{std::visit(*this, expr->right_)};
 

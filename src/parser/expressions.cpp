@@ -51,7 +51,13 @@ auto call(Cursor& cursor) -> Expression {
       Token const closing{cursor.previous()};
       assert(closing.type_ == TokenType::RIGHT_PAREN);
 
-      return CallExpression{expr, closing, args};
+      expr = CallExpression{expr, closing, args};
+    } else if (cursor.match(TokenType::DOT)) {
+      Token const dot{cursor.take()};
+      static_cast<void>(dot);
+
+      Token const name{cursor.take(TokenType::IDENTIFIER)};
+      expr = Box{GetExpression{name, expr}};
     } else {
       break;
     }
@@ -128,6 +134,8 @@ auto assignment(Cursor& cursor) -> Expression {
 
     if (auto const var{std::get_if<VariableExpression>(&expr)}) {
       return AssignmentExpression{var->name_, value};
+    } else if (auto const get{std::get_if<Box<GetExpression>>(&expr)}) {
+      return SetExpression{(*get)->name_, (*get)->object_, value};
     }
 
     // Do not throw, just report the error

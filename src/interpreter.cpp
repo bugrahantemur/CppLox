@@ -371,14 +371,19 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
-    LoxFunction f{*stmt, environment_};
-    environment_->define(stmt->name_.lexeme_, Box{f});
+    environment_->define(stmt->name_.lexeme_, LoxFunction{*stmt, environment_});
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
     environment_->define(stmt->name_.lexeme_, std::monostate{});
-    LoxClass klass{stmt->name_.lexeme_};
-    environment_->assign(stmt->name_.lexeme_, Box{klass});
+
+    std::unordered_map<std::string, LoxFunction> class_methods;
+    for (Box<FunctionStatement> const& method : stmt->methods_) {
+      class_methods[method->name_.lexeme_] = LoxFunction{*method, environment_};
+    }
+
+    environment_->assign(stmt->name_.lexeme_,
+                         LoxClass{stmt->name_.lexeme_, class_methods});
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {

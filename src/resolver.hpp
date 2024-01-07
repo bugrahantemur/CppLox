@@ -82,6 +82,11 @@ class NameResolver {
   auto operator()(Box<ClassStatement> const& stmt) -> void {
     declare(stmt->name_);
     define(stmt->name_);
+
+    for (Box<FunctionStatement> const& method : stmt->methods_) {
+      FunctionType const declaration{FunctionType::METHOD};
+      resolve_function(*method, declaration);
+    }
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {

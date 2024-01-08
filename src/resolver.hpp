@@ -29,7 +29,8 @@ class NameResolver {
   NameResolver(std::unordered_map<Token, std::size_t>& resolution)
       : resolution_{resolution},
         scopes_{{}},  // TODO add global names here
-        current_function_type_{FunctionType::NONE} {}
+        current_function_type_{FunctionType::NONE},
+        current_class_type_{ClassType::NONE} {}
 
   auto resolve(Expression const& expr) -> void { std::visit(*this, expr); }
 
@@ -80,6 +81,9 @@ class NameResolver {
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
+    ClassType const enclosing_class{current_class_type_};
+    current_class_type_ = ClassType::CLASS;
+
     declare(stmt->name_);
     define(stmt->name_);
 
@@ -92,6 +96,8 @@ class NameResolver {
     }
 
     end_scope();
+
+    current_class_type_ = enclosing_class;
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
@@ -110,6 +116,11 @@ class NameResolver {
   auto operator()(LiteralExpression const& expr) -> void {}
 
   auto operator()(ThisExpression const& expr) -> void {
+    if (current_class_type_ == ClassType::NONE) {
+      throw Resolver::error(expr.keyword_.line_,
+                            "Can't use 'this' outside of a class.");
+    }
+
     resolve_local(expr.keyword_);
   }
 
@@ -167,6 +178,7 @@ class NameResolver {
 
  private:
   enum class FunctionType { NONE, FUNCTION, METHOD };
+  enum class ClassType { NONE, CLASS };
 
   auto begin_scope() -> void { scopes_.emplace_back(); }
 
@@ -219,6 +231,7 @@ class NameResolver {
 
   std::vector<std::unordered_map<std::string, bool>> scopes_;
   FunctionType current_function_type_;
+  ClassType current_class_type_;
 
   std::unordered_map<Token, std::size_t>& resolution_;
 };

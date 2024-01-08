@@ -14,35 +14,32 @@ struct LoxClass {
   std::unordered_map<std::string, LoxFunction> methods_;
 };
 
-class LoxInstance {
- public:
-  LoxInstance(LoxClass const& klass) : class_{klass} {}
-
-  auto to_string() const -> std::string {
-    return "<instance of " + class_.name_ + ">";
-  }
-
-  auto get(Token const& token) const -> Object {
-    if (auto const field{fields_.find(token.lexeme_)}; field != fields_.end()) {
-      return field->second;
-    }
-
-    if (auto const method{class_.methods_.find(token.lexeme_)};
-        method != class_.methods_.end()) {
-      return method->second;
-    }
-
-    throw RuntimeError{token.line_,
-                       "Undefined property '" + token.lexeme_ + "'."};
-  }
-
-  auto set(Token const& name, Object const& value) -> void {
-    fields_[name.lexeme_] = value;
-  }
-
- private:
+struct LoxInstance {
   LoxClass class_;
   std::unordered_map<std::string, Object> fields_;
 };
+
+inline auto get(std::shared_ptr<LoxInstance> const& instance,
+                Token const& token) -> Object {
+  if (auto const field{instance->fields_.find(token.lexeme_)};
+      field != instance->fields_.end()) {
+    return field->second;
+  }
+
+  if (auto const method{instance->class_.methods_.find(token.lexeme_)};
+      method != instance->class_.methods_.end()) {
+    auto const env{std::make_shared<Environment>(method->second.closure_)};
+    env->define("this", instance);
+    return LoxFunction{method->second.declaration_, env};
+  }
+
+  throw RuntimeError{token.line_,
+                     "Undefined property '" + token.lexeme_ + "'."};
+}
+
+inline auto set(std::shared_ptr<LoxInstance> instance, Token const& name,
+                Object const& value) -> void {
+  instance->fields_[name.lexeme_] = value;
+}
 
 #endif

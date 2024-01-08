@@ -74,8 +74,8 @@ struct Put {
     return put("<class " + klass->name_ + ">");
   }
 
-  auto operator()(Box<LoxInstance> const& instance) -> OStream& {
-    return put(instance->to_string());
+  auto operator()(std::shared_ptr<LoxInstance> const& instance) -> OStream& {
+    return put("<instance of " + instance->class_.name_ + ">");
   }
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
@@ -137,7 +137,7 @@ struct Call {
   }
 
   [[nodiscard]] auto operator()(Box<LoxClass> const& klass) -> Object {
-    return Box{LoxInstance{*klass}};
+    return std::make_shared<LoxInstance>(LoxInstance{*klass, {}});
   }
 
   template <typename T>
@@ -161,6 +161,10 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(LiteralExpression const& expr) -> Object {
     return std::visit([](auto const& value) -> Object { return value; },
                       expr.value_);
+  }
+
+  [[nodiscard]] auto operator()(ThisExpression const& expr) -> Object {
+    return (*this)(VariableExpression{expr.keyword_});
   }
 
   [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
@@ -272,8 +276,8 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<GetExpression> const& expr) -> Object {
     Object const obj{std::visit(*this, expr->object_)};
 
-    if (auto const instance{std::get_if<Box<LoxInstance>>(&obj)}) {
-      return (*instance)->get(expr->name_);
+    if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
+      return get(*instance, expr->name_);
     }
 
     throw RuntimeError{expr->name_.line_, "Only instances have properties."};
@@ -301,9 +305,10 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<SetExpression> const& expr) -> Object {
     Object obj{std::visit(*this, expr->object_)};
 
-    if (auto const instance{std::get_if<Box<LoxInstance>>(&obj)}) {
+    if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
       Object const value{std::visit(*this, expr->value_)};
-      (*instance)->set(expr->name_, value);
+      set(*instance, expr->name_, value);
+
       return value;
     }
 

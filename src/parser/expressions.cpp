@@ -33,6 +33,9 @@ auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::IDENTIFIER)) {
     return VariableExpression{cursor.take()};
   }
+  if (cursor.match(TokenType::THIS)) {
+    return ThisExpression{cursor.take()};
+  }
 
   throw error(cursor.peek(), "Expected expression.");
 }

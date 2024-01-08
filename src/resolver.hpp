@@ -83,10 +83,15 @@ class NameResolver {
     declare(stmt->name_);
     define(stmt->name_);
 
+    begin_scope();
+    scopes_.back()["this"] = true;
+
     for (Box<FunctionStatement> const& method : stmt->methods_) {
       FunctionType const declaration{FunctionType::METHOD};
       resolve_function(*method, declaration);
     }
+
+    end_scope();
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
@@ -103,6 +108,10 @@ class NameResolver {
   }
 
   auto operator()(LiteralExpression const& expr) -> void {}
+
+  auto operator()(ThisExpression const& expr) -> void {
+    resolve_local(expr.keyword_);
+  }
 
   auto operator()(VariableExpression const& expr) -> void {
     if (!scopes_.empty()) {

@@ -11,16 +11,21 @@ struct LiteralExpression {
   Token::Literal value_;
 };
 
+struct ThisExpression {
+  Token keyword_;
+};
+
 struct VariableExpression {
   Token name_;
 };
 
 using Expression =
-    std::variant<std::monostate, LiteralExpression, VariableExpression,
-                 Box<struct AssignmentExpression>, Box<struct BinaryExpression>,
-                 Box<struct CallExpression>, Box<struct GetExpression>,
-                 Box<struct GroupingExpression>, Box<struct LogicalExpression>,
-                 Box<struct SetExpression>, Box<struct UnaryExpression>>;
+    std::variant<std::monostate, LiteralExpression, ThisExpression,
+                 VariableExpression, Box<struct AssignmentExpression>,
+                 Box<struct BinaryExpression>, Box<struct CallExpression>,
+                 Box<struct GetExpression>, Box<struct GroupingExpression>,
+                 Box<struct LogicalExpression>, Box<struct SetExpression>,
+                 Box<struct UnaryExpression>>;
 
 struct AssignmentExpression {
   Token name_;

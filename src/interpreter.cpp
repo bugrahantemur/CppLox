@@ -109,7 +109,13 @@ struct Arity {
     return func->declaration_.params_.size();
   }
 
-  auto operator()(Box<LoxClass> const&) -> std::size_t { return 0; }
+  auto operator()(Box<LoxClass> const& klass) -> std::size_t {
+    if (auto const initializer{klass->methods_.find("init")};
+        initializer != klass->methods_.end()) {
+      return (*this)(initializer->second);
+    }
+    return 0;
+  }
 
   template <typename T>
   auto operator()(T const& t) -> std::size_t {
@@ -118,7 +124,7 @@ struct Arity {
 };
 
 struct Call {
-  [[nodiscard]] auto operator()(Box<LoxFunction>& func) -> Object {
+  auto operator()(Box<LoxFunction>& func) -> Object {
     auto const env{std::make_shared<Environment>(func->closure_)};
 
     std::size_t const arity{std::visit(Arity{}, Object{func})};
@@ -130,18 +136,34 @@ struct Call {
     try {
       Interpreter::interpret(func->declaration_.body_, resolution_, env);
     } catch (Return const& ret) {
+      if (func->is_initializer_) {
+        return env->get_at("this", 0);
+      }
+
       return ret.value_;
     }
 
-    return std::monostate{};
+    return func->is_initializer_ ? env->get_at("this", 0) : std::monostate{};
   }
 
-  [[nodiscard]] auto operator()(Box<LoxClass> const& klass) -> Object {
-    return std::make_shared<LoxInstance>(LoxInstance{*klass, {}});
+  auto operator()(Box<LoxClass> const& klass) -> Object {
+    auto const instance{std::make_shared<LoxInstance>(LoxInstance{*klass, {}})};
+
+    if (auto const initializer{klass->methods_.find("init")};
+        initializer != klass->methods_.end()) {
+      auto const env{
+          std::make_shared<Environment>(initializer->second.closure_)};
+      env->define("this", instance);
+      auto const init{
+          Box{LoxFunction{initializer->second.declaration_, env, true}}};
+      (*this)(init);
+    }
+
+    return instance;
   }
 
   template <typename T>
-  [[nodiscard]] auto operator()(T const& t) -> Object {
+  auto operator()(T const& t) -> Object {
     throw UncallableError{};
   }
 
@@ -376,7 +398,8 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<FunctionStatement> const& stmt) -> void {
-    environment_->define(stmt->name_.lexeme_, LoxFunction{*stmt, environment_});
+    environment_->define(stmt->name_.lexeme_,
+                         LoxFunction{*stmt, environment_, false});
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
@@ -384,7 +407,8 @@ struct StatementExecutor {
 
     std::unordered_map<std::string, LoxFunction> class_methods;
     for (Box<FunctionStatement> const& method : stmt->methods_) {
-      class_methods[method->name_.lexeme_] = LoxFunction{*method, environment_};
+      class_methods[method->name_.lexeme_] =
+          LoxFunction{*method, environment_, method->name_.lexeme_ == "init"};
     }
 
     environment_->assign(stmt->name_.lexeme_,

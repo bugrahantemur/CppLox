@@ -30,7 +30,8 @@ inline auto get(std::shared_ptr<LoxInstance> const& instance,
       method != instance->class_.methods_.end()) {
     auto const env{std::make_shared<Environment>(method->second.closure_)};
     env->define("this", instance);
-    return LoxFunction{method->second.declaration_, env};
+    return Box{LoxFunction{method->second.declaration_, env,
+                           method->second.is_initializer_}};
   }
 
   throw RuntimeError{token.line_,

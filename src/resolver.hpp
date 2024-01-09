@@ -58,6 +58,11 @@ class NameResolver {
                             "Can't return from top-level code.");
     }
 
+    if (current_function_type_ == FunctionType::INITIALIZER) {
+      throw Resolver::error(stmt.keyword_.line_,
+                            "Can't return a value from an initializer.");
+    }
+
     resolve(stmt.value_);
   }
 
@@ -91,8 +96,9 @@ class NameResolver {
     scopes_.back()["this"] = true;
 
     for (Box<FunctionStatement> const& method : stmt->methods_) {
-      FunctionType const declaration{FunctionType::METHOD};
-      resolve_function(*method, declaration);
+      resolve_function(*method, method->name_.lexeme_ == "init"
+                                    ? FunctionType::INITIALIZER
+                                    : FunctionType::METHOD);
     }
 
     end_scope();
@@ -177,7 +183,7 @@ class NameResolver {
   }
 
  private:
-  enum class FunctionType { NONE, FUNCTION, METHOD };
+  enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
   enum class ClassType { NONE, CLASS };
 
   auto begin_scope() -> void { scopes_.emplace_back(); }

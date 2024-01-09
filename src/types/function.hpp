@@ -9,6 +9,7 @@
 struct LoxFunction {
   FunctionStatement declaration_;
   std::shared_ptr<Environment> closure_;
+  bool is_initializer_;
 };
 
 #endif

@@ -39,7 +39,7 @@ auto block_statement(Cursor& cursor) -> Statement {
 
   cursor.take(TokenType::RIGHT_BRACE);
 
-  return Box{BlockStatement{statements}};
+  return BlockStatement{statements};
 }
 
 auto if_statement(Cursor& cursor) -> Statement {
@@ -59,7 +59,7 @@ auto if_statement(Cursor& cursor) -> Statement {
     else_branch = statement(cursor);
   }
 
-  return Box{IfStatement{condition, then_branch, else_branch}};
+  return IfStatement{condition, then_branch, else_branch};
 }
 
 auto while_statement(Cursor& cursor) -> Statement {
@@ -71,7 +71,7 @@ auto while_statement(Cursor& cursor) -> Statement {
   Expression const condition{Expressions::expression(cursor)};
   cursor.take(TokenType::RIGHT_PAREN);
 
-  return Box{WhileStatement{condition, statement(cursor)}};
+  return WhileStatement{condition, statement(cursor)};
 }
 
 auto for_statement(Cursor& cursor) -> Statement {
@@ -104,13 +104,12 @@ auto for_statement(Cursor& cursor) -> Statement {
 
   Statement const body{statement(cursor)};
 
-  return Box{BlockStatement{
+  return BlockStatement{
       {initializer,
-       WhileStatement{
-           std::holds_alternative<std::monostate>(condition)
-               ? LiteralExpression{true}
-               : condition,
-           BlockStatement{{body, ExpressionStatement{increment}}}}}}};
+       WhileStatement{std::holds_alternative<std::monostate>(condition)
+                          ? LiteralExpression{true}
+                          : condition,
+                      BlockStatement{{body, ExpressionStatement{increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {
@@ -168,7 +167,7 @@ auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
 
   std::vector<Statement> const body{block_statement(cursor)};
 
-  return Box{FunctionStatement{name, parameters, body}};
+  return FunctionStatement{name, parameters, body};
 }
 
 auto class_declaration(Cursor& cursor) -> Statement {
@@ -177,6 +176,12 @@ auto class_declaration(Cursor& cursor) -> Statement {
   static_cast<void>(keyword);
 
   Token const name{cursor.take(TokenType::IDENTIFIER)};
+
+  VariableExpression super_class{Token::none()};
+  if (cursor.match(TokenType::LESS)) {
+    cursor.take();
+    super_class = VariableExpression{cursor.take(TokenType::IDENTIFIER)};
+  }
 
   cursor.take(TokenType::LEFT_BRACE);
 
@@ -189,7 +194,7 @@ auto class_declaration(Cursor& cursor) -> Statement {
 
   cursor.take(TokenType::RIGHT_BRACE);
 
-  return Box{ClassStatement{name, methods}};
+  return ClassStatement{name, super_class, methods};
 }
 
 auto variable_declaration(Cursor& cursor) -> Statement {

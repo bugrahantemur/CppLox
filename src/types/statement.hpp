@@ -45,6 +45,7 @@ struct FunctionStatement {
 
 struct ClassStatement {
   Token name_;
+  VariableExpression super_class_;
   std::vector<Box<FunctionStatement>> methods_;
 };
 

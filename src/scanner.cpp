@@ -87,7 +87,7 @@ class Cursor {
     return true;
   }
 
-  [[nodiscard]] auto index() const -> std::size_t { return current_; }
+  [[nodiscard]] auto index() const -> std::size_t { return 1 + current_; }
 
  private:
   std::string const& source_;

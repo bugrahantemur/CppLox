@@ -403,6 +403,19 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
+    Object const superclass_expression{
+        ExpressionEvaluator{environment_, resolution_}(stmt->super_class_)};
+
+    std::optional<Box<LoxClass>> superclass;
+    if (std::holds_alternative<std::monostate>(superclass_expression)) {
+      superclass = std::nullopt;
+    } else if (std::holds_alternative<Box<LoxClass>>(superclass_expression)) {
+      superclass = std::get<Box<LoxClass>>(superclass_expression);
+    } else {
+      throw RuntimeError{stmt->super_class_.name_.line_,
+                         "Superclass must be a class."};
+    }
+
     environment_->define(stmt->name_.lexeme_, std::monostate{});
 
     std::unordered_map<std::string, LoxFunction> class_methods;
@@ -411,8 +424,9 @@ struct StatementExecutor {
           LoxFunction{*method, environment_, method->name_.lexeme_ == "init"};
     }
 
-    environment_->assign(stmt->name_.lexeme_,
-                         LoxClass{stmt->name_.lexeme_, class_methods});
+    environment_->assign(
+        stmt->name_.lexeme_,
+        LoxClass{stmt->name_.lexeme_, superclass, class_methods});
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {

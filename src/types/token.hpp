@@ -62,6 +62,10 @@ struct Token {
   auto operator==(Token const& other) const -> bool {
     return token_id_ == other.token_id_;
   }
+
+  static auto none() -> Token {
+    return Token{TokenType::EOFF, "", std::monostate{}, 0, 0};
+  }
 };
 
 template <>

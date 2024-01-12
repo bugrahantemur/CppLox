@@ -92,6 +92,15 @@ class NameResolver {
     declare(stmt->name_);
     define(stmt->name_);
 
+    if (stmt->super_class_.name_ != Token::none()) {
+      if (stmt->super_class_.name_ == stmt->name_) {
+        throw Resolver::error(stmt->super_class_.name_.line_,
+                              "A class can't inherit from itself.");
+      }
+
+      resolve(stmt->super_class_);
+    }
+
     begin_scope();
     scopes_.back()["this"] = true;
 

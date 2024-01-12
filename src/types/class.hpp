@@ -1,9 +1,11 @@
 #ifndef LOX_TYPES_CLASS
 #define LOX_TYPES_CLASS
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 
+#include "../utils/box.hpp"
 #include "../utils/error.hpp"
 #include "./function.hpp"
 #include "./object.hpp"
@@ -11,6 +13,7 @@
 
 struct LoxClass {
   std::string name_;
+  std::optional<Box<LoxClass>> superclass_;
   std::unordered_map<std::string, LoxFunction> methods_;
 };
 

@@ -85,7 +85,6 @@ auto for_statement(Cursor& cursor) -> Statement {
   if (cursor.match(TokenType::SEMICOLON)) {
     cursor.take();
   } else if (cursor.match(TokenType::VAR)) {
-    cursor.take();
     initializer = variable_declaration(cursor);
   } else {
     initializer = expression_statement(cursor);

@@ -15,6 +15,18 @@ struct LoxClass {
   std::string name_;
   std::optional<Box<LoxClass>> superclass_;
   std::unordered_map<std::string, LoxFunction> methods_;
+
+  auto find_method(std::string const& name) -> std::optional<LoxFunction> {
+    if (auto const method{methods_.find(name)}; method != methods_.end()) {
+      return method->second;
+    }
+
+    if (superclass_) {
+      return superclass_.value()->find_method(name);
+    }
+
+    return std::nullopt;
+  }
 };
 
 struct LoxInstance {
@@ -29,12 +41,11 @@ inline auto get(std::shared_ptr<LoxInstance> const& instance,
     return field->second;
   }
 
-  if (auto const method{instance->class_.methods_.find(token.lexeme_)};
-      method != instance->class_.methods_.end()) {
-    auto const env{std::make_shared<Environment>(method->second.closure_)};
+  if (auto const method{instance->class_.find_method(token.lexeme_)}) {
+    auto const env{std::make_shared<Environment>(method.value().closure_)};
     env->define("this", instance);
-    return Box{LoxFunction{method->second.declaration_, env,
-                           method->second.is_initializer_}};
+    return LoxFunction{method.value().declaration_, env,
+                       method.value().is_initializer_};
   }
 
   throw RuntimeError{token.line_,

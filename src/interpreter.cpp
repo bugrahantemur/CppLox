@@ -403,17 +403,15 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
-    Object const superclass_expression{
-        ExpressionEvaluator{environment_, resolution_}(stmt->super_class_)};
-
     std::optional<Box<LoxClass>> superclass;
-    if (std::holds_alternative<std::monostate>(superclass_expression)) {
-      superclass = std::nullopt;
-    } else if (std::holds_alternative<Box<LoxClass>>(superclass_expression)) {
-      superclass = std::get<Box<LoxClass>>(superclass_expression);
-    } else {
-      throw RuntimeError{stmt->super_class_.name_.line_,
-                         "Superclass must be a class."};
+    if (stmt->super_class_.name_ != Token::none()) {
+      try {
+        superclass = std::get<Box<LoxClass>>(
+            ExpressionEvaluator{environment_, resolution_}(stmt->super_class_));
+      } catch (std::bad_variant_access const&) {
+        throw RuntimeError{stmt->super_class_.name_.line_,
+                           "Superclass must be a class."};
+      }
     }
 
     environment_->define(stmt->name_.lexeme_, std::monostate{});

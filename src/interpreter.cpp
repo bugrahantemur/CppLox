@@ -185,6 +185,29 @@ struct ExpressionEvaluator {
                       expr.value_);
   }
 
+  [[nodiscard]] auto operator()(SuperExpression const& expr) -> Object {
+    std::size_t const distance{resolution_.at(expr.keyword_)};
+
+    auto const superclass{
+        std::get<Box<LoxClass>>(environment_->get_at("super", distance))};
+
+    auto const instance{std::get<std::shared_ptr<LoxInstance>>(
+        environment_->get_at("this", distance - 1))};
+
+    std::optional<LoxFunction> const method{
+        superclass->find_method(expr.method_.lexeme_)};
+
+    if (!method) {
+      throw RuntimeError{expr.method_.line_,
+                         "Undefined property '" + expr.method_.lexeme_ + "'"};
+    }
+
+    auto const env{std::make_shared<Environment>(method.value().closure_)};
+    env->define("this", instance);
+    return LoxFunction{method.value().declaration_, env,
+                       method.value().is_initializer_};
+  }
+
   [[nodiscard]] auto operator()(ThisExpression const& expr) -> Object {
     return (*this)(VariableExpression{expr.keyword_});
   }
@@ -416,10 +439,19 @@ struct StatementExecutor {
 
     environment_->define(stmt->name_.lexeme_, std::monostate{});
 
+    if (superclass) {
+      environment_ = std::make_shared<Environment>(environment_);
+      environment_->define("super", superclass.value());
+    }
+
     std::unordered_map<std::string, LoxFunction> class_methods;
     for (Box<FunctionStatement> const& method : stmt->methods_) {
       class_methods[method->name_.lexeme_] =
           LoxFunction{*method, environment_, method->name_.lexeme_ == "init"};
+    }
+
+    if (superclass) {
+      environment_ = environment_->enclosing_;
     }
 
     environment_->assign(

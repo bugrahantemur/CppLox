@@ -16,7 +16,8 @@ struct LoxClass {
   std::optional<Box<LoxClass>> superclass_;
   std::unordered_map<std::string, LoxFunction> methods_;
 
-  auto find_method(std::string const& name) -> std::optional<LoxFunction> {
+  auto find_method(std::string const& name) const
+      -> std::optional<LoxFunction> {
     if (auto const method{methods_.find(name)}; method != methods_.end()) {
       return method->second;
     }

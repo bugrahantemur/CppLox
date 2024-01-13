@@ -6,8 +6,6 @@
 
 namespace Parser::Expressions {
 
-auto expression(Cursor&) -> Expression;
-
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
     cursor.take();
@@ -35,6 +33,12 @@ auto primary(Cursor& cursor) -> Expression {
   }
   if (cursor.match(TokenType::THIS)) {
     return ThisExpression{cursor.take()};
+  }
+  if (cursor.match(TokenType::SUPER)) {
+    Token const keyword{cursor.take()};
+    cursor.take(TokenType::DOT);
+    Token const method{cursor.take(TokenType::IDENTIFIER)};
+    return SuperExpression{keyword, method};
   }
 
   throw error(cursor.peek(), "Expected expression.");

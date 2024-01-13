@@ -86,7 +86,7 @@ class NameResolver {
   }
 
   auto operator()(Box<ClassStatement> const& stmt) -> void {
-    ClassType const enclosing_class{current_class_type_};
+    ClassType const enclosing_class_type{current_class_type_};
     current_class_type_ = ClassType::CLASS;
 
     declare(stmt->name_);
@@ -98,7 +98,11 @@ class NameResolver {
                               "A class can't inherit from itself.");
       }
 
+      current_class_type_ = ClassType::SUBCLASS;
       resolve(stmt->super_class_);
+
+      begin_scope();
+      scopes_.back()["super"] = true;
     }
 
     begin_scope();
@@ -111,8 +115,11 @@ class NameResolver {
     }
 
     end_scope();
+    if (stmt->super_class_.name_ != Token::none()) {
+      end_scope();
+    }
 
-    current_class_type_ = enclosing_class;
+    current_class_type_ = enclosing_class_type;
   }
 
   auto operator()(Box<IfStatement> const& stmt) -> void {
@@ -129,6 +136,20 @@ class NameResolver {
   }
 
   auto operator()(LiteralExpression const& expr) -> void {}
+
+  auto operator()(SuperExpression const& expr) -> void {
+    if (current_class_type_ == ClassType::NONE) {
+      throw Resolver::error(expr.keyword_.line_,
+                            "Can't use 'super' outside of a class.");
+    }
+
+    if (current_class_type_ != ClassType::SUBCLASS) {
+      throw Resolver::error(expr.keyword_.line_,
+                            "Can't use 'super' in a class with no superclass.");
+    }
+
+    resolve_local(expr.keyword_);
+  }
 
   auto operator()(ThisExpression const& expr) -> void {
     if (current_class_type_ == ClassType::NONE) {
@@ -193,7 +214,7 @@ class NameResolver {
 
  private:
   enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
-  enum class ClassType { NONE, CLASS };
+  enum class ClassType { NONE, CLASS, SUBCLASS };
 
   auto begin_scope() -> void { scopes_.emplace_back(); }
 

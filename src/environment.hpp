@@ -13,6 +13,8 @@ namespace {
 template <typename Key, typename Value>
 class env {
  public:
+  std::shared_ptr<env> enclosing_;
+
   explicit env(std::shared_ptr<env> const& enclosing) : enclosing_(enclosing) {}
 
   env() : enclosing_(nullptr) {}
@@ -46,8 +48,6 @@ class env {
     assert(current);
     return current;
   }
-
-  std::shared_ptr<env> enclosing_;
 
   std::unordered_map<Key, Value> map_;
 };

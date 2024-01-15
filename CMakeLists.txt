@@ -15,7 +15,10 @@ FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
     src/lox.cpp
-    src/scanner.cpp
+    src/lexer/lexer.cpp
+    src/lexer/error.cpp
+    src/lexer/cursor.cpp
+    src/lexer/tokens.cpp
     src/parser/cursor.cpp
     src/parser/error.cpp
     src/parser/parser.cpp

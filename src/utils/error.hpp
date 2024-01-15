@@ -7,10 +7,6 @@
 
 #include "../types/token.hpp"
 
-struct CompileTimeError : std::exception {
-  virtual auto report() const -> void = 0;
-};
-
 struct RuntimeError : std::exception {
   RuntimeError(std::size_t line, std::string const& message)
       : line_(line), message_(message) {}

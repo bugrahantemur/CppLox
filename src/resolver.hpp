@@ -7,14 +7,14 @@
 #include "./utils/error.hpp"
 
 namespace Resolver {
-struct Error : CompileTimeError {
+struct Error {
   Error(std::size_t line, std::string const& message)
       : line_(line), message_(message) {}
 
   std::size_t line_;
   std::string message_;
 
-  auto report() const -> void final {
+  auto report() const -> void {
     std::cerr << "[line " << line_ << "] Resolver error: " << message_ << '\n';
   }
 };

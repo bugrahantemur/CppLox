@@ -9,16 +9,17 @@
 #include "../utils/error.hpp"
 
 namespace Parser {
-Error::Error(std::size_t line, std::string const& where,
+
+Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
-    : line_(line), where_(where), message_(message), tokens_{} {}
+    : line_(line), where_(where), message_(message) {}
 
 auto Error::report() const -> void {
   std::cerr << "[line " << line_ << "] Parsing error " << where_ << ": "
             << message_ << '\n';
 }
 
-auto error(Token const& token, std::string message) -> Error {
+auto error(Token const& token, std::string const& message) -> Error {
   return Error{token.line_,
                token.type_ == TokenType::EOFF ? "at the end"
                                               : " at '" + token.lexeme_ + "'",

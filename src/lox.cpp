@@ -2,9 +2,11 @@
 #include <string>
 
 #include "./interpreter.hpp"
+#include "./lexer/error.hpp"
+#include "./lexer/lexer.hpp"
+#include "./parser/error.hpp"
 #include "./parser/parser.hpp"
 #include "./resolver.hpp"
-#include "./scanner.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"
 #include "./types/statement.hpp"
@@ -12,6 +14,7 @@
 #include "./utils/error.hpp"
 #include "./utils/reader.hpp"
 
+namespace LOX {
 class Lox {
  public:
   auto run(std::string const &file_path) -> void {
@@ -30,14 +33,17 @@ class Lox {
 
  private:
   auto do_run(std::string const &contents) -> void {
-    Expression expr;
     try {
-      std::vector<Token> const tokens = Scanner::scan_tokens(contents);
+      std::vector<Token> const tokens = Lexer::scan_tokens(contents);
       std::vector<Statement> const statements = Parser::parse(tokens);
       std::unordered_map<Token, std::size_t> const resolution =
           Resolver::resolve(statements);
       Interpreter::interpret(statements, resolution);
-    } catch (CompileTimeError const &e) {
+    } catch (Lexer::Error const &e) {
+      had_error = true;
+      e.report();
+      return;
+    } catch (Parser::Error const &e) {
       had_error = true;
       e.report();
       return;
@@ -56,11 +62,12 @@ class Lox {
   bool had_runtime_error{false};
 };
 
+}  // namespace LOX
 auto main(int argc, char *argv[]) -> int {
   if (argc != 2) {
     std::cout << "Wrong! Correct usage: cpplox [script]\n";
   } else {
-    Lox lox;
+    LOX::Lox lox;
     lox.run(argv[1]);
   }
   return 0;

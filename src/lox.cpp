@@ -6,6 +6,7 @@
 #include "./lexer/lexer.hpp"
 #include "./parser/error.hpp"
 #include "./parser/parser.hpp"
+#include "./resolver/error.hpp"
 #include "./resolver/resolver.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"
@@ -44,6 +45,10 @@ class Lox {
       e.report();
       return;
     } catch (Parser::Error const &e) {
+      had_error = true;
+      e.report();
+      return;
+    } catch (Resolver::Error const &e) {
       had_error = true;
       e.report();
       return;

@@ -24,7 +24,7 @@ set(TARGET_SRC
     src/parser/parser.cpp
     src/parser/expressions.cpp
     src/parser/statements.cpp
-    src/interpreter.cpp
+    src/interpreter/interpreter.cpp
     src/builtins.cpp)
 add_executable(lox ${TARGET_SRC})
 

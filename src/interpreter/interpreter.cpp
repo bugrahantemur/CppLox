@@ -4,15 +4,15 @@
 #include <string>
 #include <variant>
 
-#include "./builtins.hpp"
-#include "./types/class.hpp"
-#include "./types/expression.hpp"
-#include "./types/function.hpp"
-#include "./types/object.hpp"
-#include "./types/statement.hpp"
-#include "./types/token.hpp"
-#include "./utils/box.hpp"
-#include "./utils/error.hpp"
+#include "../builtins.hpp"
+#include "../types/class.hpp"
+#include "../types/expression.hpp"
+#include "../types/function.hpp"
+#include "../types/object.hpp"
+#include "../types/statement.hpp"
+#include "../types/token.hpp"
+#include "../utils/box.hpp"
+#include "../utils/error.hpp"
 
 namespace {
 struct Return {

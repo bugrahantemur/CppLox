@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "../environment.hpp"
+#include "./environment.hpp"
 #include "./statement.hpp"
 
 struct LoxFunction {

@@ -6,10 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "./environment.hpp"
-#include "./types/object.hpp"
-#include "./types/statement.hpp"
-#include "./types/token.hpp"
+#include "../types/environment.hpp"
+#include "../types/object.hpp"
+#include "../types/statement.hpp"
+#include "../types/token.hpp"
 
 namespace Interpreter {
 

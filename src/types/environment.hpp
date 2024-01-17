@@ -5,9 +5,9 @@
 #include <map>
 #include <memory>
 
-#include "./types/object.hpp"
-#include "./types/token.hpp"
-#include "./utils/error.hpp"
+#include "../utils/error.hpp"
+#include "./object.hpp"
+#include "./token.hpp"
 
 namespace {
 template <typename Key, typename Value>

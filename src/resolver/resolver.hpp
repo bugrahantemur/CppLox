@@ -2,9 +2,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "./interpreter.hpp"
-#include "./types/statement.hpp"
-#include "./utils/error.hpp"
+#include "../interpreter/interpreter.hpp"
+#include "../types/statement.hpp"
+#include "../utils/error.hpp"
 
 namespace Resolver {
 struct Error {

@@ -1,12 +1,12 @@
 #include <iostream>
 #include <string>
 
-#include "./interpreter.hpp"
+#include "./interpreter/interpreter.hpp"
 #include "./lexer/error.hpp"
 #include "./lexer/lexer.hpp"
 #include "./parser/error.hpp"
 #include "./parser/parser.hpp"
-#include "./resolver.hpp"
+#include "./resolver/resolver.hpp"
 #include "./types/expression.hpp"
 #include "./types/function.hpp"
 #include "./types/statement.hpp"

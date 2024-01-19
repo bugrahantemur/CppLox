@@ -7,7 +7,8 @@
 #include "./expressions.hpp"
 #include "./utils.hpp"
 
-namespace Parser::Statements {
+namespace LOX::Parser::Statements {
+
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type_ == TokenType::PRINT);
@@ -232,4 +233,5 @@ auto declaration(Cursor& cursor) -> Statement {
     return std::monostate{};
   }
 }
-}  // namespace Parser::Statements
+
+}  // namespace LOX::Parser::Statements

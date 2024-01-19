@@ -25,6 +25,7 @@ set(TARGET_SRC
     src/parser/expressions.cpp
     src/parser/statements.cpp
     src/interpreter/interpreter.cpp
+    src/interpreter/error.cpp
     src/resolver/resolver.cpp
     src/resolver/error.cpp
     src/builtins.cpp)

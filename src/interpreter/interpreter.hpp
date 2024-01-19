@@ -11,7 +11,7 @@
 #include "../types/statement.hpp"
 #include "../types/token.hpp"
 
-namespace Interpreter {
+namespace LOX::Interpreter {
 
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,
@@ -21,6 +21,6 @@ auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)
     -> void;
 
-}  // namespace Interpreter
+}  // namespace LOX::Interpreter
 
 #endif

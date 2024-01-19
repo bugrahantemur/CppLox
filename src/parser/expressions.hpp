@@ -4,7 +4,7 @@
 #include "../types/expression.hpp"
 #include "./cursor.hpp"
 
-namespace Parser::Expressions {
+namespace LOX::Parser::Expressions {
 
 auto primary(Cursor& tc) -> Expression;
 
@@ -39,6 +39,6 @@ auto assignment(Cursor& tc) -> Expression;
 
 auto expression(Cursor& tc) -> Expression;
 
-}  // namespace Parser::Expressions
+}  // namespace LOX::Parser::Expressions
 
 #endif

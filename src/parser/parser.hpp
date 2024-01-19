@@ -6,8 +6,8 @@
 #include "../types/statement.hpp"
 #include "../types/token.hpp"
 
-namespace Parser {
+namespace LOX::Parser {
 auto parse(std::vector<Token> const& tokens) -> std::vector<Statement>;
-}  // namespace Parser
+}  // namespace LOX::Parser
 
 #endif

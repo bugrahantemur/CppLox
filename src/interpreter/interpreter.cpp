@@ -1,6 +1,7 @@
 #include "./interpreter.hpp"
 
 #include <concepts>
+#include <iostream>
 #include <string>
 #include <variant>
 
@@ -12,9 +13,10 @@
 #include "../types/statement.hpp"
 #include "../types/token.hpp"
 #include "../utils/box.hpp"
-#include "../utils/error.hpp"
+#include "./error.hpp"
 
-namespace {
+namespace LOX::Interpreter {
+
 struct Return {
   Object value_;
 };
@@ -25,9 +27,9 @@ auto check_number_operand(Token const& token, Objects... operands) -> void {
   if (std::all_of(std::begin(ops), std::end(ops), [](Object const& obj) {
         return !std::holds_alternative<double>(obj);
       })) {
-    throw RuntimeError{token.line_, sizeof...(operands) > 1
-                                        ? "Operands must be numbers."
-                                        : "Operand must be a number."};
+    throw Error{token.line_, sizeof...(operands) > 1
+                                 ? "Operands must be numbers."
+                                 : "Operand must be a number."};
   }
 }
 
@@ -180,13 +182,13 @@ struct ExpressionEvaluator {
     return std::monostate{};
   }
 
-  [[nodiscard]] auto operator()(LiteralExpression const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<LiteralExpression> const& expr) -> Object {
     return std::visit([](auto const& value) -> Object { return value; },
-                      expr.value_);
+                      expr->value_);
   }
 
-  [[nodiscard]] auto operator()(SuperExpression const& expr) -> Object {
-    std::size_t const distance{resolution_.at(expr.keyword_)};
+  [[nodiscard]] auto operator()(Box<SuperExpression> const& expr) -> Object {
+    std::size_t const distance{resolution_.at(expr->keyword_)};
 
     auto const superclass{
         std::get<Box<LoxClass>>(environment_->get_at("super", distance))};
@@ -195,11 +197,11 @@ struct ExpressionEvaluator {
         environment_->get_at("this", distance - 1))};
 
     std::optional<LoxFunction> const method{
-        superclass->find_method(expr.method_.lexeme_)};
+        superclass->find_method(expr->method_.lexeme_)};
 
     if (!method) {
-      throw RuntimeError{expr.method_.line_,
-                         "Undefined property '" + expr.method_.lexeme_ + "'"};
+      throw Error{expr->method_.line_,
+                  "Undefined property '" + expr->method_.lexeme_ + "'"};
     }
 
     auto const env{std::make_shared<Environment>(method.value().closure_)};
@@ -208,18 +210,17 @@ struct ExpressionEvaluator {
                        method.value().is_initializer_};
   }
 
-  [[nodiscard]] auto operator()(ThisExpression const& expr) -> Object {
-    return (*this)(VariableExpression{expr.keyword_});
+  [[nodiscard]] auto operator()(Box<ThisExpression> const& expr) -> Object {
+    return (*this)(VariableExpression{expr->keyword_});
   }
 
-  [[nodiscard]] auto operator()(VariableExpression const& expr) -> Object {
-    if (auto const found{resolution_.find(expr.name_)};
+  [[nodiscard]] auto operator()(Box<VariableExpression> const& expr) -> Object {
+    if (auto const found{resolution_.find(expr->name_)};
         found != resolution_.end()) {
       std::size_t const distance = found->second;
-      return environment_->get_at(expr.name_.lexeme_, distance);
+      return environment_->get_at(expr->name_.lexeme_, distance);
     } else {
-      throw RuntimeError{expr.name_.line_,
-                         expr.name_.lexeme_ + " is not defined"};
+      throw Error{expr->name_.line_, expr->name_.lexeme_ + " is not defined"};
     }
   }
 
@@ -231,8 +232,7 @@ struct ExpressionEvaluator {
       std::size_t const distance = found->second;
       environment_->assign_at(expr->name_.lexeme_, value, distance);
     } else {
-      throw RuntimeError{expr->name_.line_,
-                         expr->name_.lexeme_ + " is not defined"};
+      throw Error{expr->name_.line_, expr->name_.lexeme_ + " is not defined"};
     }
 
     return value;
@@ -266,8 +266,7 @@ struct ExpressionEvaluator {
           std::holds_alternative<std::string>(right)) {
         return std::get<std::string>(left) + std::get<std::string>(right);
       }
-      throw RuntimeError{op.line_,
-                         "Operands must be two numbers or two strings."};
+      throw Error{op.line_, "Operands must be two numbers or two strings."};
     }
     if (op_type == TokenType::GREATER) {
       check_number_operand(op, left, right);
@@ -306,15 +305,13 @@ struct ExpressionEvaluator {
     try {
       std::size_t const arity{std::visit(Arity{}, callee)};
       if (args.size() != arity) {
-        throw RuntimeError{expr->paren_.line_,
-                           "Expected " + std::to_string(arity) +
-                               " arguments but got " +
-                               std::to_string(args.size()) + "."};
+        throw Error{expr->paren_.line_, "Expected " + std::to_string(arity) +
+                                            " arguments but got " +
+                                            std::to_string(args.size()) + "."};
       }
       return std::visit(Call{environment_, resolution_, args}, callee);
     } catch (UncallableError const& e) {
-      throw RuntimeError{expr->paren_.line_,
-                         "Can only call functions and classes."};
+      throw Error{expr->paren_.line_, "Can only call functions and classes."};
     }
   }
 
@@ -325,7 +322,7 @@ struct ExpressionEvaluator {
       return get(*instance, expr->name_);
     }
 
-    throw RuntimeError{expr->name_.line_, "Only instances have properties."};
+    throw Error{expr->name_.line_, "Only instances have properties."};
   }
 
   [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
@@ -357,7 +354,7 @@ struct ExpressionEvaluator {
       return value;
     }
 
-    throw RuntimeError{expr->name_.line_, "Only instances have properties."};
+    throw Error{expr->name_.line_, "Only instances have properties."};
   }
   [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
     Object const right{std::visit(*this, expr->right_)};
@@ -384,29 +381,29 @@ struct StatementExecutor {
 
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(ExpressionStatement const& stmt) -> void {
+  auto operator()(Box<ExpressionStatement> const& stmt) -> void {
     static_cast<void>(std::visit(ExpressionEvaluator{environment_, resolution_},
-                                 stmt.expression_));
+                                 stmt->expression_));
   }
 
-  auto operator()(PrintStatement const& stmt) -> void {
+  auto operator()(Box<PrintStatement> const& stmt) -> void {
     Object const value{std::visit(
-        ExpressionEvaluator{environment_, resolution_}, stmt.expression_)};
+        ExpressionEvaluator{environment_, resolution_}, stmt->expression_)};
     std::visit(Put{std::cout}, value);
   }
 
-  auto operator()(ReturnStatement const& stmt) -> void {
+  auto operator()(Box<ReturnStatement> const& stmt) -> void {
     Object const value{std::visit(
-        ExpressionEvaluator{environment_, resolution_}, stmt.value_)};
+        ExpressionEvaluator{environment_, resolution_}, stmt->value_)};
 
     throw Return{value};
   }
 
-  auto operator()(VariableStatement const& stmt) -> void {
+  auto operator()(Box<VariableStatement> const& stmt) -> void {
     Object const value{std::visit(
-        ExpressionEvaluator{environment_, resolution_}, stmt.initializer_)};
+        ExpressionEvaluator{environment_, resolution_}, stmt->initializer_)};
 
-    environment_->define(stmt.name_.lexeme_, value);
+    environment_->define(stmt->name_.lexeme_, value);
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
@@ -432,8 +429,8 @@ struct StatementExecutor {
         superclass = std::get<Box<LoxClass>>(
             ExpressionEvaluator{environment_, resolution_}(stmt->super_class_));
       } catch (std::bad_variant_access const&) {
-        throw RuntimeError{stmt->super_class_.name_.line_,
-                           "Superclass must be a class."};
+        throw Error{stmt->super_class_.name_.line_,
+                    "Superclass must be a class."};
       }
     }
 
@@ -475,20 +472,20 @@ struct StatementExecutor {
     }
   }
 };
-}  // namespace
 
-auto Interpreter::interpret(
-    std::vector<Statement> const& statements,
-    std::unordered_map<Token, std::size_t> const& resolution,
-    std::shared_ptr<Environment> const& environment) -> void {
+auto interpret(std::vector<Statement> const& statements,
+               std::unordered_map<Token, std::size_t> const& resolution,
+               std::shared_ptr<Environment> const& environment) -> void {
   for (auto const& stmt : statements) {
     std::visit(StatementExecutor{environment, resolution}, stmt);
   }
 }
 
-auto Interpreter::interpret(
-    std::vector<Statement> const& statements,
-    std::unordered_map<Token, std::size_t> const& resolution) -> void {
+auto interpret(std::vector<Statement> const& statements,
+               std::unordered_map<Token, std::size_t> const& resolution)
+    -> void {
   auto const env{std::make_shared<Environment>()};
   interpret(statements, resolution, env);
 }
+
+}  // namespace LOX::Interpreter

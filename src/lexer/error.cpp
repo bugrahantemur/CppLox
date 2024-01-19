@@ -4,6 +4,7 @@
 #include <string>
 
 namespace LOX::Lexer {
+
 Error::Error(std::size_t const line, std::string const& message)
     : line_(line), message_(message) {}
 
@@ -15,4 +16,5 @@ auto Error::report() const -> void {
 auto error(std::size_t const line, std::string message) -> void {
   throw Error{line, message};
 }
+
 }  // namespace LOX::Lexer

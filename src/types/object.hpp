@@ -7,8 +7,12 @@
 
 #include "../utils/box.hpp"
 
+namespace LOX {
+
 using Object = std::variant<std::monostate, bool, double, std::string,
                             Box<struct LoxFunction>, Box<struct LoxClass>,
                             std::shared_ptr<class LoxInstance>>;
+
+}
 
 #endif

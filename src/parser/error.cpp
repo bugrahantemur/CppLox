@@ -1,4 +1,3 @@
-
 #include "./error.hpp"
 
 #include <iostream>
@@ -6,9 +5,9 @@
 #include <vector>
 
 #include "../types/token.hpp"
-#include "../utils/error.hpp"
+#include "../utils/error_interface.hpp"
 
-namespace Parser {
+namespace LOX::Parser {
 
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
@@ -25,4 +24,5 @@ auto error(Token const& token, std::string const& message) -> Error {
                                               : " at '" + token.lexeme_ + "'",
                message};
 }
-}  // namespace Parser
+
+}  // namespace LOX::Parser

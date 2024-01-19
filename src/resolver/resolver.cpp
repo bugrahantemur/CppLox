@@ -4,7 +4,7 @@
 
 #include "./error.hpp"
 
-namespace {
+namespace LOX::Resolver {
 
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };
@@ -18,32 +18,31 @@ struct Resolve {
 
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(ExpressionStatement const& stmt) -> void {
-    resolve(stmt.expression_);
+  auto operator()(Box<ExpressionStatement> const& stmt) -> void {
+    resolve(stmt->expression_);
   }
 
-  auto operator()(PrintStatement const& stmt) -> void {
-    resolve(stmt.expression_);
+  auto operator()(Box<PrintStatement> const& stmt) -> void {
+    resolve(stmt->expression_);
   }
 
-  auto operator()(ReturnStatement const& stmt) -> void {
+  auto operator()(Box<ReturnStatement> const& stmt) -> void {
     if (current_function_type_ == FunctionType::NONE) {
-      throw Resolver::Error{stmt.keyword_.line_,
-                            "Can't return from top-level code."};
+      throw Error{stmt->keyword_.line_, "Can't return from top-level code."};
     }
 
     if (current_function_type_ == FunctionType::INITIALIZER) {
-      throw Resolver::Error{stmt.keyword_.line_,
-                            "Can't return a value from an initializer."};
+      throw Error{stmt->keyword_.line_,
+                  "Can't return a value from an initializer."};
     }
 
-    resolve(stmt.value_);
+    resolve(stmt->value_);
   }
 
-  auto operator()(VariableStatement const& stmt) -> void {
-    declare(stmt.name_);
-    resolve(stmt.initializer_);
-    define(stmt.name_);
+  auto operator()(Box<VariableStatement> const& stmt) -> void {
+    declare(stmt->name_);
+    resolve(stmt->initializer_);
+    define(stmt->name_);
   }
 
   auto operator()(Box<BlockStatement> const& stmt) -> void {
@@ -68,8 +67,8 @@ struct Resolve {
 
     if (stmt->super_class_.name_ != Token::none()) {
       if (stmt->super_class_.name_ == stmt->name_) {
-        throw Resolver::Error{stmt->super_class_.name_.line_,
-                              "A class can't inherit from itself."};
+        throw Error{stmt->super_class_.name_.line_,
+                    "A class can't inherit from itself."};
       }
 
       current_class_type_ = ClassType::SUBCLASS;
@@ -107,41 +106,41 @@ struct Resolve {
     resolve(stmt->body_);
   }
 
-  auto operator()(LiteralExpression const& expr) -> void {}
+  auto operator()(Box<LiteralExpression> const& expr) -> void {}
 
-  auto operator()(SuperExpression const& expr) -> void {
+  auto operator()(Box<SuperExpression> const& expr) -> void {
     if (current_class_type_ == ClassType::NONE) {
-      throw Resolver::Error{expr.keyword_.line_,
+      throw Resolver::Error{expr->keyword_.line_,
                             "Can't use 'super' outside of a class."};
     }
 
     if (current_class_type_ != ClassType::SUBCLASS) {
-      throw Resolver::Error{expr.keyword_.line_,
+      throw Resolver::Error{expr->keyword_.line_,
                             "Can't use 'super' in a class with no superclass."};
     }
 
-    resolve(expr.keyword_);
+    resolve(expr->keyword_);
   }
 
-  auto operator()(ThisExpression const& expr) -> void {
+  auto operator()(Box<ThisExpression> const& expr) -> void {
     if (current_class_type_ == ClassType::NONE) {
-      throw Resolver::Error{expr.keyword_.line_,
+      throw Resolver::Error{expr->keyword_.line_,
                             "Can't use 'this' outside of a class."};
     }
 
-    resolve(expr.keyword_);
+    resolve(expr->keyword_);
   }
 
-  auto operator()(VariableExpression const& expr) -> void {
+  auto operator()(Box<VariableExpression> const& expr) -> void {
     if (!scopes_.empty()) {
-      if (auto const found{scopes_.back().find(expr.name_.lexeme_)};
+      if (auto const found{scopes_.back().find(expr->name_.lexeme_)};
           found != scopes_.back().end() && found->second == false) {
         throw Resolver::Error{
-            expr.name_.line_,
+            expr->name_.line_,
             "Can't read local variable in its own initializer."};
       }
     }
-    resolve(expr.name_);
+    resolve(expr->name_);
   }
 
   auto operator()(Box<AssignmentExpression> const& expr) -> void {
@@ -245,9 +244,6 @@ struct Resolve {
   auto end_scope() -> void { scopes_.pop_back(); }
 };
 
-}  // namespace
-
-namespace Resolver {
 auto resolve(std::vector<Statement> const& statements)
     -> std::unordered_map<Token, std::size_t> {
   std::unordered_map<Token, std::size_t> resolution;
@@ -263,4 +259,5 @@ auto resolve(std::vector<Statement> const& statements)
 
   return resolution;
 }
-}  // namespace Resolver
+
+}  // namespace LOX::Resolver

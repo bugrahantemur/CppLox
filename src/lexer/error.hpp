@@ -4,12 +4,15 @@
 #include <exception>
 #include <string>
 
+#include "../utils/error_interface.hpp"
+
 namespace LOX::Lexer {
-class Error : std::exception {
+
+class Error : ErrorInterface {
  public:
   Error(std::size_t const line, std::string const& message);
 
-  auto report() const -> void;
+  auto report() const -> void final;
 
  private:
   std::size_t line_;

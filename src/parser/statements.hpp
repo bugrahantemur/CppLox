@@ -4,7 +4,8 @@
 #include "../types/statement.hpp"
 #include "./cursor.hpp"
 
-namespace Parser::Statements {
+namespace LOX::Parser::Statements {
+
 auto print_statement(Cursor& cursor) -> Statement;
 
 auto expression_statement(Cursor& cursor) -> Statement;
@@ -26,6 +27,6 @@ auto function_declaration(Cursor& cursor) -> Statement;
 auto variable_declaration(Cursor& cursor) -> Statement;
 
 auto declaration(Cursor& cursor) -> Statement;
-}  // namespace Parser::Statements
+}  // namespace LOX::Parser::Statements
 
 #endif

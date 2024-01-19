@@ -5,7 +5,6 @@
 #include <map>
 #include <memory>
 
-#include "../utils/error.hpp"
 #include "./object.hpp"
 #include "./token.hpp"
 
@@ -53,6 +52,9 @@ class env {
 };
 }  // namespace
 
+namespace LOX {
+
 using Environment = env<std::string, Object>;
 
+}
 #endif

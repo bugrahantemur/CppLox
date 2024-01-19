@@ -6,7 +6,8 @@
 #include "./cursor.hpp"
 #include "./error.hpp"
 
-namespace Parser::Utils {
+namespace LOX::Parser::Utils {
+
 template <typename T, typename F>
 auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
   cursor.take(TokenType::LEFT_PAREN);
@@ -29,5 +30,6 @@ auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
 
   return list;
 }
-}  // namespace Parser::Utils
+
+}  // namespace LOX::Parser::Utils
 #endif

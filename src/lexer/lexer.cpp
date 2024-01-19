@@ -47,8 +47,7 @@ namespace LOX::Lexer {
   error(cursor.at_line(), "Unexpected character '" + std::string{c} + "'");
   return std::nullopt;
 }
-[[nodiscard]] auto scan_tokens(std::string const& contents)
-    -> std::vector<Token> {
+[[nodiscard]] auto scan(std::string const& contents) -> std::vector<Token> {
   std::vector<Token> tokens;
   Cursor cursor(contents);
 

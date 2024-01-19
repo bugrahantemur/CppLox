@@ -4,7 +4,7 @@
 #include "./error.hpp"
 #include "./utils.hpp"
 
-namespace Parser::Expressions {
+namespace LOX::Parser::Expressions {
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
@@ -139,8 +139,8 @@ auto assignment(Cursor& cursor) -> Expression {
     Token const equals{cursor.take()};
     Expression const value{or_expr(cursor)};
 
-    if (auto const var{std::get_if<VariableExpression>(&expr)}) {
-      return AssignmentExpression{var->name_, value};
+    if (auto const var{std::get_if<Box<VariableExpression>>(&expr)}) {
+      return AssignmentExpression{(*var)->name_, value};
     } else if (auto const get{std::get_if<Box<GetExpression>>(&expr)}) {
       return SetExpression{(*get)->name_, (*get)->object_, value};
     }
@@ -154,4 +154,4 @@ auto assignment(Cursor& cursor) -> Expression {
 
 auto expression(Cursor& cursor) -> Expression { return assignment(cursor); };
 
-}  // namespace Parser::Expressions
+}  // namespace LOX::Parser::Expressions

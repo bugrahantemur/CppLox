@@ -1,36 +1,35 @@
 #ifndef LOX_TYPES_EXPRESSION
 #define LOX_TYPES_EXPRESSION
 
-#include <string>
 #include <variant>
 
 #include "../utils/box.hpp"
 #include "./token.hpp"
 
-struct LiteralExpression {
-  Token::Literal value_;
-};
+namespace LOX {
 
-struct SuperExpression {
-  Token keyword_;
-  Token method_;
-};
+// Forward declaration of all expression types
+struct AssignmentExpression;
+struct BinaryExpression;
+struct CallExpression;
+struct GetExpression;
+struct GroupingExpression;
+struct LiteralExpression;
+struct LogicalExpression;
+struct SetExpression;
+struct SuperExpression;
+struct ThisExpression;
+struct UnaryExpression;
+struct VariableExpression;
 
-struct ThisExpression {
-  Token keyword_;
-};
-
-struct VariableExpression {
-  Token name_;
-};
-
+// Expression variant
 using Expression =
-    std::variant<std::monostate, LiteralExpression, SuperExpression,
-                 ThisExpression, VariableExpression,
-                 Box<struct AssignmentExpression>, Box<struct BinaryExpression>,
-                 Box<struct CallExpression>, Box<struct GetExpression>,
-                 Box<struct GroupingExpression>, Box<struct LogicalExpression>,
-                 Box<struct SetExpression>, Box<struct UnaryExpression>>;
+    std::variant<std::monostate, Box<AssignmentExpression>,
+                 Box<BinaryExpression>, Box<CallExpression>, Box<GetExpression>,
+                 Box<GroupingExpression>, Box<LiteralExpression>,
+                 Box<LogicalExpression>, Box<SetExpression>,
+                 Box<SuperExpression>, Box<ThisExpression>,
+                 Box<UnaryExpression>, Box<VariableExpression>>;
 
 struct AssignmentExpression {
   Token name_;
@@ -58,6 +57,10 @@ struct GroupingExpression {
   Expression expression_;
 };
 
+struct LiteralExpression {
+  Token::Literal value_;
+};
+
 struct LogicalExpression {
   Expression left_;
   Token op_;
@@ -70,9 +73,24 @@ struct SetExpression {
   Expression value_;
 };
 
+struct SuperExpression {
+  Token keyword_;
+  Token method_;
+};
+
+struct ThisExpression {
+  Token keyword_;
+};
+
 struct UnaryExpression {
   Token op_;
   Expression right_;
 };
+
+struct VariableExpression {
+  Token name_;
+};
+
+}  // namespace LOX
 
 #endif

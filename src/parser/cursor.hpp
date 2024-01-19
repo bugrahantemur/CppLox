@@ -5,11 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "../../magic_enum/include/magic_enum/magic_enum.hpp"
 #include "../types/token.hpp"
 #include "./error.hpp"
 
-namespace Parser {
+namespace LOX::Parser {
 
 class Cursor {
   std::vector<Token> const& tokens_;
@@ -36,6 +35,6 @@ class Cursor {
 
   auto synchronize() -> void;
 };
-}  // namespace Parser
+}  // namespace LOX::Parser
 
 #endif

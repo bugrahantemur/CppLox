@@ -6,14 +6,15 @@
 #include <vector>
 
 #include "../types/token.hpp"
+#include "../utils/error_interface.hpp"
 
-namespace Parser {
-class Error : std::exception {
+namespace LOX::Parser {
+class Error : ErrorInterface {
  public:
   Error(std::size_t const line, std::string const& where,
         std::string const& message);
 
-  auto report() const -> void;
+  auto report() const -> void override;
 
  private:
   std::size_t line_;
@@ -22,6 +23,7 @@ class Error : std::exception {
 };
 
 auto error(Token const& token, std::string const& message) -> Error;
-}  // namespace Parser
+
+}  // namespace LOX::Parser
 
 #endif

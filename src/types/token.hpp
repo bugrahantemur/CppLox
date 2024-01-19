@@ -4,6 +4,8 @@
 #include <string>
 #include <variant>
 
+namespace LOX {
+
 enum class TokenType {
   LEFT_PAREN,
   RIGHT_PAREN,
@@ -16,7 +18,6 @@ enum class TokenType {
   SEMICOLON,
   SLASH,
   STAR,
-
   BANG,
   BANG_EQUAL,
   EQUAL,
@@ -25,11 +26,9 @@ enum class TokenType {
   GREATER_EQUAL,
   LESS,
   LESS_EQUAL,
-
   IDENTIFIER,
   STRING,
   NUMBER,
-
   AND,
   CLASS,
   ELSE,
@@ -46,7 +45,6 @@ enum class TokenType {
   TRUE,
   VAR,
   WHILE,
-
   EOFF
 };
 
@@ -68,9 +66,11 @@ struct Token {
   }
 };
 
+}  // namespace LOX
+
 template <>
-struct std::hash<Token> {
-  auto operator()(Token const& token) const -> std::size_t {
+struct std::hash<LOX::Token> {
+  auto operator()(LOX::Token const& token) const -> std::size_t {
     return token.token_id_;
   }
 };

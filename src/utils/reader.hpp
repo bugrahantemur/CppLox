@@ -15,7 +15,7 @@ namespace Reader {
  *
  * @throws std::ifstream::failure If the file cannot be opened or read.
  */
-inline auto read_file(std::string const &path) -> std::string {
+inline auto read(std::string const &path) -> std::string {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::ifstream::failure("Failed to open file");

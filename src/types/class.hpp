@@ -5,12 +5,13 @@
 #include <string>
 #include <unordered_map>
 
+#include "../interpreter/error.hpp"
 #include "../utils/box.hpp"
-#include "../utils/error.hpp"
 #include "./function.hpp"
 #include "./object.hpp"
 #include "./token.hpp"
 
+namespace LOX {
 struct LoxClass {
   std::string name_;
   std::optional<Box<LoxClass>> superclass_;
@@ -49,13 +50,13 @@ inline auto get(std::shared_ptr<LoxInstance> const& instance,
                        method.value().is_initializer_};
   }
 
-  throw RuntimeError{token.line_,
-                     "Undefined property '" + token.lexeme_ + "'."};
+  throw Interpreter::Error{token.line_,
+                           "Undefined property '" + token.lexeme_ + "'."};
 }
 
 inline auto set(std::shared_ptr<LoxInstance> instance, Token const& name,
                 Object const& value) -> void {
   instance->fields_[name.lexeme_] = value;
 }
-
+}  // namespace LOX
 #endif

@@ -8,7 +8,7 @@
 #include "../types/token.hpp"
 #include "./error.hpp"
 
-namespace Parser {
+namespace LOX::Parser {
 
 Cursor::Cursor(std::vector<Token> const& tokens)
     : tokens_(tokens), current_(0){};
@@ -59,4 +59,4 @@ auto Cursor::synchronize() -> void {
     }
   }
 }
-}  // namespace Parser
+}  // namespace LOX::Parser

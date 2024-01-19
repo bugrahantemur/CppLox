@@ -10,7 +10,7 @@ TEST(ReadFileTest, FileExists) {
   std::string const path = "../tests/test.txt";
 
   // Act
-  std::string const result = Reader::read_file(path);
+  std::string const result = Reader::read(path);
 
   // Assert
   std::string const expected = "Hello, _world!\n4.20.floor() ; \"{x}\"\n";
@@ -22,7 +22,7 @@ TEST(ReadFileTest, FileDoesNotExist) {
   std::string const path = "nonexistent.txt";
 
   // Act and Assert
-  ASSERT_THROW(Reader::read_file(path), std::ifstream::failure);
+  ASSERT_THROW(Reader::read(path), std::ifstream::failure);
 }
 
 TEST(ReadFileTest, EmptyFile) {
@@ -30,7 +30,7 @@ TEST(ReadFileTest, EmptyFile) {
   std::string const path = "../tests/empty.txt";
 
   // Act
-  std::string const result = Reader::read_file(path);
+  std::string const result = Reader::read(path);
 
   // Assert
   std::string expected = "";

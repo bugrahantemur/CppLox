@@ -7,7 +7,7 @@
 #include "./cursor.hpp"
 #include "./statements.hpp"
 
-namespace Parser {
+namespace LOX::Parser {
 auto parse(std::vector<Token> const& tokens) -> std::vector<Statement> {
   Cursor cursor(tokens);
 
@@ -19,4 +19,4 @@ auto parse(std::vector<Token> const& tokens) -> std::vector<Statement> {
 
   return statements;
 }
-}  // namespace Parser
+}  // namespace LOX::Parser

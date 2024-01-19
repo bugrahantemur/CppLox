@@ -10,7 +10,7 @@ namespace LOX::Parser::Utils {
 
 template <typename T, typename F>
 auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
-  cursor.take(TokenType::LEFT_PAREN);
+  cursor.consume(TokenType::LEFT_PAREN, "Expect '(' before list.");
 
   std::vector<T> list{};
 
@@ -26,7 +26,7 @@ auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
     error(cursor.peek(), "Can't have more than 255 constituents.").report();
   }
 
-  cursor.take(TokenType::RIGHT_PAREN);
+  cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after list.");
 
   return list;
 }

@@ -29,7 +29,7 @@ class Cursor {
 
   auto take() -> Token;
 
-  auto take(TokenType const& type) -> Token;
+  auto consume(TokenType const& type, std::string const& message) -> Token;
 
   auto previous() -> Token;
 

@@ -16,14 +16,14 @@ auto print_statement(Cursor& cursor) -> Statement {
 
   Expression const value{Expressions::expression(cursor)};
 
-  cursor.take(TokenType::SEMICOLON);
+  cursor.consume(TokenType::SEMICOLON, "Expect ';' after value.");
 
   return PrintStatement{value};
 }
 
 auto expression_statement(Cursor& cursor) -> Statement {
   Expression const expr{Expressions::expression(cursor)};
-  cursor.take(TokenType::SEMICOLON);
+  cursor.consume(TokenType::SEMICOLON, "Expect ';' after expression.");
   return ExpressionStatement{expr};
 }
 
@@ -38,7 +38,7 @@ auto block_statement(Cursor& cursor) -> Statement {
     statements.push_back(declaration(cursor));
   }
 
-  cursor.take(TokenType::RIGHT_BRACE);
+  cursor.consume(TokenType::RIGHT_BRACE, "Expect '}' to close a block.");
 
   return BlockStatement{statements};
 }
@@ -48,9 +48,9 @@ auto if_statement(Cursor& cursor) -> Statement {
   assert(keyword.type_ == TokenType::IF);
   static_cast<void>(keyword);
 
-  cursor.take(TokenType::LEFT_PAREN);
+  cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
   Expression const condition{Expressions::expression(cursor)};
-  cursor.take(TokenType::RIGHT_PAREN);
+  cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after if condition.");
 
   Statement const then_branch{statement(cursor)};
 
@@ -68,9 +68,9 @@ auto while_statement(Cursor& cursor) -> Statement {
   assert(keyword.type_ == TokenType::WHILE);
   static_cast<void>(keyword);
 
-  cursor.take(TokenType::LEFT_PAREN);
+  cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
   Expression const condition{Expressions::expression(cursor)};
-  cursor.take(TokenType::RIGHT_PAREN);
+  cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
 
   return WhileStatement{condition, statement(cursor)};
 }
@@ -80,7 +80,7 @@ auto for_statement(Cursor& cursor) -> Statement {
   assert(keyword.type_ == TokenType::FOR);
   static_cast<void>(keyword);
 
-  cursor.take(TokenType::LEFT_PAREN);
+  cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
 
   Statement initializer{std::monostate{}};
   if (cursor.match(TokenType::SEMICOLON)) {
@@ -95,12 +95,12 @@ auto for_statement(Cursor& cursor) -> Statement {
   if (!cursor.match(TokenType::SEMICOLON)) {
     condition = Expressions::expression(cursor);
   }
-  cursor.take(TokenType::SEMICOLON);
+  cursor.consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
 
   Expression const increment{cursor.match(TokenType::RIGHT_PAREN)
                                  ? std::monostate{}
                                  : Expressions::expression(cursor)};
-  cursor.take(TokenType::RIGHT_PAREN);
+  cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
 
   Statement const body{statement(cursor)};
 
@@ -119,7 +119,7 @@ auto return_statement(Cursor& cursor) -> Statement {
   Expression const value{cursor.match(TokenType::SEMICOLON)
                              ? std::monostate{}
                              : Expressions::expression(cursor)};
-  cursor.take(TokenType::SEMICOLON);
+  cursor.consume(TokenType::SEMICOLON, "Expect ';' after return value.");
   return ReturnStatement{keyword, value};
 }
 
@@ -148,7 +148,7 @@ auto statement(Cursor& cursor) -> Statement {
 
 auto parse_params(Cursor& cursor) -> std::vector<Token> {
   return Utils::parse_parenthesized_list<Token>(cursor, [](Cursor& cursor) {
-    return cursor.take(TokenType::IDENTIFIER);
+    return cursor.consume(TokenType::IDENTIFIER, "Expect parameter name.");
   });
 }
 
@@ -161,7 +161,8 @@ auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
     static_cast<void>(keyword);
   }
 
-  Token const name{cursor.take(TokenType::IDENTIFIER)};
+  Token const name{
+      cursor.consume(TokenType::IDENTIFIER, "Expect function name.")};
 
   std::vector<Token> const parameters{parse_params(cursor)};
 
@@ -175,15 +176,16 @@ auto class_declaration(Cursor& cursor) -> Statement {
   assert(keyword.type_ == TokenType::CLASS);
   static_cast<void>(keyword);
 
-  Token const name{cursor.take(TokenType::IDENTIFIER)};
+  Token const name{cursor.consume(TokenType::IDENTIFIER, "Expect class name.")};
 
   VariableExpression super_class{Token::none()};
   if (cursor.match(TokenType::LESS)) {
     cursor.take();
-    super_class = VariableExpression{cursor.take(TokenType::IDENTIFIER)};
+    super_class = VariableExpression{
+        cursor.consume(TokenType::IDENTIFIER, "Expect superclass name.")};
   }
 
-  cursor.take(TokenType::LEFT_BRACE);
+  cursor.consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
 
   std::vector<Box<FunctionStatement>> methods{};
 
@@ -192,7 +194,7 @@ auto class_declaration(Cursor& cursor) -> Statement {
         function_declaration(cursor, FunctionType::Method)));
   }
 
-  cursor.take(TokenType::RIGHT_BRACE);
+  cursor.consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
 
   return ClassStatement{name, super_class, methods};
 }
@@ -202,7 +204,8 @@ auto variable_declaration(Cursor& cursor) -> Statement {
   assert(keyword.type_ == TokenType::VAR);
   static_cast<void>(keyword);
 
-  Token const name{cursor.take(TokenType::IDENTIFIER)};
+  Token const name{
+      cursor.consume(TokenType::IDENTIFIER, "Expect variable name.")};
 
   Expression initializer{std::monostate{}};
   if (cursor.match(TokenType::EQUAL)) {
@@ -210,7 +213,8 @@ auto variable_declaration(Cursor& cursor) -> Statement {
     initializer = Expressions::expression(cursor);
   }
 
-  cursor.take(TokenType::SEMICOLON);
+  cursor.consume(TokenType::SEMICOLON,
+                 "Expect ';' after variable declaration.");
 
   return VariableStatement{name, initializer};
 }

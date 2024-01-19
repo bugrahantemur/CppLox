@@ -31,12 +31,13 @@ auto Cursor::is_at_end() const -> bool {
 
 auto Cursor::take() -> Token { return tokens_.at(current_++); }
 
-auto Cursor::take(TokenType const& type) -> Token {
+auto Cursor::consume(TokenType const& type, std::string const& message)
+    -> Token {
   if (match(type)) {
     return take();
   }
 
-  throw error(peek(), "Expected " + std::string{magic_enum::enum_name(type)});
+  throw error(peek(), message);
 }
 
 auto Cursor::previous() -> Token {

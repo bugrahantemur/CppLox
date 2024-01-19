@@ -25,7 +25,7 @@ auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::LEFT_PAREN)) {
     cursor.take();
     Expression const expr{expression(cursor)};
-    cursor.take(TokenType::RIGHT_PAREN);
+    cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
     return GroupingExpression{expr};
   }
   if (cursor.match(TokenType::IDENTIFIER)) {
@@ -36,8 +36,9 @@ auto primary(Cursor& cursor) -> Expression {
   }
   if (cursor.match(TokenType::SUPER)) {
     Token const keyword{cursor.take()};
-    cursor.take(TokenType::DOT);
-    Token const method{cursor.take(TokenType::IDENTIFIER)};
+    cursor.consume(TokenType::DOT, "Expect '.' after 'super'.");
+    Token const method{cursor.consume(TokenType::IDENTIFIER,
+                                      "Expect superclass method name.")};
     return SuperExpression{keyword, method};
   }
 
@@ -63,7 +64,8 @@ auto call(Cursor& cursor) -> Expression {
       Token const dot{cursor.take()};
       static_cast<void>(dot);
 
-      Token const name{cursor.take(TokenType::IDENTIFIER)};
+      Token const name{
+          cursor.consume(TokenType::IDENTIFIER, "Expect property name.")};
       expr = Box{GetExpression{name, expr}};
     } else {
       break;

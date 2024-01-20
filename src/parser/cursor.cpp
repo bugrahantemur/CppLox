@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "../../magic_enum/include/magic_enum/magic_enum.hpp"
 #include "../types/token.hpp"
 #include "./error.hpp"
 

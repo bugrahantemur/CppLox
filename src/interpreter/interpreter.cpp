@@ -1,11 +1,11 @@
 #include "./interpreter.hpp"
 
+#include <chrono>
 #include <concepts>
 #include <iostream>
 #include <string>
 #include <variant>
 
-#include "../builtins.hpp"
 #include "../types/class.hpp"
 #include "../types/expression.hpp"
 #include "../types/function.hpp"
@@ -14,6 +14,27 @@
 #include "../types/token.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
+
+namespace LOX {
+struct BuiltinFunction {
+  virtual auto arity() const -> std::size_t = 0;
+  virtual auto to_string() const -> std::string = 0;
+  virtual auto operator()(std::vector<Object> const& args) const -> Object = 0;
+};
+
+struct Clock : public BuiltinFunction {
+  auto arity() const -> std::size_t final { return 0; }
+  auto to_string() const -> std::string final { return "Clock"; };
+  auto operator()(std::vector<Object> const& args) const -> Object final {
+    static_cast<void>(args);
+
+    return static_cast<double>(
+        std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count());
+  };
+};
+}  // namespace LOX
 
 namespace LOX::Interpreter {
 
@@ -40,15 +61,10 @@ struct Equality {
   auto operator()(std::string const& left, std::string const& right) -> bool {
     return left == right;
   }
-  auto operator()(Box<LoxFunction> const& left, LoxFunction const& right)
-      -> bool {
-    // TODO
-    return false;
-  }
 
   template <typename T, typename U>
   auto operator()(T const& left, U const& right) -> bool {
-    return false;
+    throw Error{0, "Can only compare booleans, strings, and numbers"};
   }
 };
 
@@ -59,6 +75,8 @@ auto is_equal(Object const& left, Object const& right) -> bool {
 template <typename OStream>
 struct Put {
   Put(OStream& out) : out_{out} {}
+
+  auto operator()(std::monostate) -> OStream& { return put("nil"); }
 
   auto operator()(std::string const& str) -> OStream& { return put(str); }
 
@@ -80,7 +98,9 @@ struct Put {
     return put("<instance of " + instance->class_.name_ + ">");
   }
 
-  auto operator()(std::monostate) -> OStream& { return put("nil"); }
+  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> OStream& {
+    return put("<builtin-fn " + func->to_string() + ">");
+  }
 
  private:
   template <typename T>
@@ -119,6 +139,10 @@ struct Arity {
     return 0;
   }
 
+  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> std::size_t {
+    return func->arity();
+  }
+
   template <typename T>
   auto operator()(T const& t) -> std::size_t {
     throw UncallableError{};
@@ -129,7 +153,7 @@ struct Call {
   auto operator()(Box<LoxFunction>& func) -> Object {
     auto const env{std::make_shared<Environment>(func->closure_)};
 
-    std::size_t const arity{std::visit(Arity{}, Object{func})};
+    std::size_t const arity{Arity{}(func)};
 
     for (std::size_t i = 0; i < arity; ++i) {
       env->define(func->declaration_.params_.at(i).lexeme_, args_.at(i));
@@ -162,6 +186,10 @@ struct Call {
     }
 
     return instance;
+  }
+
+  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> Object {
+    return (*func)(args_);
   }
 
   template <typename T>
@@ -484,7 +512,8 @@ auto interpret(std::vector<Statement> const& statements,
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)
     -> void {
-  auto const env{std::make_shared<Environment>()};
+  auto env{std::make_shared<Environment>()};
+  env->define("clock", std::make_shared<Clock>());
   interpret(statements, resolution, env);
 }
 

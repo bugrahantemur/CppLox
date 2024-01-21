@@ -28,7 +28,8 @@ set(TARGET_SRC
     src/interpreter/error.cpp
     src/resolver/resolver.cpp
     src/resolver/error.cpp
-    src/builtins.cpp)
+    # src/builtins/builtins.cpp
+)
 add_executable(lox ${TARGET_SRC})
 
 # TESTING

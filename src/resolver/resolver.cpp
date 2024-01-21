@@ -247,7 +247,7 @@ struct Resolve {
 auto resolve(std::vector<Statement> const& statements)
     -> std::unordered_map<Token, std::size_t> {
   std::unordered_map<Token, std::size_t> resolution;
-  std::vector<std::unordered_map<std::string, bool>> scopes{{}};
+  std::vector<std::unordered_map<std::string, bool>> scopes{{{"clock", true}}};
   auto function_type{FunctionType::NONE};
   auto class_type{ClassType::NONE};
 

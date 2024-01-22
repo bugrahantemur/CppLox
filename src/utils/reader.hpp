@@ -2,10 +2,26 @@
 #define LOX_UTILS_READER
 
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
 
-namespace Reader {
+#include "./error_interface.hpp"
+
+namespace LOX::Reader {
+
+class Error : public ErrorInterface {
+ public:
+  Error(std::string const &message) : message(message) {}
+
+  auto report() const -> void final {
+    std::cerr << "File reader error: " << message << std::endl;
+  }
+
+ private:
+  std::string message;
+};
+
 /**
  * Reads the contents of a file and returns them as a string.
  *
@@ -13,12 +29,18 @@ namespace Reader {
  *
  * @return The contents of the file as a string.
  *
- * @throws std::ifstream::failure If the file cannot be opened or read.
+ * @throws LOX::Reader::Error If the file cannot be opened or read.
  */
 inline auto read(std::string const &path) -> std::string {
+  std::string const extension{".lox"};
+
+  if (path.find(extension) != path.size() - extension.size()) {
+    throw Error("File must end in '" + extension + "'");
+  }
+
   std::ifstream file(path);
   if (!file.is_open()) {
-    throw std::ifstream::failure("Failed to open file");
+    throw Error("Failed to open '" + path + "'");
   }
 
   std::stringstream buffer;
@@ -26,6 +48,6 @@ inline auto read(std::string const &path) -> std::string {
 
   return buffer.str();
 }
-}  // namespace Reader
+}  // namespace LOX::Reader
 
 #endif

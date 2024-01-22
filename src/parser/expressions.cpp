@@ -1,5 +1,8 @@
 #include "./expressions.hpp"
 
+#include <iostream>
+
+#include "../utils/error.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 #include "./utils.hpp"
@@ -148,7 +151,7 @@ auto assignment(Cursor& cursor) -> Expression {
     }
 
     // Do not throw, just report the error
-    error(equals, "Invalid assignment target.").report();
+    LOX::report(error(equals, "Invalid assignment target."));
   }
 
   return expr;

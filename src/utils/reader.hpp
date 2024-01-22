@@ -6,20 +6,14 @@
 #include <sstream>
 #include <string>
 
-#include "./error_interface.hpp"
+#include "./error.hpp"
 
 namespace LOX::Reader {
 
 class Error : public ErrorInterface {
  public:
-  Error(std::string const &message) : message(message) {}
-
-  auto report() const -> void final {
-    std::cerr << "File reader error: " << message << std::endl;
-  }
-
- private:
-  std::string message;
+  Error(std::string const &message)
+      : ErrorInterface("File reader error: " + message) {}
 };
 
 /**

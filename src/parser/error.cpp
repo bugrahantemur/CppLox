@@ -5,18 +5,13 @@
 #include <vector>
 
 #include "../types/token.hpp"
-#include "../utils/error_interface.hpp"
 
 namespace LOX::Parser {
 
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
-    : line_(line), where_(where), message_(message) {}
-
-auto Error::report() const -> void {
-  std::cerr << "[line " << line_ << "] Parsing error " << where_ << ": "
-            << message_ << '\n';
-}
+    : ErrorInterface("[line " + std::to_string(line) + "] Parsing error " +
+                     where + ": " + message + "\n") {}
 
 auto error(Token const& token, std::string const& message) -> Error {
   return Error{token.line_,

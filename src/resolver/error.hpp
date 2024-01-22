@@ -3,19 +3,13 @@
 
 #include <string>
 
-#include "../utils/error_interface.hpp"
+#include "../utils/error.hpp"
 
 namespace LOX::Resolver {
 
-class Error : ErrorInterface {
+class Error : public ErrorInterface {
  public:
   Error(std::size_t line, std::string const& message);
-
-  auto report() const -> void final;
-
- private:
-  std::size_t line_;
-  std::string message_;
 };
 
 }  // namespace LOX::Resolver

@@ -11,7 +11,7 @@
 #include "./types/object.hpp"
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
-#include "./utils/error_interface.hpp"
+#include "./utils/error.hpp"
 #include "./utils/reader.hpp"
 
 namespace LOX {
@@ -33,15 +33,19 @@ auto run(std::string const &file_path) -> void {
 
 auto main(int argc, char *argv[]) -> int {
   if (argc != 2) {
-    std::cout << "Wrong usage! Correct usage: cpplox [script]\n";
+    LOX::report(
+        std::runtime_error{"Wrong usage! Correct usage: cpplox [script]\n"});
   } else {
     try {
       LOX::run(argv[1]);
     } catch (LOX::ErrorInterface const &e) {
-      e.report();
+      LOX::report(e);
       return EXIT_FAILURE;
     } catch (std::exception const &e) {
-      std::cerr << "Unhandled exception: " << e.what() << '\n';
+      LOX::report("Unhandled exception: ", e);
+      return EXIT_FAILURE;
+    } catch (...) {
+      LOX::report(std::runtime_error{"Unknown error occured."});
       return EXIT_FAILURE;
     }
   }

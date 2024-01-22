@@ -1,7 +1,10 @@
 #include "./statements.hpp"
 
+#include <iostream>
+
 #include "../types/expression.hpp"
 #include "../types/statement.hpp"
+#include "../utils/error.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 #include "./expressions.hpp"
@@ -232,7 +235,7 @@ auto declaration(Cursor& cursor) -> Statement {
     }
     return statement(cursor);
   } catch (Error const& e) {
-    e.report();
+    LOX::report(e);
     cursor.synchronize();
     return std::monostate{};
   }

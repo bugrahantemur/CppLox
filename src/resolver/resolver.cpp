@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "../builtins/names.hpp"
 #include "./error.hpp"
 
 namespace LOX::Resolver {
@@ -244,12 +245,20 @@ struct Resolve {
   auto end_scope() -> void { scopes_.pop_back(); }
 };
 
+auto preamble() -> std::unordered_map<std::string, bool> {
+  std::unordered_map<std::string, bool> scope;
+  for (auto const& name : Builtins::names()) {
+    scope[name] = true;
+  }
+  return scope;
+}
+
 auto resolve(std::vector<Statement> const& statements)
     -> std::unordered_map<Token, std::size_t> {
-  std::unordered_map<Token, std::size_t> resolution;
-  std::vector<std::unordered_map<std::string, bool>> scopes{{{"clock", true}}};
   auto function_type{FunctionType::NONE};
   auto class_type{ClassType::NONE};
+  std::vector<std::unordered_map<std::string, bool>> scopes{preamble()};
+  std::unordered_map<Token, std::size_t> resolution;
 
   Resolve resolver{resolution, scopes, function_type, class_type};
 

@@ -6,6 +6,7 @@
 #include <string>
 #include <variant>
 
+#include "../builtins/builtins.hpp"
 #include "../types/class.hpp"
 #include "../types/expression.hpp"
 #include "../types/function.hpp"
@@ -14,27 +15,6 @@
 #include "../types/token.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
-
-namespace LOX {
-struct BuiltinFunction {
-  virtual auto arity() const -> std::size_t = 0;
-  virtual auto to_string() const -> std::string = 0;
-  virtual auto operator()(std::vector<Object> const& args) const -> Object = 0;
-};
-
-struct Clock : public BuiltinFunction {
-  auto arity() const -> std::size_t final { return 0; }
-  auto to_string() const -> std::string final { return "Clock"; };
-  auto operator()(std::vector<Object> const& args) const -> Object final {
-    static_cast<void>(args);
-
-    return static_cast<double>(
-        std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::now().time_since_epoch())
-            .count());
-  };
-};
-}  // namespace LOX
 
 namespace LOX::Interpreter {
 
@@ -98,7 +78,8 @@ struct Put {
     return put("<instance of " + instance->class_.name_ + ">");
   }
 
-  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> OStream& {
+  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
+      -> OStream& {
     return put("<builtin-fn " + func->to_string() + ">");
   }
 
@@ -139,7 +120,8 @@ struct Arity {
     return 0;
   }
 
-  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> std::size_t {
+  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
+      -> std::size_t {
     return func->arity();
   }
 
@@ -188,7 +170,8 @@ struct Call {
     return instance;
   }
 
-  auto operator()(std::shared_ptr<BuiltinFunction> const& func) -> Object {
+  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
+      -> Object {
     return (*func)(args_);
   }
 
@@ -501,6 +484,16 @@ struct StatementExecutor {
   }
 };
 
+auto make_preamble_environment() -> std::shared_ptr<Environment> {
+  auto env{std::make_shared<Environment>()};
+
+  for (auto const& name : Builtins::builtins()) {
+    env->define(name.first, name.second);
+  }
+
+  return env;
+}
+
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,
                std::shared_ptr<Environment> const& environment) -> void {
@@ -512,9 +505,10 @@ auto interpret(std::vector<Statement> const& statements,
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)
     -> void {
-  auto env{std::make_shared<Environment>()};
-  env->define("clock", std::make_shared<Clock>());
-  interpret(statements, resolution, env);
+  std::shared_ptr<Environment> const preamble_environment{
+      make_preamble_environment()};
+
+  interpret(statements, resolution, preamble_environment);
 }
 
 }  // namespace LOX::Interpreter

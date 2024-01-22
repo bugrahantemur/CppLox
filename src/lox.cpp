@@ -8,6 +8,7 @@
 #include "./lexer/lexer.hpp"
 #include "./parser/parser.hpp"
 #include "./resolver/resolver.hpp"
+#include "./types/object.hpp"
 #include "./types/statement.hpp"
 #include "./types/token.hpp"
 #include "./utils/error_interface.hpp"

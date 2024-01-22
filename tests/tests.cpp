@@ -19,7 +19,7 @@ TEST(ReadFileTest, FileExists) {
 
 TEST(ReadFileTest, FileDoesNotExist) {
   // Arrange
-  std::string const path = "nonexistent.txt";
+  std::string const path = "nonexistent.lox";
 
   // Act and Assert
   ASSERT_THROW(Reader::read(path), std::ifstream::failure);
@@ -27,7 +27,7 @@ TEST(ReadFileTest, FileDoesNotExist) {
 
 TEST(ReadFileTest, EmptyFile) {
   // Arrange
-  std::string const path = "../tests/empty.txt";
+  std::string const path = "../tests/empty.lox";
 
   // Act
   std::string const result = Reader::read(path);

@@ -23,7 +23,7 @@ auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
   }
 
   if (list.size() >= 255) {
-    error(cursor.peek(), "Can't have more than 255 constituents.").report();
+    throw error(cursor.peek(), "Can't have more than 255 constituents.");
   }
 
   cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after list.");

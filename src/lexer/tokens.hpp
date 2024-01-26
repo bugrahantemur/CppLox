@@ -1,6 +1,6 @@
 #include <optional>
 
-#include "../types/token.hpp"
+#include "../syntax/token.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Lexer {

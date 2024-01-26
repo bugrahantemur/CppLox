@@ -6,12 +6,13 @@
 #include <string>
 #include <vector>
 
-#include "../types/token.hpp"
+#include "../syntax/token.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 #include "./tokens.hpp"
 
 namespace LOX::Lexer {
+
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
   char const c = cursor.take();
 

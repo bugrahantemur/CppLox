@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../types/object.hpp"
+#include "../objects/object.hpp"
 
 namespace LOX::Builtins {
 

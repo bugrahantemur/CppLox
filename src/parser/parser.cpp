@@ -2,12 +2,13 @@
 
 #include <vector>
 
-#include "../types/statement.hpp"
-#include "../types/token.hpp"
+#include "../syntax/statement.hpp"
+#include "../syntax/token.hpp"
 #include "./cursor.hpp"
 #include "./statements.hpp"
 
 namespace LOX::Parser {
+
 auto parse(std::vector<Token> const& tokens) -> std::vector<Statement> {
   Cursor cursor(tokens);
 

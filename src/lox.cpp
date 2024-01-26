@@ -6,11 +6,11 @@
 
 #include "./interpreter/interpreter.hpp"
 #include "./lexer/lexer.hpp"
+#include "./objects/object.hpp"
 #include "./parser/parser.hpp"
 #include "./resolver/resolver.hpp"
-#include "./types/object.hpp"
-#include "./types/statement.hpp"
-#include "./types/token.hpp"
+#include "./syntax/statement.hpp"
+#include "./syntax/token.hpp"
 #include "./utils/error.hpp"
 #include "./utils/reader.hpp"
 

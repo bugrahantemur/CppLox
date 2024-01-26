@@ -9,6 +9,8 @@
 
 namespace LOX::Parser::Expressions {
 
+using namespace LOX::Expressions;
+
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
     cursor.take();

@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../types/statement.hpp"
+#include "../syntax/statement.hpp"
 
 namespace LOX::Resolver {
 

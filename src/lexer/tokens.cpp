@@ -1,10 +1,11 @@
 #include "./tokens.hpp"
 
-#include "../types/token.hpp"
+#include "../syntax/token.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 
 namespace LOX::Lexer {
+
 auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType> {
   if (text == "and") return TokenType::AND;

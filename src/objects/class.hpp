@@ -6,12 +6,13 @@
 #include <unordered_map>
 
 #include "../interpreter/error.hpp"
+#include "../syntax/token.hpp"
 #include "../utils/box.hpp"
 #include "./function.hpp"
 #include "./object.hpp"
-#include "./token.hpp"
 
-namespace LOX {
+namespace LOX::Objects {
+
 struct LoxClass {
   std::string name_;
   std::optional<Box<LoxClass>> superclass_;
@@ -58,5 +59,5 @@ inline auto set(std::shared_ptr<LoxInstance> instance, Token const& name,
                 Object const& value) -> void {
   instance->fields_[name.lexeme_] = value;
 }
-}  // namespace LOX
+}  // namespace LOX::Objects
 #endif

@@ -9,6 +9,7 @@
 namespace LOX {
 
 // Forward declaration of all expression types
+namespace Expressions {
 struct AssignmentExpression;
 struct BinaryExpression;
 struct CallExpression;
@@ -21,15 +22,19 @@ struct SuperExpression;
 struct ThisExpression;
 struct UnaryExpression;
 struct VariableExpression;
+}  // namespace Expressions
 
-// Expression variant
-using Expression =
-    std::variant<std::monostate, Box<AssignmentExpression>,
-                 Box<BinaryExpression>, Box<CallExpression>, Box<GetExpression>,
-                 Box<GroupingExpression>, Box<LiteralExpression>,
-                 Box<LogicalExpression>, Box<SetExpression>,
-                 Box<SuperExpression>, Box<ThisExpression>,
-                 Box<UnaryExpression>, Box<VariableExpression>>;
+using Expression = std::variant<
+    std::monostate, Box<Expressions::AssignmentExpression>,
+    Box<Expressions::BinaryExpression>, Box<Expressions::CallExpression>,
+    Box<Expressions::GetExpression>, Box<Expressions::GroupingExpression>,
+    Box<Expressions::LiteralExpression>, Box<Expressions::LogicalExpression>,
+    Box<Expressions::SetExpression>, Box<Expressions::SuperExpression>,
+    Box<Expressions::ThisExpression>, Box<Expressions::UnaryExpression>,
+    Box<Expressions::VariableExpression>>;
+
+}  // namespace LOX
+namespace LOX::Expressions {
 
 struct AssignmentExpression {
   Token name_;
@@ -91,6 +96,6 @@ struct VariableExpression {
   Token name_;
 };
 
-}  // namespace LOX
+}  // namespace LOX::Expressions
 
 #endif

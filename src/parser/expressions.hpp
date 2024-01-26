@@ -1,7 +1,7 @@
 #ifndef LOX_PARSER_EXPRESSIONS
 #define LOX_PARSER_EXPRESSIONS
 
-#include "../types/expression.hpp"
+#include "../syntax/expression.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Parser::Expressions {
@@ -14,14 +14,14 @@ auto call(Cursor& tc) -> Expression;
 
 auto unary(Cursor& tc) -> Expression;
 
-template <typename F, typename Result, typename... Types>
-auto sequence(Cursor& tc, F const& f, Types... types) -> Expression;
+template <typename F, typename Result, typename... Ts>
+auto sequence(Cursor& tc, F const& f, Ts... ts) -> Expression;
 
-template <typename F, typename... Types>
-auto binary_expression(Cursor& tc, F const& f, Types... types) -> Expression;
+template <typename F, typename... Ts>
+auto binary_expression(Cursor& tc, F const& f, Ts... ts) -> Expression;
 
-template <typename F, typename... Types>
-auto logical_expression(Cursor& tc, F const& f, Types... types) -> Expression;
+template <typename F, typename... Ts>
+auto logical_expression(Cursor& tc, F const& f, Ts... ts) -> Expression;
 
 auto factor(Cursor& tc) -> Expression;
 

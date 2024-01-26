@@ -7,6 +7,8 @@
 
 namespace LOX::Resolver {
 
+using namespace Statements;
+
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };
 

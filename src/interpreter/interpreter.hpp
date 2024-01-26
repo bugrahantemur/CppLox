@@ -6,10 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../types/environment.hpp"
-#include "../types/object.hpp"
-#include "../types/statement.hpp"
-#include "../types/token.hpp"
+#include "../objects/object.hpp"
+#include "../syntax/statement.hpp"
+#include "../syntax/token.hpp"
+#include "./environment.hpp"
 
 namespace LOX::Interpreter {
 

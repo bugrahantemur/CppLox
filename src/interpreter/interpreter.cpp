@@ -7,23 +7,27 @@
 #include <variant>
 
 #include "../builtins/builtins.hpp"
-#include "../types/class.hpp"
-#include "../types/expression.hpp"
-#include "../types/function.hpp"
-#include "../types/object.hpp"
-#include "../types/statement.hpp"
-#include "../types/token.hpp"
+#include "../objects/class.hpp"
+#include "../objects/function.hpp"
+#include "../objects/object.hpp"
+#include "../syntax/expression.hpp"
+#include "../syntax/statement.hpp"
+#include "../syntax/token.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
 
 namespace LOX::Interpreter {
 
+using namespace Statements;
+using namespace Expressions;
+using namespace Objects;
+
 struct Return {
   Object value_;
 };
 
-template <typename... Objects>
-auto check_number_operand(Token const& token, Objects... operands) -> void {
+template <typename... Objs>
+auto check_number_operand(Token const& token, Objs... operands) -> void {
   std::array const ops{operands...};
   if (std::all_of(std::begin(ops), std::end(ops), [](Object const& obj) {
         return !std::holds_alternative<double>(obj);

@@ -9,8 +9,9 @@
 #include "./token.hpp"
 
 namespace LOX {
-
 // Forward declaration of all statement types
+
+namespace Statements {
 struct BlockStatement;
 struct ClassStatement;
 struct ExpressionStatement;
@@ -20,13 +21,20 @@ struct PrintStatement;
 struct ReturnStatement;
 struct VariableStatement;
 struct WhileStatement;
+}  // namespace Statements
 
 // Statement variant
-using Statement =
-    std::variant<std::monostate, Box<BlockStatement>, Box<ClassStatement>,
-                 Box<ExpressionStatement>, Box<FunctionStatement>,
-                 Box<IfStatement>, Box<PrintStatement>, Box<ReturnStatement>,
-                 Box<VariableStatement>, Box<WhileStatement>>;
+using Statement = std::variant<
+    std::monostate, Box<Statements::BlockStatement>,
+    Box<Statements::ClassStatement>, Box<Statements::ExpressionStatement>,
+    Box<Statements::FunctionStatement>, Box<Statements::IfStatement>,
+    Box<Statements::PrintStatement>, Box<Statements::ReturnStatement>,
+    Box<Statements::VariableStatement>, Box<Statements::WhileStatement>>;
+
+}  // namespace LOX
+namespace LOX::Statements {
+
+using namespace LOX::Expressions;
 
 struct BlockStatement {
   std::vector<Statement> statements_;
@@ -73,6 +81,6 @@ struct WhileStatement {
   Statement body_;
 };
 
-}  // namespace LOX
+}  // namespace LOX::Statements
 
 #endif

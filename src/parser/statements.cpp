@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "../types/expression.hpp"
-#include "../types/statement.hpp"
+#include "../syntax/expression.hpp"
+#include "../syntax/statement.hpp"
 #include "../utils/error.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
@@ -11,6 +11,8 @@
 #include "./utils.hpp"
 
 namespace LOX::Parser::Statements {
+
+using namespace LOX::Statements;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};

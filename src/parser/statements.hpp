@@ -1,7 +1,7 @@
 #ifndef LOX_PARSER_STATEMENTS
 #define LOX_PARSER_STATEMENTS
 
-#include "../types/statement.hpp"
+#include "../syntax/statement.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Parser::Statements {
@@ -27,6 +27,7 @@ auto function_declaration(Cursor& cursor) -> Statement;
 auto variable_declaration(Cursor& cursor) -> Statement;
 
 auto declaration(Cursor& cursor) -> Statement;
+
 }  // namespace LOX::Parser::Statements
 
 #endif

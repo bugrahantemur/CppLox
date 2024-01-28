@@ -6,10 +6,10 @@
 
 #include "../syntax/token.hpp"
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 [[nodiscard]] auto scan(std::string const& contents) -> std::vector<Token>;
 
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner
 
 #endif

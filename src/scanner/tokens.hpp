@@ -3,7 +3,7 @@
 #include "../syntax/token.hpp"
 #include "./cursor.hpp"
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 [[nodiscard]] auto handle_string_literal(Cursor& cursor) -> Token;
 
@@ -20,4 +20,4 @@ auto handle_whitespace(Cursor& cursor) -> std::nullopt_t;
 
 auto handle_newline(Cursor& cursor) -> std::nullopt_t;
 
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner

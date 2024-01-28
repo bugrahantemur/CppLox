@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 Error::Error(std::size_t const line, std::string const& message)
     : ErrorInterface("[line " + std::to_string(line) +
@@ -13,4 +13,4 @@ auto error(std::size_t const line, std::string message) -> void {
   throw Error{line, message};
 }
 
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner

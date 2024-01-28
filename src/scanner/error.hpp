@@ -6,7 +6,7 @@
 
 #include "../utils/error.hpp"
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 class Error : public ErrorInterface {
  public:
@@ -15,6 +15,6 @@ class Error : public ErrorInterface {
 
 auto error(std::size_t const line, std::string message) -> void;
 
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner
 
 #endif

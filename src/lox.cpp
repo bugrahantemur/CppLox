@@ -5,10 +5,10 @@
 #include <vector>
 
 #include "./interpreter/interpreter.hpp"
-#include "./lexer/lexer.hpp"
 #include "./objects/object.hpp"
 #include "./parser/parser.hpp"
 #include "./resolver/resolver.hpp"
+#include "./scanner/scanner.hpp"
 #include "./syntax/statement.hpp"
 #include "./syntax/token.hpp"
 #include "./utils/error.hpp"
@@ -19,7 +19,7 @@ namespace LOX {
 auto run(std::string const &file_path) -> void {
   std::string const contents = Reader::read(file_path);
 
-  std::vector<Token> const tokens = Lexer::scan(contents);
+  std::vector<Token> const tokens = Scanner::scan(contents);
 
   std::vector<Statement> const statements = Parser::parse(tokens);
 

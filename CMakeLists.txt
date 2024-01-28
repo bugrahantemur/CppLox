@@ -15,10 +15,10 @@ FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
     src/lox.cpp
-    src/lexer/lexer.cpp
-    src/lexer/error.cpp
-    src/lexer/cursor.cpp
-    src/lexer/tokens.cpp
+    src/scanner/scanner.cpp
+    src/scanner/error.cpp
+    src/scanner/cursor.cpp
+    src/scanner/tokens.cpp
     src/parser/cursor.cpp
     src/parser/error.cpp
     src/parser/parser.cpp
@@ -28,7 +28,6 @@ set(TARGET_SRC
     src/interpreter/error.cpp
     src/resolver/resolver.cpp
     src/resolver/error.cpp
-    # src/builtins/builtins.cpp
 )
 add_executable(lox ${TARGET_SRC})
 

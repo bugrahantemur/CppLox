@@ -4,7 +4,7 @@
 #include "./cursor.hpp"
 #include "./error.hpp"
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType> {
@@ -168,4 +168,4 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
   return std::nullopt;
 }
 
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner

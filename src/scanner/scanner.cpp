@@ -1,4 +1,4 @@
-#include "lexer.hpp"
+#include "scanner.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -11,7 +11,7 @@
 #include "./error.hpp"
 #include "./tokens.hpp"
 
-namespace LOX::Lexer {
+namespace LOX::Scanner {
 
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
   char const c = cursor.take();
@@ -64,4 +64,4 @@ namespace LOX::Lexer {
 
   return tokens;
 }
-}  // namespace LOX::Lexer
+}  // namespace LOX::Scanner

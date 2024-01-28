@@ -1,7 +1,7 @@
 #ifndef LOX_PARSER_STATEMENTS
 #define LOX_PARSER_STATEMENTS
 
-#include "../syntax/statement.hpp"
+#include "../syntax_types/statement.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Parser::Statements {

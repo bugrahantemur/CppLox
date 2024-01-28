@@ -7,12 +7,12 @@
 #include <variant>
 
 #include "../builtins/builtins.hpp"
-#include "../objects/class.hpp"
-#include "../objects/function.hpp"
-#include "../objects/object.hpp"
-#include "../syntax/expression.hpp"
-#include "../syntax/statement.hpp"
-#include "../syntax/token.hpp"
+#include "../object_types/class.hpp"
+#include "../object_types/function.hpp"
+#include "../object_types/object.hpp"
+#include "../syntax_types/expression.hpp"
+#include "../syntax_types/statement.hpp"
+#include "../token/token.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
 

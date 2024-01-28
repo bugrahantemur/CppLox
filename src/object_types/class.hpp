@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "../interpreter/error.hpp"
-#include "../syntax/token.hpp"
+#include "../token/token.hpp"
 #include "../utils/box.hpp"
 #include "./function.hpp"
 #include "./object.hpp"

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../syntax/token.hpp"
+#include "../token/token.hpp"
 #include "./error.hpp"
 
 namespace LOX::Parser {

@@ -1,5 +1,5 @@
-#ifndef LOX_TYPES_TOKEN
-#define LOX_TYPES_TOKEN
+#ifndef LOX_TOKEN
+#define LOX_TOKEN
 
 #include <string>
 #include <variant>
@@ -57,22 +57,16 @@ struct Token {
   std::size_t line_;
   std::size_t token_id_;
 
-  auto operator==(Token const& other) const -> bool {
-    return token_id_ == other.token_id_;
-  }
+  auto operator==(Token const& other) const -> bool;
 
-  static auto none() -> Token {
-    return Token{TokenType::EOFF, "", std::monostate{}, 0, 0};
-  }
+  static auto none() -> Token;
 };
 
 }  // namespace LOX
 
 template <>
 struct std::hash<LOX::Token> {
-  auto operator()(LOX::Token const& token) const -> std::size_t {
-    return token.token_id_;
-  }
+  auto operator()(LOX::Token const& token) const -> std::size_t;
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../objects/object.hpp"
+#include "../object_types/object.hpp"
 #include "./clock.hpp"
 
 namespace LOX::Builtins {

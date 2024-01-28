@@ -1,6 +1,6 @@
 #include <optional>
 
-#include "../syntax/token.hpp"
+#include "../token/token.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Scanner {

@@ -5,12 +5,12 @@
 #include <vector>
 
 #include "./interpreter/interpreter.hpp"
-#include "./objects/object.hpp"
+#include "./object_types/object.hpp"
 #include "./parser/parser.hpp"
 #include "./resolver/resolver.hpp"
 #include "./scanner/scanner.hpp"
-#include "./syntax/statement.hpp"
-#include "./syntax/token.hpp"
+#include "./syntax_types/statement.hpp"
+#include "./token/token.hpp"
 #include "./utils/error.hpp"
 #include "./utils/reader.hpp"
 

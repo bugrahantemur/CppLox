@@ -4,9 +4,9 @@
 
 #include <variant>
 
+#include "../token/token.hpp"
 #include "../utils/box.hpp"
 #include "./expression.hpp"
-#include "./token.hpp"
 
 namespace LOX {
 // Forward declaration of all statement types
@@ -34,7 +34,7 @@ using Statement = std::variant<
 }  // namespace LOX
 namespace LOX::Statements {
 
-using namespace LOX::Expressions;
+using namespace Expressions;
 
 struct BlockStatement {
   std::vector<Statement> statements_;

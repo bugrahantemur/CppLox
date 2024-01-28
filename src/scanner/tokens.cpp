@@ -1,6 +1,6 @@
 #include "./tokens.hpp"
 
-#include "../syntax/token.hpp"
+#include "../token/token.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 

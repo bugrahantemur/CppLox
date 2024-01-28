@@ -15,6 +15,7 @@ FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
     src/lox.cpp
+    src/token/token.cpp
     src/scanner/scanner.cpp
     src/scanner/error.cpp
     src/scanner/cursor.cpp

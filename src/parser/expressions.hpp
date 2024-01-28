@@ -1,7 +1,7 @@
 #ifndef LOX_PARSER_EXPRESSIONS
 #define LOX_PARSER_EXPRESSIONS
 
-#include "../syntax/expression.hpp"
+#include "../syntax_types/expression.hpp"
 #include "./cursor.hpp"
 
 namespace LOX::Parser::Expressions {

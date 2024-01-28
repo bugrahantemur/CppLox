@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "../syntax/token.hpp"
+#include "../token/token.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
 #include "./tokens.hpp"

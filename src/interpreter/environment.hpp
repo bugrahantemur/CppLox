@@ -5,8 +5,8 @@
 #include <map>
 #include <memory>
 
-#include "../objects/object.hpp"
-#include "../syntax/token.hpp"
+#include "../object_types/object.hpp"
+#include "../token/token.hpp"
 
 namespace {
 template <typename Key, typename Value>

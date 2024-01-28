@@ -3,8 +3,8 @@
 
 #include <variant>
 
+#include "../token/token.hpp"
 #include "../utils/box.hpp"
-#include "./token.hpp"
 
 namespace LOX {
 

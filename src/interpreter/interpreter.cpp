@@ -38,6 +38,7 @@ auto check_number_operand(Token const& token, Objs... operands) -> void {
   }
 }
 
+struct NotComparableError : public std::exception {};
 struct Equality {
   auto operator()(std::monostate, std::monostate) -> bool { return true; }
   auto operator()(bool left, bool right) -> bool { return left == right; }
@@ -48,7 +49,7 @@ struct Equality {
 
   template <typename T, typename U>
   auto operator()(T const& left, U const& right) -> bool {
-    throw Error{0, "Can only compare booleans, strings, and numbers"};
+    throw NotComparableError{};
   }
 };
 
@@ -299,11 +300,17 @@ struct ExpressionEvaluator {
       check_number_operand(op, left, right);
       return std::get<double>(left) <= std::get<double>(right);
     }
-    if (op_type == TokenType::BANG_EQUAL) {
-      return !is_equal(left, right);
-    }
-    if (op_type == TokenType::EQUAL_EQUAL) {
-      return is_equal(left, right);
+    try {
+      if (op_type == TokenType::BANG_EQUAL) {
+        return !is_equal(left, right);
+      }
+      if (op_type == TokenType::EQUAL_EQUAL) {
+        return is_equal(left, right);
+      }
+    } catch (NotComparableError const& e) {
+      throw Error{
+          op.line_,
+          "Can only compare booleans, strings, and numbers for equality."};
     }
     // Unreachable
     return std::monostate{};

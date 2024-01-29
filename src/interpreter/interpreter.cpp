@@ -18,9 +18,9 @@
 
 namespace LOX::Interpreter {
 
-using namespace Statements;
-using namespace Expressions;
-using namespace Objects;
+using namespace LOX::Statements;
+using namespace LOX::Expressions;
+using namespace LOX::Objects;
 
 struct Return {
   Object value_;

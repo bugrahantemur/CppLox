@@ -34,7 +34,7 @@ using Statement = std::variant<
 }  // namespace LOX
 namespace LOX::Statements {
 
-using namespace Expressions;
+using namespace LOX::Expressions;
 
 struct BlockStatement {
   std::vector<Statement> statements_;

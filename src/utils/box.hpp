@@ -21,6 +21,8 @@ class Box {
     return *this;
   }
 
+  Box(Box&& other) = default;
+  Box& operator=(Box&& other) = default;
   ~Box() = default;
 
   T& operator*() { return *impl_; }

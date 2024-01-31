@@ -5,12 +5,13 @@
 #include <vector>
 
 #include "../object_types/object.hpp"
+#include "../utils/arcdyn.hpp"
 #include "./clock.hpp"
 
 namespace LOX::Builtins {
 
 inline auto builtins() -> std::vector<std::pair<std::string, Object>> {
-  return {{"clock", std::make_shared<Clock>()}, {"pi", 3.14159265359}};
+  return {{"clock", ArcDyn<FunctionInterface>{Clock{}}}, {"pi", 3.14159265359}};
 }
 
 }  // namespace LOX::Builtins

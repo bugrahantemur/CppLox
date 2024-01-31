@@ -13,6 +13,8 @@
 #include "../syntax_types/expression.hpp"
 #include "../syntax_types/statement.hpp"
 #include "../token/token.hpp"
+#include "../utils/arc.hpp"
+#include "../utils/arcdyn.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
 
@@ -38,8 +40,7 @@ auto check_number_operand(Token const& token, Objs... operands) -> void {
   }
 }
 
-auto get(std::shared_ptr<LoxInstance> const& instance, Token const& token)
-    -> Object {
+auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
   if (auto const field{instance->fields_.find(token.lexeme_)};
       field != instance->fields_.end()) {
     return field->second;
@@ -48,15 +49,15 @@ auto get(std::shared_ptr<LoxInstance> const& instance, Token const& token)
   if (auto const method{instance->class_.find_method(token.lexeme_)}) {
     auto const env{std::make_shared<Environment>(method.value().closure_)};
     env->define("this", instance);
-    return LoxFunction{method.value().declaration_, env,
-                       method.value().is_initializer_};
+    return Box{LoxFunction{method.value().declaration_, env,
+                           method.value().is_initializer_}};
   }
 
   throw Error{token.line_, "Undefined property '" + token.lexeme_ + "'."};
 }
 
-auto set(std::shared_ptr<LoxInstance> instance, Token const& name,
-         Object const& value) -> void {
+auto set(Arc<LoxInstance> instance, Token const& name, Object const& value)
+    -> void {
   instance->fields_[name.lexeme_] = value;
 }
 
@@ -101,12 +102,11 @@ struct Put {
     return put("<class " + klass->name_ + ">");
   }
 
-  auto operator()(std::shared_ptr<LoxInstance> const& instance) -> OStream& {
+  auto operator()(Arc<LoxInstance> const& instance) -> OStream& {
     return put("<instance of " + instance->class_.name_ + ">");
   }
 
-  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
-      -> OStream& {
+  auto operator()(ArcDyn<Builtins::FunctionInterface> const& func) -> OStream& {
     return put("<builtin-fn " + func->to_string() + ">");
   }
 
@@ -147,7 +147,7 @@ struct Arity {
     return 0;
   }
 
-  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
+  auto operator()(ArcDyn<Builtins::FunctionInterface> const& func)
       -> std::size_t {
     return func->arity();
   }
@@ -182,7 +182,7 @@ struct Call {
   }
 
   auto operator()(Box<LoxClass> const& klass) -> Object {
-    auto const instance{std::make_shared<LoxInstance>(LoxInstance{*klass, {}})};
+    auto const instance{Arc{LoxInstance{*klass, {}}}};
 
     if (auto const initializer{klass->methods_.find("init")};
         initializer != klass->methods_.end()) {
@@ -197,8 +197,7 @@ struct Call {
     return instance;
   }
 
-  auto operator()(std::shared_ptr<Builtins::FunctionInterface> const& func)
-      -> Object {
+  auto operator()(ArcDyn<Builtins::FunctionInterface> const& func) -> Object {
     return (*func)(args_);
   }
 
@@ -231,8 +230,8 @@ struct ExpressionEvaluator {
     auto const superclass{
         std::get<Box<LoxClass>>(environment_->get_at("super", distance))};
 
-    auto const instance{std::get<std::shared_ptr<LoxInstance>>(
-        environment_->get_at("this", distance - 1))};
+    auto const instance{
+        std::get<Arc<LoxInstance>>(environment_->get_at("this", distance - 1))};
 
     std::optional<LoxFunction> const method{
         superclass->find_method(expr->method_.lexeme_)};
@@ -244,8 +243,8 @@ struct ExpressionEvaluator {
 
     auto const env{std::make_shared<Environment>(method.value().closure_)};
     env->define("this", instance);
-    return LoxFunction{method.value().declaration_, env,
-                       method.value().is_initializer_};
+    return Box{LoxFunction{method.value().declaration_, env,
+                           method.value().is_initializer_}};
   }
 
   [[nodiscard]] auto operator()(Box<ThisExpr> const& expr) -> Object {
@@ -361,7 +360,7 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<GetExpr> const& expr) -> Object {
     Object const obj{std::visit(*this, expr->object_)};
 
-    if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
+    if (auto const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
       return get(*instance, expr->name_);
     }
 
@@ -390,7 +389,7 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<SetExpr> const& expr) -> Object {
     Object obj{std::visit(*this, expr->object_)};
 
-    if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
+    if (auto const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
       Object const value{std::visit(*this, expr->value_)};
       set(*instance, expr->name_, value);
 
@@ -462,7 +461,7 @@ struct StatementExecutor {
 
   auto operator()(Box<FunctionStmt> const& stmt) -> void {
     environment_->define(stmt->name_.lexeme_,
-                         LoxFunction{*stmt, environment_, false});
+                         Box{LoxFunction{*stmt, environment_, false}});
   }
 
   auto operator()(Box<ClassStmt> const& stmt) -> void {
@@ -496,7 +495,7 @@ struct StatementExecutor {
 
     environment_->assign(
         stmt->name_.lexeme_,
-        LoxClass{stmt->name_.lexeme_, superclass, class_methods});
+        Box{LoxClass{stmt->name_.lexeme_, superclass, class_methods}});
   }
 
   auto operator()(Box<IfStmt> const& stmt) -> void {

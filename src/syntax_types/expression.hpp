@@ -10,89 +10,89 @@ namespace LOX {
 
 // Forward declaration of all expression types
 namespace Expressions {
-struct AssignmentExpression;
-struct BinaryExpression;
-struct CallExpression;
-struct GetExpression;
-struct GroupingExpression;
-struct LiteralExpression;
-struct LogicalExpression;
-struct SetExpression;
-struct SuperExpression;
-struct ThisExpression;
-struct UnaryExpression;
-struct VariableExpression;
+struct AssignmentExpr;
+struct BinaryExpr;
+struct CallExpr;
+struct GetExpr;
+struct GroupingExpr;
+struct LiteralExpr;
+struct LogicalExpr;
+struct SetExpr;
+struct SuperExpr;
+struct ThisExpr;
+struct UnaryExpr;
+struct VariableExpr;
 }  // namespace Expressions
 
-using Expression = std::variant<
-    std::monostate, Box<Expressions::AssignmentExpression>,
-    Box<Expressions::BinaryExpression>, Box<Expressions::CallExpression>,
-    Box<Expressions::GetExpression>, Box<Expressions::GroupingExpression>,
-    Box<Expressions::LiteralExpression>, Box<Expressions::LogicalExpression>,
-    Box<Expressions::SetExpression>, Box<Expressions::SuperExpression>,
-    Box<Expressions::ThisExpression>, Box<Expressions::UnaryExpression>,
-    Box<Expressions::VariableExpression>>;
+using Expression =
+    std::variant<std::monostate, Box<Expressions::AssignmentExpr>,
+                 Box<Expressions::BinaryExpr>, Box<Expressions::CallExpr>,
+                 Box<Expressions::GetExpr>, Box<Expressions::GroupingExpr>,
+                 Box<Expressions::LiteralExpr>, Box<Expressions::LogicalExpr>,
+                 Box<Expressions::SetExpr>, Box<Expressions::SuperExpr>,
+                 Box<Expressions::ThisExpr>, Box<Expressions::UnaryExpr>,
+                 Box<Expressions::VariableExpr>>;
 
 }  // namespace LOX
 namespace LOX::Expressions {
 
-struct AssignmentExpression {
+struct AssignmentExpr {
   Token name_;
   Expression value_;
 };
 
-struct BinaryExpression {
+struct BinaryExpr {
   Expression left_;
   Token op_;
   Expression right_;
 };
 
-struct CallExpression {
+struct CallExpr {
   Expression callee_;
   Token paren_;
   std::vector<Expression> arguments_;
 };
 
-struct GetExpression {
+struct GetExpr {
   Token name_;
   Expression object_;
 };
 
-struct GroupingExpression {
+struct GroupingExpr {
   Expression expression_;
 };
 
-struct LiteralExpression {
+struct LiteralExpr {
   Token::Literal value_;
 };
 
-struct LogicalExpression {
+struct LogicalExpr {
   Expression left_;
   Token op_;
   Expression right_;
 };
 
-struct SetExpression {
+struct SetExpr {
   Token name_;
   Expression object_;
   Expression value_;
 };
 
-struct SuperExpression {
+struct SuperExpr {
   Token keyword_;
   Token method_;
 };
 
-struct ThisExpression {
+struct ThisExpr {
   Token keyword_;
 };
 
-struct UnaryExpression {
+struct UnaryExpr {
   Token op_;
   Expression right_;
 };
 
-struct VariableExpression {
+struct VariableExpr {
   Token name_;
 };
 

@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "../syntax_types/expression.hpp"
 #include "../utils/error.hpp"
 #include "./cursor.hpp"
 #include "./error.hpp"
@@ -14,37 +15,37 @@ using namespace LOX::Expressions;
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
     cursor.take();
-    return LiteralExpression{false};
+    return LiteralExpr{false};
   }
   if (cursor.match(TokenType::TRUE)) {
     cursor.take();
-    return LiteralExpression{true};
+    return LiteralExpr{true};
   }
   if (cursor.match(TokenType::NIL)) {
     cursor.take();
-    return LiteralExpression{std::monostate{}};
+    return LiteralExpr{std::monostate{}};
   }
   if (cursor.match(TokenType::NUMBER, TokenType::STRING)) {
-    return LiteralExpression{cursor.take().literal_};
+    return LiteralExpr{cursor.take().literal_};
   }
   if (cursor.match(TokenType::LEFT_PAREN)) {
     cursor.take();
     Expression const expr{expression(cursor)};
     cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-    return GroupingExpression{expr};
+    return GroupingExpr{expr};
   }
   if (cursor.match(TokenType::IDENTIFIER)) {
-    return VariableExpression{cursor.take()};
+    return VariableExpr{cursor.take()};
   }
   if (cursor.match(TokenType::THIS)) {
-    return ThisExpression{cursor.take()};
+    return ThisExpr{cursor.take()};
   }
   if (cursor.match(TokenType::SUPER)) {
     Token const keyword{cursor.take()};
     cursor.consume(TokenType::DOT, "Expect '.' after 'super'.");
     Token const method{cursor.consume(TokenType::IDENTIFIER,
                                       "Expect superclass method name.")};
-    return SuperExpression{keyword, method};
+    return SuperExpr{keyword, method};
   }
 
   throw error(cursor.peek(), "Expected expression.");
@@ -64,14 +65,14 @@ auto call(Cursor& cursor) -> Expression {
       Token const closing{cursor.previous()};
       assert(closing.type_ == TokenType::RIGHT_PAREN);
 
-      expr = CallExpression{expr, closing, args};
+      expr = CallExpr{expr, closing, args};
     } else if (cursor.match(TokenType::DOT)) {
       Token const dot{cursor.take()};
       static_cast<void>(dot);
 
       Token const name{
           cursor.consume(TokenType::IDENTIFIER, "Expect property name.")};
-      expr = Box{GetExpression{name, expr}};
+      expr = Box{GetExpr{name, expr}};
     } else {
       break;
     }
@@ -83,7 +84,7 @@ auto call(Cursor& cursor) -> Expression {
 auto unary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::BANG, TokenType::MINUS)) {
     Token const op{cursor.take()};
-    return UnaryExpression{op, unary(cursor)};
+    return UnaryExpr{op, unary(cursor)};
   }
 
   return call(cursor);
@@ -103,13 +104,13 @@ auto sequence(Cursor& cursor, F const& f, Types... types) -> Expression {
 template <typename F, typename... Types>
 auto binary_expression(Cursor& cursor, F const& f, Types... types)
     -> Expression {
-  return sequence<F, BinaryExpression, Types...>(cursor, f, types...);
+  return sequence<F, BinaryExpr, Types...>(cursor, f, types...);
 }
 
 template <typename F, typename... Types>
 auto logical_expression(Cursor& cursor, F const& f, Types... types)
     -> Expression {
-  return sequence<F, LogicalExpression, Types...>(cursor, f, types...);
+  return sequence<F, LogicalExpr, Types...>(cursor, f, types...);
 }
 
 auto factor(Cursor& cursor) -> Expression {
@@ -146,10 +147,10 @@ auto assignment(Cursor& cursor) -> Expression {
     Token const equals{cursor.take()};
     Expression const value{or_expr(cursor)};
 
-    if (auto const var{std::get_if<Box<VariableExpression>>(&expr)}) {
-      return AssignmentExpression{(*var)->name_, value};
-    } else if (auto const get{std::get_if<Box<GetExpression>>(&expr)}) {
-      return SetExpression{(*get)->name_, (*get)->object_, value};
+    if (auto const var{std::get_if<Box<VariableExpr>>(&expr)}) {
+      return AssignmentExpr{(*var)->name_, value};
+    } else if (auto const get{std::get_if<Box<GetExpr>>(&expr)}) {
+      return SetExpr{(*get)->name_, (*get)->object_, value};
     }
 
     // Do not throw, just report the error

@@ -23,13 +23,13 @@ auto print_statement(Cursor& cursor) -> Statement {
 
   cursor.consume(TokenType::SEMICOLON, "Expect ';' after value.");
 
-  return PrintStatement{value};
+  return PrintStmt{value};
 }
 
 auto expression_statement(Cursor& cursor) -> Statement {
   Expression const expr{Expressions::expression(cursor)};
   cursor.consume(TokenType::SEMICOLON, "Expect ';' after expression.");
-  return ExpressionStatement{expr};
+  return ExpressionStmt{expr};
 }
 
 auto block_statement(Cursor& cursor) -> Statement {
@@ -45,7 +45,7 @@ auto block_statement(Cursor& cursor) -> Statement {
 
   cursor.consume(TokenType::RIGHT_BRACE, "Expect '}' to close a block.");
 
-  return BlockStatement{statements};
+  return BlockStmt{statements};
 }
 
 auto if_statement(Cursor& cursor) -> Statement {
@@ -65,7 +65,7 @@ auto if_statement(Cursor& cursor) -> Statement {
     else_branch = statement(cursor);
   }
 
-  return IfStatement{condition, then_branch, else_branch};
+  return IfStmt{condition, then_branch, else_branch};
 }
 
 auto while_statement(Cursor& cursor) -> Statement {
@@ -77,7 +77,7 @@ auto while_statement(Cursor& cursor) -> Statement {
   Expression const condition{Expressions::expression(cursor)};
   cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
 
-  return WhileStatement{condition, statement(cursor)};
+  return WhileStmt{condition, statement(cursor)};
 }
 
 auto for_statement(Cursor& cursor) -> Statement {
@@ -109,12 +109,11 @@ auto for_statement(Cursor& cursor) -> Statement {
 
   Statement const body{statement(cursor)};
 
-  return BlockStatement{
-      {initializer,
-       WhileStatement{std::holds_alternative<std::monostate>(condition)
-                          ? LiteralExpression{true}
-                          : condition,
-                      BlockStatement{{body, ExpressionStatement{increment}}}}}};
+  return BlockStmt{
+      {initializer, WhileStmt{std::holds_alternative<std::monostate>(condition)
+                                  ? LiteralExpr{true}
+                                  : condition,
+                              BlockStmt{{body, ExpressionStmt{increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {
@@ -125,7 +124,7 @@ auto return_statement(Cursor& cursor) -> Statement {
                              ? std::monostate{}
                              : Expressions::expression(cursor)};
   cursor.consume(TokenType::SEMICOLON, "Expect ';' after return value.");
-  return ReturnStatement{keyword, value};
+  return ReturnStmt{keyword, value};
 }
 
 auto statement(Cursor& cursor) -> Statement {
@@ -173,7 +172,7 @@ auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
 
   std::vector<Statement> const body{block_statement(cursor)};
 
-  return FunctionStatement{name, parameters, body};
+  return FunctionStmt{name, parameters, body};
 }
 
 auto class_declaration(Cursor& cursor) -> Statement {
@@ -183,25 +182,25 @@ auto class_declaration(Cursor& cursor) -> Statement {
 
   Token const name{cursor.consume(TokenType::IDENTIFIER, "Expect class name.")};
 
-  VariableExpression super_class{Token::none()};
+  VariableExpr super_class{Token::none()};
   if (cursor.match(TokenType::LESS)) {
     cursor.take();
-    super_class = VariableExpression{
+    super_class = VariableExpr{
         cursor.consume(TokenType::IDENTIFIER, "Expect superclass name.")};
   }
 
   cursor.consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
 
-  std::vector<Box<FunctionStatement>> methods{};
+  std::vector<Box<FunctionStmt>> methods{};
 
   while (!cursor.match(TokenType::RIGHT_BRACE)) {
-    methods.emplace_back(*std::get<Box<FunctionStatement>>(
+    methods.emplace_back(*std::get<Box<FunctionStmt>>(
         function_declaration(cursor, FunctionType::Method)));
   }
 
   cursor.consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
 
-  return ClassStatement{name, super_class, methods};
+  return ClassStmt{name, super_class, methods};
 }
 
 auto variable_declaration(Cursor& cursor) -> Statement {
@@ -221,7 +220,7 @@ auto variable_declaration(Cursor& cursor) -> Statement {
   cursor.consume(TokenType::SEMICOLON,
                  "Expect ';' after variable declaration.");
 
-  return VariableStatement{name, initializer};
+  return VariableStmt{name, initializer};
 }
 
 auto declaration(Cursor& cursor) -> Statement {

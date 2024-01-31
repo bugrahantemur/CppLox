@@ -9,7 +9,7 @@
 namespace LOX::Objects {
 
 struct LoxFunction {
-  Statements::FunctionStatement declaration_;
+  Statements::FunctionStmt declaration_;
   std::shared_ptr<Environment> closure_;
   bool is_initializer_;
 };

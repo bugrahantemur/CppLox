@@ -12,71 +12,71 @@ namespace LOX {
 // Forward declaration of all statement types
 
 namespace Statements {
-struct BlockStatement;
-struct ClassStatement;
-struct ExpressionStatement;
-struct FunctionStatement;
-struct IfStatement;
-struct PrintStatement;
-struct ReturnStatement;
-struct VariableStatement;
-struct WhileStatement;
+struct BlockStmt;
+struct ClassStmt;
+struct ExpressionStmt;
+struct FunctionStmt;
+struct IfStmt;
+struct PrintStmt;
+struct ReturnStmt;
+struct VariableStmt;
+struct WhileStmt;
 }  // namespace Statements
 
 // Statement variant
-using Statement = std::variant<
-    std::monostate, Box<Statements::BlockStatement>,
-    Box<Statements::ClassStatement>, Box<Statements::ExpressionStatement>,
-    Box<Statements::FunctionStatement>, Box<Statements::IfStatement>,
-    Box<Statements::PrintStatement>, Box<Statements::ReturnStatement>,
-    Box<Statements::VariableStatement>, Box<Statements::WhileStatement>>;
+using Statement =
+    std::variant<std::monostate, Box<Statements::BlockStmt>,
+                 Box<Statements::ClassStmt>, Box<Statements::ExpressionStmt>,
+                 Box<Statements::FunctionStmt>, Box<Statements::IfStmt>,
+                 Box<Statements::PrintStmt>, Box<Statements::ReturnStmt>,
+                 Box<Statements::VariableStmt>, Box<Statements::WhileStmt>>;
 
 }  // namespace LOX
 namespace LOX::Statements {
 
 using namespace LOX::Expressions;
 
-struct BlockStatement {
+struct BlockStmt {
   std::vector<Statement> statements_;
 };
 
-struct ClassStatement {
+struct ClassStmt {
   Token name_;
-  VariableExpression super_class_;
-  std::vector<Box<FunctionStatement>> methods_;
+  VariableExpr super_class_;
+  std::vector<Box<FunctionStmt>> methods_;
 };
 
-struct ExpressionStatement {
+struct ExpressionStmt {
   Expression expression_;
 };
 
-struct FunctionStatement {
+struct FunctionStmt {
   Token name_;
   std::vector<Token> params_;
   std::vector<Statement> body_;
 };
 
-struct IfStatement {
+struct IfStmt {
   Expression condition_;
   Statement then_branch_;
   Statement else_branch_;
 };
 
-struct PrintStatement {
+struct PrintStmt {
   Expression expression_;
 };
 
-struct ReturnStatement {
+struct ReturnStmt {
   Token keyword_;
   Expression value_;
 };
 
-struct VariableStatement {
+struct VariableStmt {
   Token name_;
   Expression initializer_;
 };
 
-struct WhileStatement {
+struct WhileStmt {
   Expression condition_;
   Statement body_;
 };

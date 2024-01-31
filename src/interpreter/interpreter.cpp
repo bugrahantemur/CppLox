@@ -220,12 +220,12 @@ struct ExpressionEvaluator {
     return std::monostate{};
   }
 
-  [[nodiscard]] auto operator()(Box<LiteralExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<LiteralExpr> const& expr) -> Object {
     return std::visit([](auto const& value) -> Object { return value; },
                       expr->value_);
   }
 
-  [[nodiscard]] auto operator()(Box<SuperExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<SuperExpr> const& expr) -> Object {
     std::size_t const distance{resolution_.at(expr->keyword_)};
 
     auto const superclass{
@@ -248,11 +248,11 @@ struct ExpressionEvaluator {
                        method.value().is_initializer_};
   }
 
-  [[nodiscard]] auto operator()(Box<ThisExpression> const& expr) -> Object {
-    return (*this)(VariableExpression{expr->keyword_});
+  [[nodiscard]] auto operator()(Box<ThisExpr> const& expr) -> Object {
+    return (*this)(VariableExpr{expr->keyword_});
   }
 
-  [[nodiscard]] auto operator()(Box<VariableExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<VariableExpr> const& expr) -> Object {
     if (auto const found{resolution_.find(expr->name_)};
         found != resolution_.end()) {
       std::size_t const distance = found->second;
@@ -262,8 +262,7 @@ struct ExpressionEvaluator {
     }
   }
 
-  [[nodiscard]] auto operator()(Box<AssignmentExpression> const& expr)
-      -> Object {
+  [[nodiscard]] auto operator()(Box<AssignmentExpr> const& expr) -> Object {
     Object const value{std::visit(*this, expr->value_)};
     if (auto const found{resolution_.find(expr->name_)};
         found != resolution_.end()) {
@@ -276,7 +275,7 @@ struct ExpressionEvaluator {
     return value;
   }
 
-  [[nodiscard]] auto operator()(Box<BinaryExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<BinaryExpr> const& expr) -> Object {
     Object const left{std::visit(*this, expr->left_)};
     Object const right{std::visit(*this, expr->right_)};
 
@@ -338,7 +337,7 @@ struct ExpressionEvaluator {
     return std::monostate{};
   }
 
-  [[nodiscard]] auto operator()(Box<CallExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<CallExpr> const& expr) -> Object {
     Object callee{std::visit(*this, expr->callee_)};
 
     std::vector<Object> args{};
@@ -359,7 +358,7 @@ struct ExpressionEvaluator {
     }
   }
 
-  [[nodiscard]] auto operator()(Box<GetExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<GetExpr> const& expr) -> Object {
     Object const obj{std::visit(*this, expr->object_)};
 
     if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
@@ -369,11 +368,11 @@ struct ExpressionEvaluator {
     throw Error{expr->name_.line_, "Only instances have properties."};
   }
 
-  [[nodiscard]] auto operator()(Box<GroupingExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<GroupingExpr> const& expr) -> Object {
     return std::visit(*this, expr->expression_);
   }
 
-  [[nodiscard]] auto operator()(Box<LogicalExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<LogicalExpr> const& expr) -> Object {
     Object const left{std::visit(*this, expr->left_)};
 
     if (expr->op_.type_ == TokenType::OR) {
@@ -388,7 +387,7 @@ struct ExpressionEvaluator {
     return std::visit(*this, expr->right_);
   }
 
-  [[nodiscard]] auto operator()(Box<SetExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<SetExpr> const& expr) -> Object {
     Object obj{std::visit(*this, expr->object_)};
 
     if (auto const instance{std::get_if<std::shared_ptr<LoxInstance>>(&obj)}) {
@@ -400,7 +399,7 @@ struct ExpressionEvaluator {
 
     throw Error{expr->name_.line_, "Only instances have properties."};
   }
-  [[nodiscard]] auto operator()(Box<UnaryExpression> const& expr) -> Object {
+  [[nodiscard]] auto operator()(Box<UnaryExpr> const& expr) -> Object {
     Object const right{std::visit(*this, expr->right_)};
 
     Token const& op{expr->op_};
@@ -425,48 +424,48 @@ struct StatementExecutor {
 
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(Box<ExpressionStatement> const& stmt) -> void {
+  auto operator()(Box<ExpressionStmt> const& stmt) -> void {
     static_cast<void>(std::visit(ExpressionEvaluator{environment_, resolution_},
                                  stmt->expression_));
   }
 
-  auto operator()(Box<PrintStatement> const& stmt) -> void {
+  auto operator()(Box<PrintStmt> const& stmt) -> void {
     Object const value{std::visit(
         ExpressionEvaluator{environment_, resolution_}, stmt->expression_)};
     std::visit(Put{std::cout}, value);
   }
 
-  auto operator()(Box<ReturnStatement> const& stmt) -> void {
+  auto operator()(Box<ReturnStmt> const& stmt) -> void {
     Object const value{std::visit(
         ExpressionEvaluator{environment_, resolution_}, stmt->value_)};
 
     throw Return{value};
   }
 
-  auto operator()(Box<VariableStatement> const& stmt) -> void {
+  auto operator()(Box<VariableStmt> const& stmt) -> void {
     Object const value{std::visit(
         ExpressionEvaluator{environment_, resolution_}, stmt->initializer_)};
 
     environment_->define(stmt->name_.lexeme_, value);
   }
 
-  auto operator()(Box<BlockStatement> const& stmt) -> void {
+  auto operator()(Box<BlockStmt> const& stmt) -> void {
     // Create new environment with the current environment as its
     // enclosing environment
     auto const env{std::make_shared<Environment>(environment_)};
 
     // Execute statements in the block with the new environment
-    for (Statement const& statement : stmt->statements_) {
-      std::visit(StatementExecutor{env, resolution_}, statement);
+    for (Statement const& stmt : stmt->statements_) {
+      std::visit(StatementExecutor{env, resolution_}, stmt);
     }
   }
 
-  auto operator()(Box<FunctionStatement> const& stmt) -> void {
+  auto operator()(Box<FunctionStmt> const& stmt) -> void {
     environment_->define(stmt->name_.lexeme_,
                          LoxFunction{*stmt, environment_, false});
   }
 
-  auto operator()(Box<ClassStatement> const& stmt) -> void {
+  auto operator()(Box<ClassStmt> const& stmt) -> void {
     std::optional<Box<LoxClass>> superclass;
     if (stmt->super_class_.name_ != Token::none()) {
       try {
@@ -486,7 +485,7 @@ struct StatementExecutor {
     }
 
     std::unordered_map<std::string, LoxFunction> class_methods;
-    for (Box<FunctionStatement> const& method : stmt->methods_) {
+    for (Box<FunctionStmt> const& method : stmt->methods_) {
       class_methods[method->name_.lexeme_] =
           LoxFunction{*method, environment_, method->name_.lexeme_ == "init"};
     }
@@ -500,7 +499,7 @@ struct StatementExecutor {
         LoxClass{stmt->name_.lexeme_, superclass, class_methods});
   }
 
-  auto operator()(Box<IfStatement> const& stmt) -> void {
+  auto operator()(Box<IfStmt> const& stmt) -> void {
     if (is_truthy(std::visit(ExpressionEvaluator{environment_, resolution_},
                              stmt->condition_))) {
       std::visit(*this, stmt->then_branch_);
@@ -509,7 +508,7 @@ struct StatementExecutor {
     }
   }
 
-  auto operator()(Box<WhileStatement> const& stmt) -> void {
+  auto operator()(Box<WhileStmt> const& stmt) -> void {
     while (is_truthy(std::visit(ExpressionEvaluator{environment_, resolution_},
                                 stmt->condition_))) {
       std::visit(*this, stmt->body_);

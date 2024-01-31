@@ -21,15 +21,15 @@ struct Resolve {
 
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(Box<ExpressionStatement> const& stmt) -> void {
+  auto operator()(Box<ExpressionStmt> const& stmt) -> void {
     resolve(stmt->expression_);
   }
 
-  auto operator()(Box<PrintStatement> const& stmt) -> void {
+  auto operator()(Box<PrintStmt> const& stmt) -> void {
     resolve(stmt->expression_);
   }
 
-  auto operator()(Box<ReturnStatement> const& stmt) -> void {
+  auto operator()(Box<ReturnStmt> const& stmt) -> void {
     if (current_function_type_ == FunctionType::NONE) {
       throw Error{stmt->keyword_.line_, "Can't return from top-level code."};
     }
@@ -42,26 +42,26 @@ struct Resolve {
     resolve(stmt->value_);
   }
 
-  auto operator()(Box<VariableStatement> const& stmt) -> void {
+  auto operator()(Box<VariableStmt> const& stmt) -> void {
     declare(stmt->name_);
     resolve(stmt->initializer_);
     define(stmt->name_);
   }
 
-  auto operator()(Box<BlockStatement> const& stmt) -> void {
+  auto operator()(Box<BlockStmt> const& stmt) -> void {
     begin_scope();
     resolve(stmt->statements_);
     end_scope();
   }
 
-  auto operator()(Box<FunctionStatement> const& stmt) -> void {
+  auto operator()(Box<FunctionStmt> const& stmt) -> void {
     declare(stmt->name_);
     define(stmt->name_);
 
     resolve(*stmt, FunctionType::FUNCTION);
   }
 
-  auto operator()(Box<ClassStatement> const& stmt) -> void {
+  auto operator()(Box<ClassStmt> const& stmt) -> void {
     ClassType const enclosing_class_type{current_class_type_};
     current_class_type_ = ClassType::CLASS;
 
@@ -84,7 +84,7 @@ struct Resolve {
     begin_scope();
     scopes_.back()["this"] = true;
 
-    for (Box<FunctionStatement> const& method : stmt->methods_) {
+    for (Box<FunctionStmt> const& method : stmt->methods_) {
       resolve(*method, method->name_.lexeme_ == "init"
                            ? FunctionType::INITIALIZER
                            : FunctionType::METHOD);
@@ -98,20 +98,20 @@ struct Resolve {
     current_class_type_ = enclosing_class_type;
   }
 
-  auto operator()(Box<IfStatement> const& stmt) -> void {
+  auto operator()(Box<IfStmt> const& stmt) -> void {
     resolve(stmt->condition_);
     resolve(stmt->then_branch_);
     resolve(stmt->else_branch_);
   }
 
-  auto operator()(Box<WhileStatement> const& stmt) -> void {
+  auto operator()(Box<WhileStmt> const& stmt) -> void {
     resolve(stmt->condition_);
     resolve(stmt->body_);
   }
 
-  auto operator()(Box<LiteralExpression> const& expr) -> void {}
+  auto operator()(Box<LiteralExpr> const& expr) -> void {}
 
-  auto operator()(Box<SuperExpression> const& expr) -> void {
+  auto operator()(Box<SuperExpr> const& expr) -> void {
     if (current_class_type_ == ClassType::NONE) {
       throw Resolver::Error{expr->keyword_.line_,
                             "Can't use 'super' outside of a class."};
@@ -125,7 +125,7 @@ struct Resolve {
     resolve(expr->keyword_);
   }
 
-  auto operator()(Box<ThisExpression> const& expr) -> void {
+  auto operator()(Box<ThisExpr> const& expr) -> void {
     if (current_class_type_ == ClassType::NONE) {
       throw Resolver::Error{expr->keyword_.line_,
                             "Can't use 'this' outside of a class."};
@@ -134,7 +134,7 @@ struct Resolve {
     resolve(expr->keyword_);
   }
 
-  auto operator()(Box<VariableExpression> const& expr) -> void {
+  auto operator()(Box<VariableExpr> const& expr) -> void {
     if (!scopes_.empty()) {
       if (auto const found{scopes_.back().find(expr->name_.lexeme_)};
           found != scopes_.back().end() && found->second == false) {
@@ -146,17 +146,17 @@ struct Resolve {
     resolve(expr->name_);
   }
 
-  auto operator()(Box<AssignmentExpression> const& expr) -> void {
+  auto operator()(Box<AssignmentExpr> const& expr) -> void {
     resolve(expr->value_);
     resolve(expr->name_);
   }
 
-  auto operator()(Box<BinaryExpression> const& expr) -> void {
+  auto operator()(Box<BinaryExpr> const& expr) -> void {
     resolve(expr->left_);
     resolve(expr->right_);
   }
 
-  auto operator()(Box<CallExpression> const& expr) -> void {
+  auto operator()(Box<CallExpr> const& expr) -> void {
     resolve(expr->callee_);
 
     for (Expression const& argument : expr->arguments_) {
@@ -164,27 +164,23 @@ struct Resolve {
     }
   }
 
-  auto operator()(Box<GetExpression> const& expr) -> void {
-    resolve(expr->object_);
-  }
+  auto operator()(Box<GetExpr> const& expr) -> void { resolve(expr->object_); }
 
-  auto operator()(Box<GroupingExpression> const& expr) -> void {
+  auto operator()(Box<GroupingExpr> const& expr) -> void {
     resolve(expr->expression_);
   }
 
-  auto operator()(Box<LogicalExpression> const& expr) -> void {
+  auto operator()(Box<LogicalExpr> const& expr) -> void {
     resolve(expr->left_);
     resolve(expr->right_);
   }
 
-  auto operator()(Box<SetExpression> const& expr) -> void {
+  auto operator()(Box<SetExpr> const& expr) -> void {
     resolve(expr->value_);
     resolve(expr->object_);
   }
 
-  auto operator()(Box<UnaryExpression> const& expr) -> void {
-    resolve(expr->right_);
-  }
+  auto operator()(Box<UnaryExpr> const& expr) -> void { resolve(expr->right_); }
 
  private:
   auto resolve(Statement const& stmt) -> void { std::visit(*this, stmt); }
@@ -206,8 +202,7 @@ struct Resolve {
     }
   }
 
-  auto resolve(FunctionStatement const& stmt, FunctionType function_type)
-      -> void {
+  auto resolve(FunctionStmt const& stmt, FunctionType function_type) -> void {
     FunctionType const enclosing_function{current_function_type_};
     current_function_type_ = function_type;
 
@@ -264,8 +259,8 @@ auto resolve(std::vector<Statement> const& statements)
 
   Resolve resolver{resolution, scopes, function_type, class_type};
 
-  for (Statement const& statement : statements) {
-    std::visit(resolver, statement);
+  for (Statement const& stmt : statements) {
+    std::visit(resolver, stmt);
   }
 
   return resolution;

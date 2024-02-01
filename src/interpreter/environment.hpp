@@ -40,7 +40,7 @@ class env {
  private:
   auto ancestor(std::size_t distance) -> env* {
     auto current{this};
-    for (std::size_t i = 0; i < distance; ++i) {
+    for (std::size_t i{0}; i < distance; ++i) {
       assert(current);
       current = current->enclosing_.get();
     }

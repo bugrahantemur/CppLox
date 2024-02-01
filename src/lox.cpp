@@ -17,14 +17,14 @@
 namespace LOX {
 
 auto run(std::string const &file_path) -> void {
-  std::string const contents = Reader::read(file_path);
+  std::string const contents{Reader::read(file_path)};
 
-  std::vector<Token> const tokens = Scanner::scan(contents);
+  std::vector<Token> const tokens{Scanner::scan(contents)};
 
-  std::vector<Statement> const statements = Parser::parse(tokens);
+  std::vector<Statement> const statements{Parser::parse(tokens)};
 
-  std::unordered_map<Token, std::size_t> const resolution =
-      Resolver::resolve(statements);
+  std::unordered_map<Token, std::size_t> const resolution{
+      Resolver::resolve(statements)};
 
   Interpreter::interpret(statements, resolution);
 }

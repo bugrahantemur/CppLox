@@ -265,7 +265,7 @@ struct ExpressionEvaluator {
     Object const value{std::visit(*this, expr->value_)};
     if (auto const found{resolution_.find(expr->name_)};
         found != resolution_.end()) {
-      std::size_t const distance = found->second;
+      std::size_t const distance{found->second};
       environment_->assign_at(expr->name_.lexeme_, value, distance);
     } else {
       throw Error{expr->name_.line_, expr->name_.lexeme_ + " is not defined"};

@@ -20,7 +20,7 @@ auto Cursor::peek(std::size_t forward) const -> char {
 }
 
 auto Cursor::take() -> char {
-  auto const tmp = peek();
+  auto const tmp{peek()};
   advance();
   return tmp;
 }

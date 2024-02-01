@@ -14,7 +14,7 @@
 namespace LOX::Scanner {
 
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
-  char const c = cursor.take();
+  char const c{cursor.take()};
 
   // whitespace
   if (c == ' ' || c == '\r' || c == '\t') {
@@ -54,7 +54,7 @@ namespace LOX::Scanner {
 
   while (!cursor.is_at_end()) {
     cursor.advance_word();
-    if (std::optional<Token> const token = scan_token(cursor)) {
+    if (std::optional<Token> const token{scan_token(cursor)}) {
       tokens.push_back(token.value());
     }
   }

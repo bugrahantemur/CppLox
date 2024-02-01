@@ -194,7 +194,7 @@ struct Resolve {
   }
 
   auto resolve(Token const& name) -> void {
-    for (auto scope = scopes_.crbegin(); scope != scopes_.crend(); ++scope) {
+    for (auto scope{scopes_.crbegin()}; scope != scopes_.crend(); ++scope) {
       if (scope->find(name.lexeme_) != scope->end()) {
         resolution_[name] = std::distance(scopes_.crbegin(), scope);
         return;

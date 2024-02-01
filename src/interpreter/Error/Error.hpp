@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../../utils/error.hpp"
+#include "../../Utils/error.hpp"
 
 namespace LOX::Interpreter {
 class Error : public ErrorInterface {

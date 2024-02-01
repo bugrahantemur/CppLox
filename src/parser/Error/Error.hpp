@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "../../token/token.hpp"
-#include "../../utils/error.hpp"
+#include "../../Token/Token.hpp"
+#include "../../Utils/error.hpp"
 
 namespace LOX::Parser {
 class Error : public ErrorInterface {

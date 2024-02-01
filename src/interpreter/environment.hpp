@@ -6,9 +6,9 @@
 #include <memory>
 #include <optional>
 
+#include "../Token/Token.hpp"
+#include "../Utils/arc.hpp"
 #include "../object_types/object.hpp"
-#include "../token/token.hpp"
-#include "../utils/arc.hpp"
 
 namespace {
 template <typename Key, typename Value>

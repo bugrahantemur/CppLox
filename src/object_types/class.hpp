@@ -5,8 +5,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../token/token.hpp"
-#include "../utils/box.hpp"
+#include "../Token/Token.hpp"
+#include "../Utils/box.hpp"
 #include "./function.hpp"
 #include "./object.hpp"
 

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../builtins/names.hpp"
+#include "../Builtins/names.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::Resolver {

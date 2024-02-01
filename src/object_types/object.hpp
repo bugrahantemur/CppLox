@@ -4,9 +4,9 @@
 #include <string>
 #include <variant>
 
-#include "../utils/arc.hpp"
-#include "../utils/arcdyn.hpp"
-#include "../utils/box.hpp"
+#include "../Utils/arc.hpp"
+#include "../Utils/arcdyn.hpp"
+#include "../Utils/box.hpp"
 
 namespace LOX {
 

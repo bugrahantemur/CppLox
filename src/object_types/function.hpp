@@ -4,7 +4,7 @@
 #include <memory>
 #include <optional>
 
-#include "../interpreter/environment.hpp"
+#include "../Interpreter/environment.hpp"
 #include "../syntax_types/statement.hpp"
 
 namespace LOX::Objects {

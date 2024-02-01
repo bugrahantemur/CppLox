@@ -15,20 +15,20 @@ FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
     src/lox.cpp
-    src/token/token.cpp
-    src/scanner/scanner.cpp
-    src/scanner/Error/Error.cpp
-    src/scanner/cursor.cpp
-    src/scanner/tokens.cpp
-    src/parser/cursor.cpp
-    src/parser/Error/Error.cpp
-    src/parser/parser.cpp
-    src/parser/expressions.cpp
-    src/parser/statements.cpp
-    src/interpreter/interpreter.cpp
-    src/interpreter/Error/Error.cpp
-    src/resolver/resolver.cpp
-    src/resolver/Error/Error.cpp
+    src/Token/token.cpp
+    src/Scanner/scanner.cpp
+    src/Scanner/Error/Error.cpp
+    src/Scanner/cursor.cpp
+    src/Scanner/tokens.cpp
+    src/Parser/cursor.cpp
+    src/Parser/Error/Error.cpp
+    src/Parser/parser.cpp
+    src/Parser/expressions.cpp
+    src/Parser/statements.cpp
+    src/Interpreter/interpreter.cpp
+    src/Interpreter/Error/Error.cpp
+    src/Resolver/resolver.cpp
+    src/Resolver/Error/Error.cpp
 )
 add_executable(lox ${TARGET_SRC})
 

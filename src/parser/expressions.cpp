@@ -2,8 +2,8 @@
 
 #include <iostream>
 
+#include "../Utils/error.hpp"
 #include "../syntax_types/expression.hpp"
-#include "../utils/error.hpp"
 #include "./Error/Error.hpp"
 #include "./cursor.hpp"
 #include "./utils.hpp"

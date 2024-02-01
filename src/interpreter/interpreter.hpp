@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../Token/Token.hpp"
+#include "../Utils/arc.hpp"
 #include "../syntax_types/statement.hpp"
-#include "../token/token.hpp"
-#include "../utils/arc.hpp"
 #include "./environment.hpp"
 
 namespace LOX::Interpreter {

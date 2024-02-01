@@ -4,15 +4,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "./interpreter/interpreter.hpp"
+#include "./Interpreter/interpreter.hpp"
+#include "./Parser/parser.hpp"
+#include "./Resolver/resolver.hpp"
+#include "./Scanner/scanner.hpp"
+#include "./Token/Token.hpp"
+#include "./Utils/error.hpp"
+#include "./Utils/reader.hpp"
 #include "./object_types/object.hpp"
-#include "./parser/parser.hpp"
-#include "./resolver/resolver.hpp"
-#include "./scanner/scanner.hpp"
 #include "./syntax_types/statement.hpp"
-#include "./token/token.hpp"
-#include "./utils/error.hpp"
-#include "./utils/reader.hpp"
 
 namespace LOX {
 

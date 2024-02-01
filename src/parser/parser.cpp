@@ -2,8 +2,8 @@
 
 #include <vector>
 
+#include "../Token/Token.hpp"
 #include "../syntax_types/statement.hpp"
-#include "../token/token.hpp"
 #include "./cursor.hpp"
 #include "./statements.hpp"
 

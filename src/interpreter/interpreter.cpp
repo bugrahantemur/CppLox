@@ -6,15 +6,15 @@
 #include <string>
 #include <variant>
 
-#include "../builtins/builtins.hpp"
+#include "../Builtins/builtins.hpp"
+#include "../Token/Token.hpp"
+#include "../Utils/arc.hpp"
+#include "../Utils/box.hpp"
 #include "../object_types/class.hpp"
 #include "../object_types/function.hpp"
 #include "../object_types/object.hpp"
 #include "../syntax_types/expression.hpp"
 #include "../syntax_types/statement.hpp"
-#include "../token/token.hpp"
-#include "../utils/arc.hpp"
-#include "../utils/box.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::Interpreter {

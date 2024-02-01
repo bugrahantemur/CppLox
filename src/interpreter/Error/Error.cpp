@@ -1,6 +1,5 @@
-#include "./error.hpp"
+#include "./Error.hpp"
 
-#include <iostream>
 #include <string>
 
 namespace LOX::Interpreter {

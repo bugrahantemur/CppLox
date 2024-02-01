@@ -15,7 +15,7 @@
 #include "../token/token.hpp"
 #include "../utils/arc.hpp"
 #include "../utils/box.hpp"
-#include "./error.hpp"
+#include "./Error/Error.hpp"
 
 namespace LOX::Interpreter {
 

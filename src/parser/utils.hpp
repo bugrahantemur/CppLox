@@ -3,8 +3,8 @@
 
 #include <vector>
 
+#include "./Error/Error.hpp"
 #include "./cursor.hpp"
-#include "./error.hpp"
 
 namespace LOX::Parser::Utils {
 

@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "../interpreter/error.hpp"
 #include "../token/token.hpp"
 #include "../utils/box.hpp"
 #include "./function.hpp"

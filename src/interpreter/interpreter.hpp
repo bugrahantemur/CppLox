@@ -1,12 +1,9 @@
 #ifndef LOX_INTERPRETER
 #define LOX_INTERPRETER
 
-#include <memory>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "../object_types/object.hpp"
 #include "../syntax_types/statement.hpp"
 #include "../token/token.hpp"
 #include "../utils/arc.hpp"

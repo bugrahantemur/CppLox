@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "../token/token.hpp"
+#include "./Error/Error.hpp"
 #include "./cursor.hpp"
-#include "./error.hpp"
 #include "./tokens.hpp"
 
 namespace LOX::Scanner {

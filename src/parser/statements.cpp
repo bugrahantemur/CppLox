@@ -5,8 +5,8 @@
 #include "../syntax_types/expression.hpp"
 #include "../syntax_types/statement.hpp"
 #include "../utils/error.hpp"
+#include "./Error/Error.hpp"
 #include "./cursor.hpp"
-#include "./error.hpp"
 #include "./expressions.hpp"
 #include "./utils.hpp"
 

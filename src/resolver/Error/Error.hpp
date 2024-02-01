@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../utils/error.hpp"
+#include "../../utils/error.hpp"
 
 namespace LOX::Resolver {
 

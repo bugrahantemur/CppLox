@@ -4,19 +4,21 @@
 #include <cassert>
 #include <map>
 #include <memory>
+#include <optional>
 
 #include "../object_types/object.hpp"
 #include "../token/token.hpp"
+#include "../utils/arc.hpp"
 
 namespace {
 template <typename Key, typename Value>
 class env {
  public:
-  std::shared_ptr<env> enclosing_;
+  std::optional<Arc<env>> enclosing_;
 
-  explicit env(std::shared_ptr<env> const& enclosing) : enclosing_(enclosing) {}
+  env(std::optional<Arc<env>> const& enclosing) : enclosing_(enclosing) {}
 
-  env() : enclosing_(nullptr) {}
+  env() : enclosing_(std::nullopt) {}
 
   auto define(Key const& name, Value const& value) -> void {
     map_[name] = value;
@@ -42,7 +44,7 @@ class env {
     auto current{this};
     for (std::size_t i{0}; i < distance; ++i) {
       assert(current);
-      current = current->enclosing_.get();
+      current = current->enclosing_.value().get();
     }
     assert(current);
     return current;

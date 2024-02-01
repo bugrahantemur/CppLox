@@ -14,7 +14,6 @@
 #include "../syntax_types/statement.hpp"
 #include "../token/token.hpp"
 #include "../utils/arc.hpp"
-#include "../utils/arcdyn.hpp"
 #include "../utils/box.hpp"
 #include "./error.hpp"
 
@@ -46,8 +45,10 @@ auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
     return field->second;
   }
 
-  if (auto const method{instance->class_.find_method(token.lexeme_)}) {
-    auto const env{std::make_shared<Environment>(method.value().closure_)};
+  if (std::optional<LoxFunction> const method{
+          instance->class_.find_method(token.lexeme_)}) {
+    Arc<Environment> env{Arc{Environment{method.value().closure_}}};
+
     env->define("this", instance);
     return Box{LoxFunction{method.value().declaration_, env,
                            method.value().is_initializer_}};
@@ -159,8 +160,12 @@ struct Arity {
 };
 
 struct Call {
+  Arc<Environment> environment_;
+  std::unordered_map<Token, std::size_t> const& resolution_;
+  std::vector<Object> const& args_;
+
   auto operator()(Box<LoxFunction>& func) -> Object {
-    auto const env{std::make_shared<Environment>(func->closure_)};
+    auto env{Arc{Environment{func->closure_}}};
 
     std::size_t const arity{Arity{}(func)};
 
@@ -186,8 +191,7 @@ struct Call {
 
     if (auto const initializer{klass->methods_.find("init")};
         initializer != klass->methods_.end()) {
-      auto const env{
-          std::make_shared<Environment>(initializer->second.closure_)};
+      auto env{Arc{Environment{initializer->second.closure_}}};
       env->define("this", instance);
       auto const init{
           Box{LoxFunction{initializer->second.declaration_, env, true}}};
@@ -205,14 +209,10 @@ struct Call {
   auto operator()(T const& t) -> Object {
     throw UncallableError{};
   }
-
-  std::shared_ptr<Environment> environment_;
-  std::unordered_map<Token, std::size_t> const& resolution_;
-  std::vector<Object> const& args_;
 };
 
 struct ExpressionEvaluator {
-  std::shared_ptr<Environment> environment_;
+  Arc<Environment> environment_;
   std::unordered_map<Token, std::size_t> const& resolution_;
 
   [[nodiscard]] auto operator()(std::monostate) -> Object {
@@ -241,7 +241,7 @@ struct ExpressionEvaluator {
                   "Undefined property '" + expr->method_.lexeme_ + "'"};
     }
 
-    auto const env{std::make_shared<Environment>(method.value().closure_)};
+    auto env{Arc{Environment{method.value().closure_}}};
     env->define("this", instance);
     return Box{LoxFunction{method.value().declaration_, env,
                            method.value().is_initializer_}};
@@ -360,7 +360,8 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<GetExpr> const& expr) -> Object {
     Object const obj{std::visit(*this, expr->object_)};
 
-    if (auto const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
+    if (Arc<LoxInstance> const* const instance{
+            std::get_if<Arc<LoxInstance>>(&obj)}) {
       return get(*instance, expr->name_);
     }
 
@@ -418,7 +419,7 @@ struct ExpressionEvaluator {
 };
 
 struct StatementExecutor {
-  std::shared_ptr<Environment> environment_;
+  Arc<Environment> environment_;
   std::unordered_map<Token, std::size_t> const& resolution_;
 
   auto operator()(std::monostate) -> void {}
@@ -451,7 +452,7 @@ struct StatementExecutor {
   auto operator()(Box<BlockStmt> const& stmt) -> void {
     // Create new environment with the current environment as its
     // enclosing environment
-    auto const env{std::make_shared<Environment>(environment_)};
+    auto env{Arc{Environment{environment_}}};
 
     // Execute statements in the block with the new environment
     for (Statement const& stmt : stmt->statements_) {
@@ -479,7 +480,7 @@ struct StatementExecutor {
     environment_->define(stmt->name_.lexeme_, std::monostate{});
 
     if (superclass) {
-      environment_ = std::make_shared<Environment>(environment_);
+      environment_ = Arc{Environment{environment_}};
       environment_->define("super", superclass.value());
     }
 
@@ -490,7 +491,7 @@ struct StatementExecutor {
     }
 
     if (superclass) {
-      environment_ = environment_->enclosing_;
+      environment_ = environment_->enclosing_.value();
     }
 
     environment_->assign(
@@ -515,8 +516,8 @@ struct StatementExecutor {
   }
 };
 
-auto make_preamble_environment() -> std::shared_ptr<Environment> {
-  auto env{std::make_shared<Environment>()};
+auto make_preamble_environment() -> Arc<Environment> {
+  auto env{Arc{Environment{}}};
 
   for (auto const& name : Builtins::builtins()) {
     env->define(name.first, name.second);
@@ -527,7 +528,7 @@ auto make_preamble_environment() -> std::shared_ptr<Environment> {
 
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,
-               std::shared_ptr<Environment> const& environment) -> void {
+               Arc<Environment> const& environment) -> void {
   for (auto const& stmt : statements) {
     std::visit(StatementExecutor{environment, resolution}, stmt);
   }
@@ -536,8 +537,7 @@ auto interpret(std::vector<Statement> const& statements,
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)
     -> void {
-  std::shared_ptr<Environment> const preamble_environment{
-      make_preamble_environment()};
+  Arc<Environment> const preamble_environment{make_preamble_environment()};
 
   interpret(statements, resolution, preamble_environment);
 }

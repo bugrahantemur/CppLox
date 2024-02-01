@@ -9,13 +9,14 @@
 #include "../object_types/object.hpp"
 #include "../syntax_types/statement.hpp"
 #include "../token/token.hpp"
+#include "../utils/arc.hpp"
 #include "./environment.hpp"
 
 namespace LOX::Interpreter {
 
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,
-               std::shared_ptr<Environment> const& env) -> void;
+               Arc<Environment> const& env) -> void;
 
 auto interpret(std::vector<Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)

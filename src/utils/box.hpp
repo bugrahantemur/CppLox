@@ -9,25 +9,27 @@ class Box {
   std::unique_ptr<T> impl;
 
  public:
-  Box(T&& object) : impl(std::make_unique<T>(std::move(object))) {}
+  Box() : impl{std::make_unique<T>()} {}
 
-  Box(T const& object) : impl(std::make_unique<T>(object)) {}
+  Box(T&& object) : impl{std::make_unique<T>(std::move(object))} {}
 
-  Box(Box const& other) : Box(*other.impl) {}
+  Box(T const& object) : impl{std::make_unique<T>(object)} {}
+
+  Box(Box const& other) : Box{*other.impl} {}
   Box& operator=(Box const& other) {
     *impl = *other.impl;
     return *this;
   }
 
   Box(Box&& other) = default;
-  Box& operator=(Box&& other) = default;
+  auto operator=(Box&& other) -> Box& = default;
   ~Box() = default;
 
-  T& operator*() { return *impl; }
-  T const& operator*() const { return *impl; }
+  auto operator*() -> T& { return *impl; }
+  auto operator*() const -> T const& { return *impl; }
 
-  T* operator->() { return impl.get(); }
-  T const* operator->() const { return impl.get(); }
+  auto operator->() -> T* { return impl.get(); }
+  auto operator->() const -> T const* { return impl.get(); }
 
   auto get() -> T* { return impl.get(); }
   auto get() const -> T const* { return impl.get(); }

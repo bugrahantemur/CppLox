@@ -12,6 +12,8 @@ class Arc {
   std::shared_ptr<T> impl;
 
  public:
+  Arc() : impl(std::make_shared<T>()) {}
+
   Arc(T&& object) : impl(std::make_shared<T>(std::move(object))) {}
 
   Arc(T const& object) : impl(std::make_shared<T>(object)) {}

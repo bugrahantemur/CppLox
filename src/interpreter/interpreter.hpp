@@ -4,18 +4,18 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../Token/Token.hpp"
-#include "../Utils/arc.hpp"
-#include "../syntax_types/statement.hpp"
-#include "./environment.hpp"
+#include "../Types/Syntax/Statement.hpp"
+#include "../Types/Token/Token.hpp"
+#include "../Utils/Arc.hpp"
+#include "./Environment.hpp"
 
 namespace LOX::Interpreter {
 
-auto interpret(std::vector<Statement> const& statements,
+auto interpret(std::vector<Types::Syntax::Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,
                Arc<Environment> const& env) -> void;
 
-auto interpret(std::vector<Statement> const& statements,
+auto interpret(std::vector<Types::Syntax::Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution)
     -> void;
 

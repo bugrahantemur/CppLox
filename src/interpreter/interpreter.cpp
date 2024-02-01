@@ -1,4 +1,4 @@
-#include "./interpreter.hpp"
+#include "./Interpreter.hpp"
 
 #include <chrono>
 #include <concepts>
@@ -6,22 +6,27 @@
 #include <string>
 #include <variant>
 
-#include "../Builtins/builtins.hpp"
-#include "../Token/Token.hpp"
-#include "../Utils/arc.hpp"
-#include "../Utils/box.hpp"
-#include "../object_types/class.hpp"
-#include "../object_types/function.hpp"
-#include "../object_types/object.hpp"
-#include "../syntax_types/expression.hpp"
-#include "../syntax_types/statement.hpp"
+#include "../Builtins/Builtins.hpp"
+#include "../Types/Object/Class.hpp"
+#include "../Types/Object/Function.hpp"
+#include "../Types/Object/Object.hpp"
+#include "../Types/Syntax/Expression.hpp"
+#include "../Types/Syntax/Statement.hpp"
+#include "../Types/Token/Token.hpp"
+#include "../Utils/Arc.hpp"
+#include "../Utils/Box.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::Interpreter {
 
-using namespace LOX::Statements;
-using namespace LOX::Expressions;
-using namespace LOX::Objects;
+using Types::Syntax::Expression;
+using Types::Syntax::Statement;
+
+using namespace Types::Syntax::Statements;
+using namespace Types::Syntax::Expressions;
+
+using Types::Object;
+using namespace Types::Objects;
 
 struct Return {
   Object value_;
@@ -519,7 +524,7 @@ struct StatementExecutor {
 auto make_preamble_environment() -> Arc<Environment> {
   auto env{Arc{Environment{}}};
 
-  for (auto const& name : Builtins::builtins()) {
+  for (auto const& name : Native::builtins()) {
     env->define(name.first, name.second);
   }
 

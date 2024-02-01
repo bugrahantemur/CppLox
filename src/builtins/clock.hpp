@@ -5,15 +5,16 @@
 #include <string>
 #include <vector>
 
-#include "../object_types/object.hpp"
-#include "./function_interface.hpp"
+#include "../Types/Object/Builtins/FunctionInterface.hpp"
+#include "../Types/Object/Object.hpp"
 
-namespace LOX::Builtins {
+namespace LOX::Native {
 
-struct Clock : public FunctionInterface {
+struct Clock : public Types::Objects::Builtins::FunctionInterface {
   auto arity() const -> std::size_t final { return 0; }
   auto to_string() const -> std::string final { return "Clock"; };
-  auto operator()(std::vector<Object> const& args) const -> Object final {
+  auto operator()(std::vector<Types::Object> const& args) const
+      -> Types::Object final {
     static_cast<void>(args);
 
     return static_cast<double>(
@@ -23,6 +24,6 @@ struct Clock : public FunctionInterface {
   };
 };
 
-}  // namespace LOX::Builtins
+}  // namespace LOX::Native
 
 #endif

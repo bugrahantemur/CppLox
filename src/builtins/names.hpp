@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-namespace LOX::Builtins {
+namespace LOX::Native {
 
 inline auto names() -> std::vector<std::string> { return {"clock", "pi"}; }
 
-}  // namespace LOX::Builtins
+}  // namespace LOX::Native
 
 #endif

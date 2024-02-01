@@ -1,4 +1,4 @@
-#include "./cursor.hpp"
+#include "./Cursor.hpp"
 
 namespace LOX::Scanner {
 

@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-#include "./error.hpp"
+#include "./Error.hpp"
 
 namespace LOX::Reader {
 

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../Token/Token.hpp"
+#include "../../Types/Token/Token.hpp"
 
 namespace LOX::Parser {
 

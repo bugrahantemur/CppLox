@@ -6,9 +6,9 @@
 #include <memory>
 #include <optional>
 
-#include "../Token/Token.hpp"
-#include "../Utils/arc.hpp"
-#include "../object_types/object.hpp"
+#include "../Types/Object/Object.hpp"
+#include "../Types/Token/Token.hpp"
+#include "../Utils/Arc.hpp"
 
 namespace {
 template <typename Key, typename Value>
@@ -56,7 +56,7 @@ class env {
 
 namespace LOX {
 
-using Environment = env<std::string, Object>;
+using Environment = env<std::string, Types::Object>;
 
 }
 #endif

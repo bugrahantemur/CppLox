@@ -4,27 +4,28 @@
 #include <string>
 #include <variant>
 
-#include "../Utils/arc.hpp"
-#include "../Utils/arcdyn.hpp"
-#include "../Utils/box.hpp"
+#include "../../Utils/Arc.hpp"
+#include "../../Utils/Arcdyn.hpp"
+#include "../../Utils/Box.hpp"
 
-namespace LOX {
+namespace LOX::Types {
 
 namespace Objects {
 struct LoxFunction;
 struct LoxClass;
 struct LoxInstance;
-}  // namespace Objects
 
 namespace Builtins {
 struct FunctionInterface;
 }
 
+}  // namespace Objects
+
 using Object = std::variant<std::monostate, bool, double, std::string,
                             Box<Objects::LoxFunction>, Box<Objects::LoxClass>,
                             Arc<Objects::LoxInstance>,
-                            ArcDyn<Builtins::FunctionInterface>>;
+                            ArcDyn<Objects::Builtins::FunctionInterface>>;
 
-}  // namespace LOX
+}  // namespace LOX::Types
 
 #endif

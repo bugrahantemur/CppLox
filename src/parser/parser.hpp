@@ -3,11 +3,12 @@
 
 #include <vector>
 
-#include "../Token/Token.hpp"
-#include "../syntax_types/statement.hpp"
+#include "../Types/Syntax/Statement.hpp"
+#include "../Types/Token/Token.hpp"
 
 namespace LOX::Parser {
-auto parse(std::vector<Token> const& tokens) -> std::vector<Statement>;
+auto parse(std::vector<Token> const& tokens)
+    -> std::vector<Types::Syntax::Statement>;
 }  // namespace LOX::Parser
 
 #endif

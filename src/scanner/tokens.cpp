@@ -1,8 +1,8 @@
-#include "./tokens.hpp"
+#include "./Tokens.hpp"
 
-#include "../Token/Token.hpp"
+#include "../Types/Token/Token.hpp"
+#include "./Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./cursor.hpp"
 
 namespace LOX::Scanner {
 

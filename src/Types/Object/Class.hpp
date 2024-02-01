@@ -1,3 +1,4 @@
+
 #ifndef LOX_TYPES_CLASS
 #define LOX_TYPES_CLASS
 
@@ -5,12 +6,12 @@
 #include <string>
 #include <unordered_map>
 
-#include "../Token/Token.hpp"
-#include "../Utils/box.hpp"
-#include "./function.hpp"
-#include "./object.hpp"
+#include "../../Types/Token/Token.hpp"
+#include "../../Utils/Box.hpp"
+#include "./Function.hpp"
+#include "./Object.hpp"
 
-namespace LOX::Objects {
+namespace LOX::Types::Objects {
 
 struct LoxClass {
   std::string name_;
@@ -36,5 +37,5 @@ struct LoxInstance {
   std::unordered_map<std::string, Object> fields_;
 };
 
-}  // namespace LOX::Objects
+}  // namespace LOX::Types::Objects
 #endif

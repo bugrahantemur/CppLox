@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../Token/Token.hpp"
+#include "../Types/Token/Token.hpp"
 
 namespace LOX::Scanner {
 

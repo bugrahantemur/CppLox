@@ -4,15 +4,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "./Interpreter/interpreter.hpp"
-#include "./Parser/parser.hpp"
-#include "./Resolver/resolver.hpp"
-#include "./Scanner/scanner.hpp"
-#include "./Token/Token.hpp"
-#include "./Utils/error.hpp"
-#include "./Utils/reader.hpp"
-#include "./object_types/object.hpp"
-#include "./syntax_types/statement.hpp"
+#include "./Interpreter/Interpreter.hpp"
+#include "./Parser/Parser.hpp"
+#include "./Resolver/Resolver.hpp"
+#include "./Scanner/Scanner.hpp"
+#include "./Types/Object/Object.hpp"
+#include "./Types/Syntax/Statement.hpp"
+#include "./Types/Token/Token.hpp"
+#include "./Utils/Error.hpp"
+#include "./Utils/Reader.hpp"
 
 namespace LOX {
 
@@ -21,7 +21,7 @@ auto run(std::string const &file_path) -> void {
 
   std::vector<Token> const tokens{Scanner::scan(contents)};
 
-  std::vector<Statement> const statements{Parser::parse(tokens)};
+  std::vector<Types::Syntax::Statement> const statements{Parser::parse(tokens)};
 
   std::unordered_map<Token, std::size_t> const resolution{
       Resolver::resolve(statements)};

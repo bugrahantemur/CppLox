@@ -1,18 +1,21 @@
-#include "./statements.hpp"
+#include "./Statements.hpp"
 
 #include <iostream>
 
-#include "../Utils/error.hpp"
-#include "../syntax_types/expression.hpp"
-#include "../syntax_types/statement.hpp"
+#include "../Types/Syntax/Expression.hpp"
+#include "../Types/Syntax/Statement.hpp"
+#include "../Utils/Error.hpp"
+#include "./Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./cursor.hpp"
-#include "./expressions.hpp"
-#include "./utils.hpp"
+#include "./Expressions.hpp"
+#include "./Utils.hpp"
 
 namespace LOX::Parser::Statements {
 
-using namespace LOX::Statements;
+using Types::Syntax::Expression;
+using Types::Syntax::Statement;
+
+using namespace Types::Syntax::Statements;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
@@ -110,10 +113,11 @@ auto for_statement(Cursor& cursor) -> Statement {
   Statement const body{statement(cursor)};
 
   return BlockStmt{
-      {initializer, WhileStmt{std::holds_alternative<std::monostate>(condition)
-                                  ? LiteralExpr{true}
-                                  : condition,
-                              BlockStmt{{body, ExpressionStmt{increment}}}}}};
+      {initializer,
+       WhileStmt{std::holds_alternative<std::monostate>(condition)
+                     ? Types::Syntax::Expressions::LiteralExpr{true}
+                     : condition,
+                 BlockStmt{{body, ExpressionStmt{increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {
@@ -182,10 +186,10 @@ auto class_declaration(Cursor& cursor) -> Statement {
 
   Token const name{cursor.consume(TokenType::IDENTIFIER, "Expect class name.")};
 
-  VariableExpr super_class{Token::none()};
+  Types::Syntax::Expressions::VariableExpr super_class{Token::none()};
   if (cursor.match(TokenType::LESS)) {
     cursor.take();
-    super_class = VariableExpr{
+    super_class = Types::Syntax::Expressions::VariableExpr{
         cursor.consume(TokenType::IDENTIFIER, "Expect superclass name.")};
   }
 
@@ -236,7 +240,7 @@ auto declaration(Cursor& cursor) -> Statement {
     }
     return statement(cursor);
   } catch (Error const& e) {
-    LOX::report(e);
+    report(e);
     cursor.synchronize();
     return std::monostate{};
   }

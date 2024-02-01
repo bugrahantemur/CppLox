@@ -3,10 +3,10 @@
 
 #include <variant>
 
-#include "../Token/Token.hpp"
-#include "../Utils/box.hpp"
+#include "../../Types/Token/Token.hpp"
+#include "../../Utils/Box.hpp"
 
-namespace LOX {
+namespace LOX::Types::Syntax {
 
 // Forward declaration of all expression types
 namespace Expressions {
@@ -33,8 +33,9 @@ using Expression =
                  Box<Expressions::ThisExpr>, Box<Expressions::UnaryExpr>,
                  Box<Expressions::VariableExpr>>;
 
-}  // namespace LOX
-namespace LOX::Expressions {
+}  // namespace LOX::Types::Syntax
+
+namespace LOX::Types::Syntax::Expressions {
 
 struct AssignmentExpr {
   Token name_;
@@ -96,6 +97,6 @@ struct VariableExpr {
   Token name_;
 };
 
-}  // namespace LOX::Expressions
+}  // namespace LOX::Types::Syntax::Expressions
 
 #endif

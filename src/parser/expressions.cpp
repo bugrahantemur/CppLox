@@ -1,16 +1,17 @@
-#include "./expressions.hpp"
+#include "./Expressions.hpp"
 
 #include <iostream>
 
-#include "../Utils/error.hpp"
-#include "../syntax_types/expression.hpp"
+#include "../Types/Syntax/Expression.hpp"
+#include "../Utils/Error.hpp"
+#include "./Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./cursor.hpp"
-#include "./utils.hpp"
+#include "./Utils.hpp"
 
 namespace LOX::Parser::Expressions {
 
-using namespace LOX::Expressions;
+using Types::Syntax::Expression;
+using namespace Types::Syntax::Expressions;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
@@ -154,7 +155,7 @@ auto assignment(Cursor& cursor) -> Expression {
     }
 
     // Do not throw, just report the error
-    LOX::report(error(equals, "Invalid assignment target."));
+    report(error(equals, "Invalid assignment target."));
   }
 
   return expr;

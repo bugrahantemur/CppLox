@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 
-#include "../../Utils/error.hpp"
+#include "../../Utils/Error.hpp"
 
 namespace LOX::Scanner {
 

@@ -1,4 +1,4 @@
-#include "./resolver.hpp"
+#include "./Resolver.hpp"
 
 #include <string>
 
@@ -7,7 +7,10 @@
 
 namespace LOX::Resolver {
 
-using namespace LOX::Statements;
+using Types::Syntax::Expression;
+using Types::Syntax::Statement;
+using namespace Types::Syntax::Statements;
+using namespace Types::Syntax::Expressions;
 
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };
@@ -244,7 +247,7 @@ struct Resolve {
 
 auto preamble() -> std::unordered_map<std::string, bool> {
   std::unordered_map<std::string, bool> scope;
-  for (auto const& name : Builtins::names()) {
+  for (auto const& name : Native::names()) {
     scope[name] = true;
   }
   return scope;

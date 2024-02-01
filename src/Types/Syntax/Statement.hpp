@@ -4,11 +4,11 @@
 
 #include <variant>
 
-#include "../Token/Token.hpp"
-#include "../Utils/box.hpp"
-#include "./expression.hpp"
+#include "../../Types/Token/Token.hpp"
+#include "../../Utils/Box.hpp"
+#include "./Expression.hpp"
 
-namespace LOX {
+namespace LOX::Types::Syntax {
 // Forward declaration of all statement types
 
 namespace Statements {
@@ -31,10 +31,9 @@ using Statement =
                  Box<Statements::PrintStmt>, Box<Statements::ReturnStmt>,
                  Box<Statements::VariableStmt>, Box<Statements::WhileStmt>>;
 
-}  // namespace LOX
-namespace LOX::Statements {
+}  // namespace LOX::Types::Syntax
 
-using namespace LOX::Expressions;
+namespace LOX::Types::Syntax::Statements {
 
 struct BlockStmt {
   std::vector<Statement> statements_;
@@ -42,7 +41,7 @@ struct BlockStmt {
 
 struct ClassStmt {
   Token name_;
-  VariableExpr super_class_;
+  Expressions::VariableExpr super_class_;
   std::vector<Box<FunctionStmt>> methods_;
 };
 
@@ -81,6 +80,6 @@ struct WhileStmt {
   Statement body_;
 };
 
-}  // namespace LOX::Statements
+}  // namespace LOX::Types::Syntax::Statements
 
 #endif

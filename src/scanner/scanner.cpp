@@ -1,4 +1,4 @@
-#include "scanner.hpp"
+#include "Scanner.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "../Token/Token.hpp"
+#include "../Types/Token/Token.hpp"
+#include "./Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./cursor.hpp"
 #include "./tokens.hpp"
 
 namespace LOX::Scanner {

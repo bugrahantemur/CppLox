@@ -1,10 +1,10 @@
-#include "cursor.hpp"
+#include "Cursor.hpp"
 
 #include <cassert>
 #include <string>
 #include <vector>
 
-#include "../Token/Token.hpp"
+#include "../Types/Token/Token.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::Parser {

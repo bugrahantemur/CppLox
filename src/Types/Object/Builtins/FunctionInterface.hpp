@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "../object_types/object.hpp"
+#include "../Object.hpp"
 
-namespace LOX::Builtins {
+namespace LOX::Types::Objects::Builtins {
 
 struct FunctionInterface {
   virtual auto arity() const -> std::size_t = 0;
@@ -14,6 +14,6 @@ struct FunctionInterface {
   virtual auto operator()(std::vector<Object> const& args) const -> Object = 0;
 };
 
-}  // namespace LOX::Builtins
+}  // namespace LOX::Types::Objects::Builtins
 
 #endif

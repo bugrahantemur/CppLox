@@ -4,14 +4,14 @@
 #include <memory>
 #include <optional>
 
-#include "../../Interpreter/Environment.hpp"
+#include "../../Interpreter/Interpreter.hpp"
 #include "../Syntax/Statement.hpp"
 
 namespace LOX::Types::Objects {
 
 struct LoxFunction {
   Syntax::Statements::FunctionStmt declaration_;
-  Arc<Environment> closure_;
+  Arc<Interpreter::Environment> closure_;
   bool is_initializer_;
 };
 

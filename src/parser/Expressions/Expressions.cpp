@@ -2,11 +2,11 @@
 
 #include <initializer_list>
 
-#include "../Types/Syntax/Expression.hpp"
-#include "../Utils/Error.hpp"
-#include "./Cursor.hpp"
-#include "./Error/Error.hpp"
-#include "./Utils.hpp"
+#include "../../Types/Syntax/Expression.hpp"
+#include "../../Utils/Error.hpp"
+#include "../Cursor/Cursor.hpp"
+#include "../Error/Error.hpp"
+#include "../Utils/Utils.hpp"
 
 namespace LOX::Parser::Expressions {
 

@@ -18,13 +18,13 @@ set(TARGET_SRC
     src/Types/Token/Token.cpp
     src/Scanner/Scanner.cpp
     src/Scanner/Error/Error.cpp
-    src/Scanner/Cursor.cpp
-    src/Scanner/Tokens.cpp
-    src/Parser/Cursor.cpp
+    src/Scanner/Cursor/Cursor.cpp
+    src/Scanner/Tokens/Tokens.cpp
+    src/Parser/Cursor/Cursor.cpp
     src/Parser/Error/Error.cpp
     src/Parser/Parser.cpp
-    src/Parser/Expressions.cpp
-    src/Parser/Statements.cpp
+    src/Parser/Expressions/Expressions.cpp
+    src/Parser/Statements/Statements.cpp
     src/Interpreter/Interpreter.cpp
     src/Interpreter/Error/Error.cpp
     src/Resolver/Resolver.cpp

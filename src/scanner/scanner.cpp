@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "../Types/Token/Token.hpp"
-#include "./Cursor.hpp"
+#include "./Cursor/Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./Tokens.hpp"
+#include "./Tokens/Tokens.hpp"
 
 namespace LOX::Scanner {
 

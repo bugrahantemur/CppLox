@@ -2,13 +2,13 @@
 
 #include <iostream>
 
-#include "../Types/Syntax/Expression.hpp"
-#include "../Types/Syntax/Statement.hpp"
-#include "../Utils/Error.hpp"
-#include "./Cursor.hpp"
-#include "./Error/Error.hpp"
-#include "./Expressions.hpp"
-#include "./Utils.hpp"
+#include "../../Types/Syntax/Expression.hpp"
+#include "../../Types/Syntax/Statement.hpp"
+#include "../../Utils/Error.hpp"
+#include "../Cursor/Cursor.hpp"
+#include "../Error/Error.hpp"
+#include "../Expressions/Expressions.hpp"
+#include "../Utils/Utils.hpp"
 
 namespace LOX::Parser::Statements {
 

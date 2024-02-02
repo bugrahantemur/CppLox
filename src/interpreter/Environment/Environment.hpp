@@ -1,24 +1,23 @@
-#ifndef LOX_ENVIRONMENT
-#define LOX_ENVIRONMENT
+#ifndef LOX_Environment
+#define LOX_Environment
 
 #include <cassert>
 #include <map>
-#include <memory>
 #include <optional>
 
-#include "../Types/Object/Object.hpp"
-#include "../Types/Token/Token.hpp"
-#include "../Utils/Arc.hpp"
+#include "../../Utils/Arc.hpp"
 
-namespace {
+namespace LOX::Interpreter::Details {
+
 template <typename Key, typename Value>
-class env {
+class Environment {
  public:
-  std::optional<Arc<env>> enclosing_;
+  std::optional<Arc<Environment>> enclosing_;
 
-  env(std::optional<Arc<env>> const& enclosing) : enclosing_(enclosing) {}
+  Environment(std::optional<Arc<Environment>> const& enclosing)
+      : enclosing_(enclosing) {}
 
-  env() : enclosing_(std::nullopt) {}
+  Environment() : enclosing_(std::nullopt) {}
 
   auto define(Key const& name, Value const& value) -> void {
     map_[name] = value;
@@ -40,7 +39,7 @@ class env {
   }
 
  private:
-  auto ancestor(std::size_t distance) -> env* {
+  auto ancestor(std::size_t distance) -> Environment* {
     auto current{this};
     for (std::size_t i{0}; i < distance; ++i) {
       assert(current);
@@ -52,11 +51,6 @@ class env {
 
   std::unordered_map<Key, Value> map_;
 };
-}  // namespace
 
-namespace LOX {
-
-using Environment = env<std::string, Types::Object>;
-
-}
+}  // namespace LOX::Interpreter::Details
 #endif

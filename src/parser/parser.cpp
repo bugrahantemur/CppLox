@@ -4,8 +4,8 @@
 
 #include "../Types/Syntax/Statement.hpp"
 #include "../Types/Token/Token.hpp"
-#include "./Cursor.hpp"
-#include "./Statements.hpp"
+#include "./Cursor/Cursor.hpp"
+#include "./Statements/Statements.hpp"
 
 namespace LOX::Parser {
 

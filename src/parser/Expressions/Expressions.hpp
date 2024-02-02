@@ -1,8 +1,8 @@
 #ifndef LOX_PARSER_EXPRESSIONS
 #define LOX_PARSER_EXPRESSIONS
 
-#include "../Types/Syntax/Expression.hpp"
-#include "./Cursor.hpp"
+#include "../../Types/Syntax/Expression.hpp"
+#include "../Cursor/Cursor.hpp"
 
 namespace LOX::Parser::Expressions {
 

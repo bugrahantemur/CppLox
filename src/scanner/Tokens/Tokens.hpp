@@ -1,7 +1,7 @@
 #include <optional>
 
-#include "../Types/Token/Token.hpp"
-#include "./Cursor.hpp"
+#include "../../Types/Token/Token.hpp"
+#include "../Cursor/Cursor.hpp"
 
 namespace LOX::Scanner {
 

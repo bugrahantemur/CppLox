@@ -2,6 +2,7 @@
 #define LOX_PARSER_CURSOR
 
 #include <cassert>
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -16,11 +17,10 @@ class Cursor {
  public:
   explicit Cursor(std::vector<Token> const& tokens);
 
-  template <typename Type>
-  [[nodiscard]] auto match(Type type) const -> bool;
+  [[nodiscard]] auto match(TokenType types) const -> bool;
 
-  template <typename Type, typename... Types>
-  [[nodiscard]] auto match(Type type, Types... types) const -> bool;
+  [[nodiscard]] auto match_any_of(std::initializer_list<TokenType> types) const
+      -> bool;
 
   [[nodiscard]] auto peek() const -> Token;
 

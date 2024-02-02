@@ -1,6 +1,6 @@
 #include "./Expressions.hpp"
 
-#include <iostream>
+#include <initializer_list>
 
 #include "../Types/Syntax/Expression.hpp"
 #include "../Utils/Error.hpp"
@@ -26,7 +26,7 @@ auto primary(Cursor& cursor) -> Expression {
     cursor.take();
     return LiteralExpr{std::monostate{}};
   }
-  if (cursor.match(TokenType::NUMBER, TokenType::STRING)) {
+  if (cursor.match_any_of({TokenType::NUMBER, TokenType::STRING})) {
     return LiteralExpr{cursor.take().literal_};
   }
   if (cursor.match(TokenType::LEFT_PAREN)) {
@@ -83,7 +83,7 @@ auto call(Cursor& cursor) -> Expression {
 }
 
 auto unary(Cursor& cursor) -> Expression {
-  if (cursor.match(TokenType::BANG, TokenType::MINUS)) {
+  if (cursor.match_any_of({TokenType::BANG, TokenType::MINUS})) {
     Token const op{cursor.take()};
     return UnaryExpr{op, unary(cursor)};
   }
@@ -91,46 +91,48 @@ auto unary(Cursor& cursor) -> Expression {
   return call(cursor);
 }
 
-template <typename F, typename Result, typename... Types>
-auto sequence(Cursor& cursor, F const& f, Types... types) -> Expression {
+template <typename F, typename Result>
+auto sequence(Cursor& cursor, F const& f,
+              std::initializer_list<TokenType> const& types) -> Expression {
   Expression expr{f(cursor)};
 
-  while (cursor.match(types...)) {
+  while (cursor.match_any_of(types)) {
     expr = Result{expr, cursor.take(), f(cursor)};
   }
 
   return expr;
 }
 
-template <typename F, typename... Types>
-auto binary_expression(Cursor& cursor, F const& f, Types... types)
+template <typename F>
+auto binary_expression(Cursor& cursor, F const& f,
+                       std::initializer_list<TokenType> const& types)
     -> Expression {
-  return sequence<F, BinaryExpr, Types...>(cursor, f, types...);
+  return sequence<F, BinaryExpr>(cursor, f, types);
 }
 
-template <typename F, typename... Types>
-auto logical_expression(Cursor& cursor, F const& f, Types... types)
+template <typename F>
+auto logical_expression(Cursor& cursor, F const& f, TokenType const& type)
     -> Expression {
-  return sequence<F, LogicalExpr, Types...>(cursor, f, types...);
+  return sequence<F, LogicalExpr>(cursor, f, {type});
 }
 
 auto factor(Cursor& cursor) -> Expression {
-  return binary_expression(cursor, unary, TokenType::SLASH, TokenType::STAR);
+  return binary_expression(cursor, unary, {TokenType::SLASH, TokenType::STAR});
 }
 
 auto term(Cursor& cursor) -> Expression {
-  return binary_expression(cursor, factor, TokenType::MINUS, TokenType::PLUS);
+  return binary_expression(cursor, factor, {TokenType::MINUS, TokenType::PLUS});
 }
 
 auto comparison(Cursor& cursor) -> Expression {
-  return binary_expression(cursor, term, TokenType::GREATER_EQUAL,
-                           TokenType::GREATER, TokenType::LESS_EQUAL,
-                           TokenType::LESS);
+  return binary_expression(cursor, term,
+                           {TokenType::GREATER_EQUAL, TokenType::GREATER,
+                            TokenType::LESS_EQUAL, TokenType::LESS});
 }
 
 auto equality(Cursor& cursor) -> Expression {
-  return binary_expression(cursor, comparison, TokenType::BANG_EQUAL,
-                           TokenType::EQUAL_EQUAL);
+  return binary_expression(cursor, comparison,
+                           {TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL});
 }
 
 auto and_expr(Cursor& cursor) -> Expression {

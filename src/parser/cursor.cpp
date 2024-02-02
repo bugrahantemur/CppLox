@@ -1,6 +1,8 @@
 #include "Cursor.hpp"
 
+#include <algorithm>
 #include <cassert>
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -12,14 +14,14 @@ namespace LOX::Parser {
 Cursor::Cursor(std::vector<Token> const& tokens)
     : tokens_(tokens), current_(0){};
 
-template <typename Type>
-auto Cursor::match(Type type) const -> bool {
-  return !is_at_end() && peek().type_ == type;
+auto Cursor::match(TokenType type) const -> bool {
+  return !is_at_end() and peek().type_ == type;
 }
 
-template <typename Type, typename... Types>
-auto Cursor::match(Type type, Types... types) const -> bool {
-  return match(type) || match(types...);
+auto Cursor::match_any_of(std::initializer_list<TokenType> types) const
+    -> bool {
+  return std::any_of(begin(types), end(types),
+                     [this](TokenType const& type) { return match(type); });
 }
 
 auto Cursor::peek() const -> Token { return tokens_.at(current_); }
@@ -46,9 +48,9 @@ auto Cursor::previous() -> Token {
 
 auto Cursor::synchronize() -> void {
   while (!is_at_end()) {
-    if (match(TokenType::CLASS, TokenType::FUN, TokenType::VAR, TokenType::FOR,
-              TokenType::IF, TokenType::WHILE, TokenType::PRINT,
-              TokenType::RETURN)) {
+    if (match_any_of({TokenType::CLASS, TokenType::FUN, TokenType::VAR,
+                      TokenType::FOR, TokenType::IF, TokenType::WHILE,
+                      TokenType::PRINT, TokenType::RETURN})) {
       return;
     }
 

@@ -9,7 +9,7 @@
 #include "../Types/Token/Token.hpp"
 #include "./Cursor.hpp"
 #include "./Error/Error.hpp"
-#include "./tokens.hpp"
+#include "./Tokens.hpp"
 
 namespace LOX::Scanner {
 

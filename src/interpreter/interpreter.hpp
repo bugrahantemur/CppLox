@@ -12,7 +12,7 @@
 
 namespace LOX::Interpreter {
 
-using Environment = Details::Environment<std::string, Types::Object>;
+using Environment = Details::Environment<std::string, Types::Objects::Object>;
 
 auto interpret(std::vector<Types::Syntax::Statement> const& statements,
                std::unordered_map<Token, std::size_t> const& resolution,

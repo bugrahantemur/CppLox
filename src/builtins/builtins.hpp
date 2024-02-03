@@ -10,7 +10,8 @@
 
 namespace LOX::Native {
 
-inline auto builtins() -> std::vector<std::pair<std::string, Types::Object>> {
+inline auto builtins()
+    -> std::vector<std::pair<std::string, Types::Objects::Object>> {
   return {
       {"clock", ArcDyn<Types::Objects::Builtins::FunctionInterface>{Clock{}}},
       {"pi", 3.14159265359}};

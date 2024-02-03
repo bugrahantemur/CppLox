@@ -13,8 +13,8 @@ namespace LOX::Native {
 struct Clock : public Types::Objects::Builtins::FunctionInterface {
   auto arity() const -> std::size_t final { return 0; }
   auto to_string() const -> std::string final { return "Clock"; };
-  auto operator()(std::vector<Types::Object> const& args) const
-      -> Types::Object final {
+  auto operator()(std::vector<Types::Objects::Object> const& args) const
+      -> Types::Objects::Object final {
     static_cast<void>(args);
 
     return static_cast<double>(

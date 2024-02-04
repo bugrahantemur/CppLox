@@ -1,13 +1,18 @@
-#ifndef LOX_Environment
-#define LOX_Environment
+#ifndef LOX_INTERPRETER_ENVIRONMENT
+#define LOX_INTERPRETER_ENVIRONMENT
 
 #include <cassert>
-#include <map>
 #include <optional>
+#include <string>
+#include <unordered_map>
 
+#include "../../Types/Object/Object.hpp"
+#include "../../Types/Token/Token.hpp"
 #include "../../Utils/Arc.hpp"
 
-namespace LOX::Interpreter::Details {
+namespace LOX::Interpreter {
+
+namespace Details {
 
 template <typename Key, typename Value>
 class Environment {
@@ -51,6 +56,10 @@ class Environment {
 
   std::unordered_map<Key, Value> map_;
 };
+}  // namespace Details
 
-}  // namespace LOX::Interpreter::Details
+using Environment = Details::Environment<std::string, Types::Objects::Object>;
+
+}  // namespace LOX::Interpreter
+
 #endif

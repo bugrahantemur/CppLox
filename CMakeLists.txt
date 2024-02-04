@@ -26,6 +26,9 @@ set(TARGET_SRC
     src/Parser/Expressions/Expressions.cpp
     src/Parser/Statements/Statements.cpp
     src/Interpreter/Interpreter.cpp
+    src/Interpreter/Expressions/Call/Call.cpp
+    src/Interpreter/Expressions/Equality/Equality.cpp
+    src/Interpreter/Expressions/Instance/Instance.cpp
     src/Interpreter/Error/Error.cpp
     src/Resolver/Resolver.cpp
     src/Resolver/Error/Error.cpp

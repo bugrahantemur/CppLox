@@ -1,29 +1,17 @@
+#ifndef LOX_INTERPRETER_EXPRESSIONS_EQUALITY
+#define LOX_INTERPRETER_EXPRESSIONS_EQUALITY
+
 #include <exception>
-#include <string>
-#include <variant>
 
 #include "../../../Types/Object/Object.hpp"
 
-namespace LOX::Interpreter::Expressions::Equality {
+namespace LOX::Interpreter::Expressions {
 
 struct NotComparableError : public std::exception {};
 
-struct Equality {
-  auto operator()(std::monostate, std::monostate) -> bool { return true; }
-  auto operator()(bool left, bool right) -> bool { return left == right; }
-  auto operator()(double left, double right) -> bool { return left == right; }
-  auto operator()(std::string const& left, std::string const& right) -> bool {
-    return left == right;
-  }
+auto is_equal(Types::Objects::Object const& left,
+              Types::Objects::Object const& right) -> bool;
 
-  template <typename T, typename U>
-  auto operator()(T const& left, U const& right) -> bool {
-    throw NotComparableError{};
-  }
-};
+}  // namespace LOX::Interpreter::Expressions
 
-auto is_equal(Object const& left, Object const& right) -> bool {
-  return std::visit(Equality{}, left, right);
-}
-
-}  // namespace LOX::Interpreter::Expressions::Equality
+#endif

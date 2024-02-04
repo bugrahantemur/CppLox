@@ -139,12 +139,12 @@ struct ExpressionEvaluator {
     }
     try {
       if (op_type == TokenType::BANG_EQUAL) {
-        return !Expressions::Equality::is_equal(left, right);
+        return !is_equal(left, right);
       }
       if (op_type == TokenType::EQUAL_EQUAL) {
-        return Expressions::Equality::is_equal(left, right);
+        return is_equal(left, right);
       }
-    } catch (Expressions::Equality::NotComparableError const& e) {
+    } catch (NotComparableError const& e) {
       throw Error{
           op.line_,
           "Can only compare booleans, strings, and numbers for equality."};
@@ -162,13 +162,13 @@ struct ExpressionEvaluator {
     }
 
     try {
-      std::size_t const arity{std::visit(Arity{}, callee)};
+      std::size_t const arity{arity_of(callee)};
       if (args.size() != arity) {
         throw Error{expr->paren_.line_, "Expected " + std::to_string(arity) +
                                             " arguments but got " +
                                             std::to_string(args.size()) + "."};
       }
-      return std::visit(Call{environment_, resolution_, args}, callee);
+      return call(environment_, resolution_, args, callee);
     } catch (UncallableError const& e) {
       throw Error{expr->paren_.line_, "Can only call functions and classes."};
     }

@@ -1,3 +1,6 @@
+#ifndef LOX_RESOLVER
+#define LOX_RESOLVER
+
 #include <unordered_map>
 #include <vector>
 
@@ -9,3 +12,5 @@ auto resolve(std::vector<Types::Syntax::Statement> const& statements)
     -> std::unordered_map<Token, std::size_t>;
 
 }  // namespace LOX::Resolver
+
+#endif

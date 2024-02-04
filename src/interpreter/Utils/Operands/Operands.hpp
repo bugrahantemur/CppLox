@@ -1,5 +1,5 @@
-#ifndef LOX_INTERPRETER_EXPRESSIONS_UTILS
-#define LOX_INTERPRETER_EXPRESSIONS_UTILS
+#ifndef LOX_INTERPRETER_UTILS_OPERANDS
+#define LOX_INTERPRETER_UTILS_OPERANDS
 
 #include "../../../Types/Object/Object.hpp"
 #include "../../../Types/Token/Token.hpp"

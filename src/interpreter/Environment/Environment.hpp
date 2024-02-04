@@ -17,12 +17,12 @@ namespace Details {
 template <typename Key, typename Value>
 class Environment {
  public:
-  std::optional<Arc<Environment>> enclosing_;
+  std::optional<Arc<Environment>> enclosing;
 
   Environment(std::optional<Arc<Environment>> const& enclosing)
-      : enclosing_(enclosing) {}
+      : enclosing(enclosing) {}
 
-  Environment() : enclosing_(std::nullopt) {}
+  Environment() : enclosing(std::nullopt) {}
 
   auto define(Key const& name, Value const& value) -> void {
     map_[name] = value;
@@ -48,7 +48,7 @@ class Environment {
     auto current{this};
     for (std::size_t i{0}; i < distance; ++i) {
       assert(current);
-      current = current->enclosing_.value().get();
+      current = current->enclosing.value().get();
     }
     assert(current);
     return current;

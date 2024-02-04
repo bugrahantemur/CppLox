@@ -11,11 +11,10 @@
 
 namespace LOX::Parser {
 
-Cursor::Cursor(std::vector<Token> const& tokens)
-    : tokens_(tokens), current_(0){};
+Cursor::Cursor(std::vector<Token> const& tokens) : tokens(tokens), current(0){};
 
 auto Cursor::match(TokenType type) const -> bool {
-  return !is_at_end() and peek().type_ == type;
+  return !is_at_end() and peek().type == type;
 }
 
 auto Cursor::match_any_of(std::initializer_list<TokenType> types) const
@@ -24,13 +23,13 @@ auto Cursor::match_any_of(std::initializer_list<TokenType> types) const
                      [this](TokenType const& type) { return match(type); });
 }
 
-auto Cursor::peek() const -> Token { return tokens_.at(current_); }
+auto Cursor::peek() const -> Token { return tokens.at(current); }
 
 auto Cursor::is_at_end() const -> bool {
-  return (current_ >= tokens_.size()) || (peek().type_ == TokenType::EOFF);
+  return (current >= tokens.size()) || (peek().type == TokenType::EOFF);
 }
 
-auto Cursor::take() -> Token { return tokens_.at(current_++); }
+auto Cursor::take() -> Token { return tokens.at(current++); }
 
 auto Cursor::consume(TokenType const& type, std::string const& message)
     -> Token {
@@ -42,8 +41,8 @@ auto Cursor::consume(TokenType const& type, std::string const& message)
 }
 
 auto Cursor::previous() -> Token {
-  assert(current_ > 0);
-  return tokens_.at(current_ - 1);
+  assert(current > 0);
+  return tokens.at(current - 1);
 }
 
 auto Cursor::synchronize() -> void {

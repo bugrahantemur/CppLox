@@ -36,48 +36,48 @@ using Statement =
 namespace LOX::Types::Syntax::Statements {
 
 struct BlockStmt {
-  std::vector<Statement> statements_;
+  std::vector<Statement> statements;
 };
 
 struct ClassStmt {
-  Token name_;
-  Expressions::VariableExpr super_class_;
-  std::vector<Box<FunctionStmt>> methods_;
+  Token name;
+  Expressions::VariableExpr super_class;
+  std::vector<Box<FunctionStmt>> methods;
 };
 
 struct ExpressionStmt {
-  Expression expression_;
+  Expression expression;
 };
 
 struct FunctionStmt {
-  Token name_;
-  std::vector<Token> params_;
-  std::vector<Statement> body_;
+  Token name;
+  std::vector<Token> params;
+  std::vector<Statement> body;
 };
 
 struct IfStmt {
-  Expression condition_;
-  Statement then_branch_;
-  Statement else_branch_;
+  Expression condition;
+  Statement then_branch;
+  Statement else_branch;
 };
 
 struct PrintStmt {
-  Expression expression_;
+  Expression expression;
 };
 
 struct ReturnStmt {
-  Token keyword_;
-  Expression value_;
+  Token keyword;
+  Expression value;
 };
 
 struct VariableStmt {
-  Token name_;
-  Expression initializer_;
+  Token name;
+  Expression initializer;
 };
 
 struct WhileStmt {
-  Expression condition_;
-  Statement body_;
+  Expression condition;
+  Statement body;
 };
 
 }  // namespace LOX::Types::Syntax::Statements

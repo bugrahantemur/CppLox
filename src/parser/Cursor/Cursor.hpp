@@ -11,8 +11,8 @@
 namespace LOX::Parser {
 
 class Cursor {
-  std::vector<Token> const& tokens_;
-  std::size_t current_;
+  std::vector<Token> const& tokens;
+  std::size_t current;
 
  public:
   explicit Cursor(std::vector<Token> const& tokens);

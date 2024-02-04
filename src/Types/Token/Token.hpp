@@ -51,11 +51,11 @@ enum class TokenType {
 struct Token {
   using Literal = std::variant<std::monostate, bool, double, std::string>;
 
-  TokenType type_;
-  std::string lexeme_;
-  Literal literal_;
-  std::size_t line_;
-  std::size_t token_id_;
+  TokenType type;
+  std::string lexeme;
+  Literal literal;
+  std::size_t line;
+  std::size_t token_id;
 
   auto operator==(Token const& other) const -> bool;
 

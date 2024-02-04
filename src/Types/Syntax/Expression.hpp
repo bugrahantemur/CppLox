@@ -38,63 +38,63 @@ using Expression =
 namespace LOX::Types::Syntax::Expressions {
 
 struct AssignmentExpr {
-  Token name_;
-  Expression value_;
+  Token name;
+  Expression value;
 };
 
 struct BinaryExpr {
-  Expression left_;
-  Token op_;
-  Expression right_;
+  Expression left;
+  Token op;
+  Expression right;
 };
 
 struct CallExpr {
-  Expression callee_;
-  Token paren_;
-  std::vector<Expression> arguments_;
+  Expression callee;
+  Token paren;
+  std::vector<Expression> arguments;
 };
 
 struct GetExpr {
-  Token name_;
-  Expression object_;
+  Token name;
+  Expression object;
 };
 
 struct GroupingExpr {
-  Expression expression_;
+  Expression expression;
 };
 
 struct LiteralExpr {
-  Token::Literal value_;
+  Token::Literal value;
 };
 
 struct LogicalExpr {
-  Expression left_;
-  Token op_;
-  Expression right_;
+  Expression left;
+  Token op;
+  Expression right;
 };
 
 struct SetExpr {
-  Token name_;
-  Expression object_;
-  Expression value_;
+  Token name;
+  Expression object;
+  Expression value;
 };
 
 struct SuperExpr {
-  Token keyword_;
-  Token method_;
+  Token keyword;
+  Token method;
 };
 
 struct ThisExpr {
-  Token keyword_;
+  Token keyword;
 };
 
 struct UnaryExpr {
-  Token op_;
-  Expression right_;
+  Token op;
+  Expression right;
 };
 
 struct VariableExpr {
-  Token name_;
+  Token name;
 };
 
 }  // namespace LOX::Types::Syntax::Expressions

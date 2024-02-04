@@ -12,9 +12,9 @@ Error::Error(std::size_t const line, std::string const& where,
                      where + ": " + message + "\n") {}
 
 auto error(Token const& token, std::string const& message) -> Error {
-  return Error{token.line_,
-               token.type_ == TokenType::EOFF ? "at the end"
-                                              : " at '" + token.lexeme_ + "'",
+  return Error{token.line,
+               token.type == TokenType::EOFF ? "at the end"
+                                             : " at '" + token.lexeme + "'",
                message};
 }
 

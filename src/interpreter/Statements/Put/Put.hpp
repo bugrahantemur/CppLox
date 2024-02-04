@@ -14,7 +14,7 @@ using namespace Types::Objects;
 
 template <typename OStream>
 struct Put {
-  Put(OStream& out) : out_{out} {}
+  Put(OStream& out) : out{out} {}
 
   auto operator()(std::monostate) -> OStream& { return put("nil"); }
 
@@ -27,15 +27,15 @@ struct Put {
   }
 
   auto operator()(Box<LoxFunction> const& func) -> OStream& {
-    return put("<fn " + func->declaration_.name_.lexeme_ + ">");
+    return put("<fn " + func->declaration_.name.lexeme + ">");
   }
 
   auto operator()(Box<LoxClass> const& klass) -> OStream& {
-    return put("<class " + klass->name_ + ">");
+    return put("<class " + klass->name + ">");
   }
 
   auto operator()(Arc<LoxInstance> const& instance) -> OStream& {
-    return put("<instance of " + instance->class_.name_ + ">");
+    return put("<instance of " + instance->class_.name + ">");
   }
 
   auto operator()(ArcDyn<Builtins::FunctionInterface> const& func) -> OStream& {
@@ -45,11 +45,11 @@ struct Put {
  private:
   template <typename T>
   auto put(T const& obj) -> OStream& {
-    out_ << obj << '\n';
-    return out_;
+    out << obj << '\n';
+    return out;
   }
 
-  OStream& out_;
+  OStream& out;
 };
 
 }  // namespace LOX::Interpreter::Statements

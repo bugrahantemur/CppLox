@@ -6,7 +6,7 @@
 namespace LOX::Interpreter::Utils {
 
 struct Return {
-  Types::Objects::Object value_;
+  Types::Objects::Object value;
 };
 
 }  // namespace LOX::Interpreter::Utils

@@ -12,7 +12,7 @@ namespace LOX::Types::Objects {
 struct LoxFunction {
   Syntax::Statements::FunctionStmt declaration_;
   Arc<Interpreter::Environment> closure_;
-  bool is_initializer_;
+  bool is_initializer;
 };
 
 }  // namespace LOX::Types::Objects

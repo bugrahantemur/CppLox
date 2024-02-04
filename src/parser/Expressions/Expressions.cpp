@@ -27,7 +27,7 @@ auto primary(Cursor& cursor) -> Expression {
     return LiteralExpr{std::monostate{}};
   }
   if (cursor.match_any_of({TokenType::NUMBER, TokenType::STRING})) {
-    return LiteralExpr{cursor.take().literal_};
+    return LiteralExpr{cursor.take().literal};
   }
   if (cursor.match(TokenType::LEFT_PAREN)) {
     cursor.take();
@@ -64,7 +64,7 @@ auto call(Cursor& cursor) -> Expression {
       std::vector<Expression> const args{parse_args(cursor)};
 
       Token const closing{cursor.previous()};
-      assert(closing.type_ == TokenType::RIGHT_PAREN);
+      assert(closing.type == TokenType::RIGHT_PAREN);
 
       expr = CallExpr{expr, closing, args};
     } else if (cursor.match(TokenType::DOT)) {
@@ -151,9 +151,9 @@ auto assignment(Cursor& cursor) -> Expression {
     Expression const value{or_expr(cursor)};
 
     if (auto const var{std::get_if<Box<VariableExpr>>(&expr)}) {
-      return AssignmentExpr{(*var)->name_, value};
+      return AssignmentExpr{(*var)->name, value};
     } else if (auto const get{std::get_if<Box<GetExpr>>(&expr)}) {
-      return SetExpr{(*get)->name_, (*get)->object_, value};
+      return SetExpr{(*get)->name, (*get)->object, value};
     }
 
     // Do not throw, just report the error

@@ -19,7 +19,7 @@ using namespace Types::Syntax::Statements;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::PRINT);
+  assert(keyword.type == TokenType::PRINT);
   static_cast<void>(keyword);
 
   Expression const value{Expressions::expression(cursor)};
@@ -37,7 +37,7 @@ auto expression_statement(Cursor& cursor) -> Statement {
 
 auto block_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::LEFT_BRACE);
+  assert(keyword.type == TokenType::LEFT_BRACE);
   static_cast<void>(keyword);
 
   std::vector<Statement> statements{};
@@ -53,7 +53,7 @@ auto block_statement(Cursor& cursor) -> Statement {
 
 auto if_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::IF);
+  assert(keyword.type == TokenType::IF);
   static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
@@ -73,7 +73,7 @@ auto if_statement(Cursor& cursor) -> Statement {
 
 auto while_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::WHILE);
+  assert(keyword.type == TokenType::WHILE);
   static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
@@ -85,7 +85,7 @@ auto while_statement(Cursor& cursor) -> Statement {
 
 auto for_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::FOR);
+  assert(keyword.type == TokenType::FOR);
   static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
@@ -122,7 +122,7 @@ auto for_statement(Cursor& cursor) -> Statement {
 
 auto return_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::RETURN);
+  assert(keyword.type == TokenType::RETURN);
 
   Expression const value{cursor.match(TokenType::SEMICOLON)
                              ? std::monostate{}
@@ -165,7 +165,7 @@ enum class FunctionType { Function, Method };
 auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
   if (type == FunctionType::Function) {
     Token const keyword{cursor.take()};
-    assert(keyword.type_ == TokenType::FUN);
+    assert(keyword.type == TokenType::FUN);
     static_cast<void>(keyword);
   }
 
@@ -181,7 +181,7 @@ auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
 
 auto class_declaration(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::CLASS);
+  assert(keyword.type == TokenType::CLASS);
   static_cast<void>(keyword);
 
   Token const name{cursor.consume(TokenType::IDENTIFIER, "Expect class name.")};
@@ -209,7 +209,7 @@ auto class_declaration(Cursor& cursor) -> Statement {
 
 auto variable_declaration(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
-  assert(keyword.type_ == TokenType::VAR);
+  assert(keyword.type == TokenType::VAR);
   static_cast<void>(keyword);
 
   Token const name{

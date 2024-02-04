@@ -16,12 +16,12 @@ using namespace Types::Objects;
 
 struct Arity {
   auto operator()(Box<LoxFunction> const& func) -> std::size_t {
-    return func->declaration_.params_.size();
+    return func->declaration_.params.size();
   }
 
   auto operator()(Box<LoxClass> const& klass) -> std::size_t {
-    if (auto const initializer{klass->methods_.find("init")};
-        initializer != klass->methods_.end()) {
+    if (auto const initializer{klass->methods.find("init")};
+        initializer != klass->methods.end()) {
       return (*this)(initializer->second);
     }
     return 0;
@@ -39,8 +39,8 @@ struct Arity {
 };
 
 struct Call {
-  Arc<Environment> environment_;
-  std::unordered_map<Token, std::size_t> const& resolution_;
+  Arc<Environment> environment;
+  std::unordered_map<Token, std::size_t> const& resolution;
   std::vector<Object> const& args_;
 
   auto operator()(Box<LoxFunction> const& func) -> Object {
@@ -49,27 +49,27 @@ struct Call {
     std::size_t const arity{Arity{}(func)};
 
     for (std::size_t i = 0; i < arity; ++i) {
-      env->define(func->declaration_.params_.at(i).lexeme_, args_.at(i));
+      env->define(func->declaration_.params.at(i).lexeme, args_.at(i));
     }
 
     try {
-      Interpreter::interpret(func->declaration_.body_, resolution_, env);
+      Interpreter::interpret(func->declaration_.body, resolution, env);
     } catch (Utils::Return const& ret) {
-      if (func->is_initializer_) {
+      if (func->is_initializer) {
         return env->get_at("this", 0);
       }
 
-      return ret.value_;
+      return ret.value;
     }
 
-    return func->is_initializer_ ? env->get_at("this", 0) : std::monostate{};
+    return func->is_initializer ? env->get_at("this", 0) : std::monostate{};
   }
 
   auto operator()(Box<LoxClass> const& klass) -> Object {
     auto const instance{Arc{LoxInstance{*klass, {}}}};
 
-    if (auto const initializer{klass->methods_.find("init")};
-        initializer != klass->methods_.end()) {
+    if (auto const initializer{klass->methods.find("init")};
+        initializer != klass->methods.end()) {
       auto env{Arc{Environment{initializer->second.closure_}}};
       env->define("this", instance);
       auto const init{

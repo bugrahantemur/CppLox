@@ -16,174 +16,173 @@ enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };
 
 struct Resolve {
-  std::unordered_map<Token, std::size_t>& resolution_;
-  std::vector<std::unordered_map<std::string, bool>>& scopes_;
+  std::unordered_map<Token, std::size_t>& resolution;
+  std::vector<std::unordered_map<std::string, bool>>& scopes;
 
-  FunctionType& current_function_type_;
-  ClassType& current_class_type_;
+  FunctionType& current_function_type;
+  ClassType& current_class_type;
 
   auto operator()(std::monostate) -> void {}
 
   auto operator()(Box<ExpressionStmt> const& stmt) -> void {
-    resolve(stmt->expression_);
+    resolve(stmt->expression);
   }
 
   auto operator()(Box<PrintStmt> const& stmt) -> void {
-    resolve(stmt->expression_);
+    resolve(stmt->expression);
   }
 
   auto operator()(Box<ReturnStmt> const& stmt) -> void {
-    if (current_function_type_ == FunctionType::NONE) {
-      throw Error{stmt->keyword_.line_, "Can't return from top-level code."};
+    if (current_function_type == FunctionType::NONE) {
+      throw Error{stmt->keyword.line, "Can't return from top-level code."};
     }
 
-    if (current_function_type_ == FunctionType::INITIALIZER) {
-      throw Error{stmt->keyword_.line_,
+    if (current_function_type == FunctionType::INITIALIZER) {
+      throw Error{stmt->keyword.line,
                   "Can't return a value from an initializer."};
     }
 
-    resolve(stmt->value_);
+    resolve(stmt->value);
   }
 
   auto operator()(Box<VariableStmt> const& stmt) -> void {
-    declare(stmt->name_);
-    resolve(stmt->initializer_);
-    define(stmt->name_);
+    declare(stmt->name);
+    resolve(stmt->initializer);
+    define(stmt->name);
   }
 
   auto operator()(Box<BlockStmt> const& stmt) -> void {
     begin_scope();
-    resolve(stmt->statements_);
+    resolve(stmt->statements);
     end_scope();
   }
 
   auto operator()(Box<FunctionStmt> const& stmt) -> void {
-    declare(stmt->name_);
-    define(stmt->name_);
+    declare(stmt->name);
+    define(stmt->name);
 
     resolve(*stmt, FunctionType::FUNCTION);
   }
 
   auto operator()(Box<ClassStmt> const& stmt) -> void {
-    ClassType const enclosing_class_type{current_class_type_};
-    current_class_type_ = ClassType::CLASS;
+    ClassType const enclosing_class_type{current_class_type};
+    current_class_type = ClassType::CLASS;
 
-    declare(stmt->name_);
-    define(stmt->name_);
+    declare(stmt->name);
+    define(stmt->name);
 
-    if (stmt->super_class_.name_ != Token::none()) {
-      if (stmt->super_class_.name_ == stmt->name_) {
-        throw Error{stmt->super_class_.name_.line_,
+    if (stmt->super_class.name != Token::none()) {
+      if (stmt->super_class.name == stmt->name) {
+        throw Error{stmt->super_class.name.line,
                     "A class can't inherit from itself."};
       }
 
-      current_class_type_ = ClassType::SUBCLASS;
-      resolve(stmt->super_class_);
+      current_class_type = ClassType::SUBCLASS;
+      resolve(stmt->super_class);
 
       begin_scope();
-      scopes_.back()["super"] = true;
+      scopes.back()["super"] = true;
     }
 
     begin_scope();
-    scopes_.back()["this"] = true;
+    scopes.back()["this"] = true;
 
-    for (Box<FunctionStmt> const& method : stmt->methods_) {
-      resolve(*method, method->name_.lexeme_ == "init"
-                           ? FunctionType::INITIALIZER
-                           : FunctionType::METHOD);
+    for (Box<FunctionStmt> const& method : stmt->methods) {
+      resolve(*method, method->name.lexeme == "init" ? FunctionType::INITIALIZER
+                                                     : FunctionType::METHOD);
     }
 
     end_scope();
-    if (stmt->super_class_.name_ != Token::none()) {
+    if (stmt->super_class.name != Token::none()) {
       end_scope();
     }
 
-    current_class_type_ = enclosing_class_type;
+    current_class_type = enclosing_class_type;
   }
 
   auto operator()(Box<IfStmt> const& stmt) -> void {
-    resolve(stmt->condition_);
-    resolve(stmt->then_branch_);
-    resolve(stmt->else_branch_);
+    resolve(stmt->condition);
+    resolve(stmt->then_branch);
+    resolve(stmt->else_branch);
   }
 
   auto operator()(Box<WhileStmt> const& stmt) -> void {
-    resolve(stmt->condition_);
-    resolve(stmt->body_);
+    resolve(stmt->condition);
+    resolve(stmt->body);
   }
 
   auto operator()(Box<LiteralExpr> const& expr) -> void {}
 
   auto operator()(Box<SuperExpr> const& expr) -> void {
-    if (current_class_type_ == ClassType::NONE) {
-      throw Resolver::Error{expr->keyword_.line_,
+    if (current_class_type == ClassType::NONE) {
+      throw Resolver::Error{expr->keyword.line,
                             "Can't use 'super' outside of a class."};
     }
 
-    if (current_class_type_ != ClassType::SUBCLASS) {
-      throw Resolver::Error{expr->keyword_.line_,
+    if (current_class_type != ClassType::SUBCLASS) {
+      throw Resolver::Error{expr->keyword.line,
                             "Can't use 'super' in a class with no superclass."};
     }
 
-    resolve(expr->keyword_);
+    resolve(expr->keyword);
   }
 
   auto operator()(Box<ThisExpr> const& expr) -> void {
-    if (current_class_type_ == ClassType::NONE) {
-      throw Resolver::Error{expr->keyword_.line_,
+    if (current_class_type == ClassType::NONE) {
+      throw Resolver::Error{expr->keyword.line,
                             "Can't use 'this' outside of a class."};
     }
 
-    resolve(expr->keyword_);
+    resolve(expr->keyword);
   }
 
   auto operator()(Box<VariableExpr> const& expr) -> void {
-    if (!scopes_.empty()) {
-      if (auto const found{scopes_.back().find(expr->name_.lexeme_)};
-          found != scopes_.back().end() && found->second == false) {
+    if (!scopes.empty()) {
+      if (auto const found{scopes.back().find(expr->name.lexeme)};
+          found != scopes.back().end() && found->second == false) {
         throw Resolver::Error{
-            expr->name_.line_,
+            expr->name.line,
             "Can't read local variable in its own initializer."};
       }
     }
-    resolve(expr->name_);
+    resolve(expr->name);
   }
 
   auto operator()(Box<AssignmentExpr> const& expr) -> void {
-    resolve(expr->value_);
-    resolve(expr->name_);
+    resolve(expr->value);
+    resolve(expr->name);
   }
 
   auto operator()(Box<BinaryExpr> const& expr) -> void {
-    resolve(expr->left_);
-    resolve(expr->right_);
+    resolve(expr->left);
+    resolve(expr->right);
   }
 
   auto operator()(Box<CallExpr> const& expr) -> void {
-    resolve(expr->callee_);
+    resolve(expr->callee);
 
-    for (Expression const& argument : expr->arguments_) {
+    for (Expression const& argument : expr->arguments) {
       resolve(argument);
     }
   }
 
-  auto operator()(Box<GetExpr> const& expr) -> void { resolve(expr->object_); }
+  auto operator()(Box<GetExpr> const& expr) -> void { resolve(expr->object); }
 
   auto operator()(Box<GroupingExpr> const& expr) -> void {
-    resolve(expr->expression_);
+    resolve(expr->expression);
   }
 
   auto operator()(Box<LogicalExpr> const& expr) -> void {
-    resolve(expr->left_);
-    resolve(expr->right_);
+    resolve(expr->left);
+    resolve(expr->right);
   }
 
   auto operator()(Box<SetExpr> const& expr) -> void {
-    resolve(expr->value_);
-    resolve(expr->object_);
+    resolve(expr->value);
+    resolve(expr->object);
   }
 
-  auto operator()(Box<UnaryExpr> const& expr) -> void { resolve(expr->right_); }
+  auto operator()(Box<UnaryExpr> const& expr) -> void { resolve(expr->right); }
 
  private:
   auto resolve(Statement const& stmt) -> void { std::visit(*this, stmt); }
@@ -197,52 +196,52 @@ struct Resolve {
   }
 
   auto resolve(Token const& name) -> void {
-    for (auto scope{scopes_.crbegin()}; scope != scopes_.crend(); ++scope) {
-      if (scope->find(name.lexeme_) != scope->end()) {
-        resolution_[name] = std::distance(scopes_.crbegin(), scope);
+    for (auto scope{scopes.crbegin()}; scope != scopes.crend(); ++scope) {
+      if (scope->find(name.lexeme) != scope->end()) {
+        resolution[name] = std::distance(scopes.crbegin(), scope);
         return;
       }
     }
   }
 
   auto resolve(FunctionStmt const& stmt, FunctionType function_type) -> void {
-    FunctionType const enclosing_function{current_function_type_};
-    current_function_type_ = function_type;
+    FunctionType const enclosing_function{current_function_type};
+    current_function_type = function_type;
 
     begin_scope();
 
-    for (Token const& param : stmt.params_) {
+    for (Token const& param : stmt.params) {
       declare(param);
       define(param);
     }
-    resolve(stmt.body_);
+    resolve(stmt.body);
 
     end_scope();
 
-    current_function_type_ = enclosing_function;
+    current_function_type = enclosing_function;
   }
 
   auto declare(Token const& name) const -> void {
-    if (!scopes_.empty()) {
-      auto& scope{scopes_.back()};
-      if (scope.find(name.lexeme_) != scope.end()) {
-        throw Resolver::Error{name.line_,
+    if (!scopes.empty()) {
+      auto& scope{scopes.back()};
+      if (scope.find(name.lexeme) != scope.end()) {
+        throw Resolver::Error{name.line,
                               "Already a variable with this name declared in "
                               "this scope."};
       }
-      scopes_.back()[name.lexeme_] = false;
+      scopes.back()[name.lexeme] = false;
     }
   }
 
   auto define(Token const& name) const -> void {
-    if (!scopes_.empty()) {
-      scopes_.back()[name.lexeme_] = true;
+    if (!scopes.empty()) {
+      scopes.back()[name.lexeme] = true;
     }
   }
 
-  auto begin_scope() -> void { scopes_.emplace_back(); }
+  auto begin_scope() -> void { scopes.emplace_back(); }
 
-  auto end_scope() -> void { scopes_.pop_back(); }
+  auto end_scope() -> void { scopes.pop_back(); }
 };
 
 auto preamble() -> std::unordered_map<std::string, bool> {

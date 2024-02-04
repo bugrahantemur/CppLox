@@ -14,18 +14,18 @@
 namespace LOX::Types::Objects {
 
 struct LoxClass {
-  std::string name_;
-  std::optional<Box<LoxClass>> superclass_;
-  std::unordered_map<std::string, LoxFunction> methods_;
+  std::string name;
+  std::optional<Box<LoxClass>> super_class;
+  std::unordered_map<std::string, LoxFunction> methods;
 
   auto find_method(std::string const& name) const
       -> std::optional<LoxFunction> {
-    if (auto const method{methods_.find(name)}; method != methods_.end()) {
+    if (auto const method{methods.find(name)}; method != methods.end()) {
       return method->second;
     }
 
-    if (superclass_) {
-      return superclass_.value()->find_method(name);
+    if (super_class) {
+      return super_class.value()->find_method(name);
     }
 
     return std::nullopt;

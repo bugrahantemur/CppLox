@@ -12,10 +12,8 @@
 
 namespace LOX::Parser::Statements {
 
-using Types::Syntax::Expression;
-using Types::Syntax::Statement;
-
 using namespace Types::Syntax::Statements;
+using namespace Types::Syntax::Expressions;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};

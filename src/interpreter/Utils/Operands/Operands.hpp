@@ -1,7 +1,7 @@
 #ifndef LOX_INTERPRETER_UTILS_OPERANDS
 #define LOX_INTERPRETER_UTILS_OPERANDS
 
-#include "../../../Types/Object/Object.hpp"
+#include "../../../Types/Objects/Object.hpp"
 #include "../../../Types/Token/Token.hpp"
 
 namespace LOX::Interpreter::Utils::Operands {

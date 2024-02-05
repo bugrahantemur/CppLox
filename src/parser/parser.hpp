@@ -8,7 +8,7 @@
 
 namespace LOX::Parser {
 auto parse(std::vector<Token> const& tokens)
-    -> std::vector<Types::Syntax::Statement>;
+    -> std::vector<Types::Syntax::Statements::Statement>;
 }  // namespace LOX::Parser
 
 #endif

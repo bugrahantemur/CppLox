@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "../Types/Object/Builtins/FunctionInterface.hpp"
-#include "../Types/Object/Object.hpp"
+#include "../Types/Objects/Builtins/FunctionInterface.hpp"
+#include "../Types/Objects/Object.hpp"
 
 namespace LOX::Native {
 

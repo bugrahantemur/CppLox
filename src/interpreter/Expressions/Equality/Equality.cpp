@@ -4,7 +4,7 @@
 #include <exception>
 #include <variant>
 
-#include "../../../Types/Object/Object.hpp"
+#include "../../../Types/Objects/Object.hpp"
 
 namespace LOX::Interpreter::Expressions {
 

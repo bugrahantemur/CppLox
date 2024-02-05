@@ -2,10 +2,10 @@
 
 #include <exception>
 
-#include "../../../Types/Object/Builtins/FunctionInterface.hpp"
-#include "../../../Types/Object/Class.hpp"
-#include "../../../Types/Object/Function.hpp"
-#include "../../../Types/Object/Object.hpp"
+#include "../../../Types/Objects/Builtins/FunctionInterface.hpp"
+#include "../../../Types/Objects/Class.hpp"
+#include "../../../Types/Objects/Function.hpp"
+#include "../../../Types/Objects/Object.hpp"
 #include "../../../Utils/Arcdyn.hpp"
 #include "../../../Utils/Box.hpp"
 #include "../../Utils/Return/Return.hpp"

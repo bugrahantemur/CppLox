@@ -1,8 +1,8 @@
 #include "./Instance.hpp"
 
-#include "../../../Types/Object/Class.hpp"
-#include "../../../Types/Object/Function.hpp"
-#include "../../../Types/Object/Object.hpp"
+#include "../../../Types/Objects/Class.hpp"
+#include "../../../Types/Objects/Function.hpp"
+#include "../../../Types/Objects/Object.hpp"
 #include "../../Error/Error.hpp"
 
 namespace LOX::Interpreter::Expressions::Instance {

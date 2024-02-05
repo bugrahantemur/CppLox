@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <variant>
 
-#include "../../Types/Object/Class.hpp"
-#include "../../Types/Object/Function.hpp"
-#include "../../Types/Object/Object.hpp"
+#include "../../Types/Objects/Class.hpp"
+#include "../../Types/Objects/Function.hpp"
+#include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Statement.hpp"
 #include "../../Types/Token/Token.hpp"
 #include "../../Utils/Arc.hpp"
@@ -21,7 +21,6 @@ namespace LOX::Interpreter::Statements {
 
 using namespace Types::Syntax::Statements;
 using Expressions::ExpressionEvaluator;
-using Types::Syntax::Statement;
 
 struct StatementExecutor {
   Arc<Environment> environment;

@@ -8,7 +8,7 @@
 #include "./Parser/Parser.hpp"
 #include "./Resolver/Resolver.hpp"
 #include "./Scanner/Scanner.hpp"
-#include "./Types/Object/Object.hpp"
+#include "./Types/Objects/Object.hpp"
 #include "./Types/Syntax/Statement.hpp"
 #include "./Types/Token/Token.hpp"
 #include "./Utils/Error.hpp"
@@ -21,7 +21,8 @@ auto run(std::string const &file_path) -> void {
 
   std::vector<Token> const tokens{Scanner::scan(contents)};
 
-  std::vector<Types::Syntax::Statement> const statements{Parser::parse(tokens)};
+  std::vector<Types::Syntax::Statements::Statement> const statements{
+      Parser::parse(tokens)};
 
   std::unordered_map<Token, std::size_t> const resolution{
       Resolver::resolve(statements)};

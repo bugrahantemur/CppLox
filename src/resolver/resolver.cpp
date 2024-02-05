@@ -7,8 +7,6 @@
 
 namespace LOX::Resolver {
 
-using Types::Syntax::Expression;
-using Types::Syntax::Statement;
 using namespace Types::Syntax::Statements;
 using namespace Types::Syntax::Expressions;
 

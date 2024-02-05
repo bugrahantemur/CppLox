@@ -10,7 +10,6 @@
 
 namespace LOX::Parser::Expressions {
 
-using Types::Syntax::Expression;
 using namespace Types::Syntax::Expressions;
 
 auto primary(Cursor& cursor) -> Expression {

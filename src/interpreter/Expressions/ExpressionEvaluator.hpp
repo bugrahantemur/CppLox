@@ -4,9 +4,9 @@
 #include <optional>
 #include <unordered_map>
 
-#include "../../Types/Object/Class.hpp"
-#include "../../Types/Object/Function.hpp"
-#include "../../Types/Object/Object.hpp"
+#include "../../Types/Objects/Class.hpp"
+#include "../../Types/Objects/Function.hpp"
+#include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Token/Token.hpp"
 #include "../../Utils/Arc.hpp"
@@ -22,8 +22,6 @@
 namespace LOX::Interpreter::Expressions {
 
 using namespace Utils;
-
-using Types::Syntax::Expression;
 
 using namespace Types::Objects;
 using namespace Types::Syntax::Expressions;

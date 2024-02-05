@@ -6,10 +6,9 @@
 #include "../../Types/Token/Token.hpp"
 #include "../../Utils/Box.hpp"
 
-namespace LOX::Types::Syntax {
+namespace LOX::Types::Syntax::Expressions {
 
 // Forward declaration of all expression types
-namespace Expressions {
 struct AssignmentExpr;
 struct BinaryExpr;
 struct CallExpr;
@@ -22,7 +21,6 @@ struct SuperExpr;
 struct ThisExpr;
 struct UnaryExpr;
 struct VariableExpr;
-}  // namespace Expressions
 
 using Expression =
     std::variant<std::monostate, Box<Expressions::AssignmentExpr>,
@@ -32,10 +30,6 @@ using Expression =
                  Box<Expressions::SetExpr>, Box<Expressions::SuperExpr>,
                  Box<Expressions::ThisExpr>, Box<Expressions::UnaryExpr>,
                  Box<Expressions::VariableExpr>>;
-
-}  // namespace LOX::Types::Syntax
-
-namespace LOX::Types::Syntax::Expressions {
 
 struct AssignmentExpr {
   Token name;

@@ -10,10 +10,10 @@
 namespace LOX::Parser {
 
 auto parse(std::vector<Token> const& tokens)
-    -> std::vector<Types::Syntax::Statement> {
+    -> std::vector<Types::Syntax::Statements::Statement> {
   Cursor cursor(tokens);
 
-  std::vector<Types::Syntax::Statement> statements{};
+  std::vector<Types::Syntax::Statements::Statement> statements{};
 
   while (!cursor.is_at_end()) {
     statements.push_back(Statements::declaration(cursor));

@@ -7,9 +7,9 @@
 #include <variant>
 
 #include "../Builtins/Builtins.hpp"
-#include "../Types/Object/Class.hpp"
-#include "../Types/Object/Function.hpp"
-#include "../Types/Object/Object.hpp"
+#include "../Types/Objects/Class.hpp"
+#include "../Types/Objects/Function.hpp"
+#include "../Types/Objects/Object.hpp"
 #include "../Types/Syntax/Expression.hpp"
 #include "../Types/Syntax/Statement.hpp"
 #include "../Types/Token/Token.hpp"
@@ -19,9 +19,6 @@
 #include "./Statements/StatementExecutor.hpp"
 
 namespace LOX::Interpreter {
-
-using Types::Syntax::Expression;
-using Types::Syntax::Statement;
 
 using namespace Types::Syntax::Statements;
 using namespace Types::Syntax::Expressions;

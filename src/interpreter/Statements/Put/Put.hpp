@@ -4,9 +4,9 @@
 #include <string>
 #include <variant>
 
-#include "../../../Types/Object/Class.hpp"
-#include "../../../Types/Object/Function.hpp"
-#include "../../../Types/Object/Object.hpp"
+#include "../../../Types/Objects/Class.hpp"
+#include "../../../Types/Objects/Function.hpp"
+#include "../../../Types/Objects/Object.hpp"
 
 namespace LOX::Interpreter::Statements {
 

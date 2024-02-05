@@ -8,10 +8,9 @@
 #include "../../Utils/Box.hpp"
 #include "./Expression.hpp"
 
-namespace LOX::Types::Syntax {
-// Forward declaration of all statement types
+namespace LOX::Types::Syntax::Statements {
 
-namespace Statements {
+// Forward declaration of all statement types
 struct BlockStmt;
 struct ClassStmt;
 struct ExpressionStmt;
@@ -21,7 +20,6 @@ struct PrintStmt;
 struct ReturnStmt;
 struct VariableStmt;
 struct WhileStmt;
-}  // namespace Statements
 
 // Statement variant
 using Statement =
@@ -30,10 +28,6 @@ using Statement =
                  Box<Statements::FunctionStmt>, Box<Statements::IfStmt>,
                  Box<Statements::PrintStmt>, Box<Statements::ReturnStmt>,
                  Box<Statements::VariableStmt>, Box<Statements::WhileStmt>>;
-
-}  // namespace LOX::Types::Syntax
-
-namespace LOX::Types::Syntax::Statements {
 
 struct BlockStmt {
   std::vector<Statement> statements;
@@ -46,7 +40,7 @@ struct ClassStmt {
 };
 
 struct ExpressionStmt {
-  Expression expression;
+  Expressions::Expression expression;
 };
 
 struct FunctionStmt {
@@ -56,27 +50,27 @@ struct FunctionStmt {
 };
 
 struct IfStmt {
-  Expression condition;
+  Expressions::Expression condition;
   Statement then_branch;
   Statement else_branch;
 };
 
 struct PrintStmt {
-  Expression expression;
+  Expressions::Expression expression;
 };
 
 struct ReturnStmt {
   Token keyword;
-  Expression value;
+  Expressions::Expression value;
 };
 
 struct VariableStmt {
   Token name;
-  Expression initializer;
+  Expressions::Expression initializer;
 };
 
 struct WhileStmt {
-  Expression condition;
+  Expressions::Expression condition;
   Statement body;
 };
 

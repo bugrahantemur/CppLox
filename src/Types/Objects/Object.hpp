@@ -40,24 +40,11 @@ struct LoxClass {
   std::string name;
   std::optional<Box<LoxClass>> super_class;
   std::unordered_map<std::string, LoxFunction> methods;
-
-  auto find_method(std::string const& name) const
-      -> std::optional<LoxFunction> {
-    if (auto const method{methods.find(name)}; method != methods.end()) {
-      return method->second;
-    }
-
-    if (super_class) {
-      return super_class.value()->find_method(name);
-    }
-
-    return std::nullopt;
-  }
 };
 
 struct LoxInstance {
   LoxClass class_;
-  std::unordered_map<std::string, Object> fields_;
+  std::unordered_map<std::string, Object> fields;
 };
 
 namespace Builtins {

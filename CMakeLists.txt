@@ -19,7 +19,7 @@ set(TARGET_SRC
     "src/Interpreter/Statements/Execute.cpp"
     "src/Interpreter/Expressions/Call/Call.cpp"
     "src/Interpreter/Expressions/Equality/Equality.cpp"
-    "src/Interpreter/Expressions/Instance/Instance.cpp"
+    "src/Interpreter/Expressions/Class/Class.cpp"
     "src/Interpreter/Expressions/Evaluate.cpp"
     "src/Interpreter/Error/Error.cpp"
     "src/Interpreter/Utils/Truth/Truth.cpp"

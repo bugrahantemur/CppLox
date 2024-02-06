@@ -13,8 +13,8 @@
 #include "../Utils/Operands/Operands.hpp"
 #include "../Utils/Truth/Truth.hpp"
 #include "./Call/Call.hpp"
+#include "./Class/Class.hpp"
 #include "./Equality/Equality.hpp"
-#include "./Instance/Instance.hpp"
 
 namespace LOX::Interpreter::Expressions {
 
@@ -40,14 +40,14 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<SuperExpr> const& expr) -> Object {
     std::size_t const distance{resolution.at(expr->keyword)};
 
-    auto const superclass{
+    auto const super_class{
         std::get<Box<LoxClass>>(environment->get_at("super", distance))};
 
     auto const instance{
         std::get<Arc<LoxInstance>>(environment->get_at("this", distance - 1))};
 
     std::optional<LoxFunction> const method{
-        superclass->find_method(expr->method.lexeme)};
+        Class::find_method(*super_class, expr->method.lexeme)};
 
     if (!method) {
       throw Error{expr->method.line,
@@ -175,7 +175,7 @@ struct ExpressionEvaluator {
 
     if (Arc<LoxInstance> const* const instance{
             std::get_if<Arc<LoxInstance>>(&obj)}) {
-      return Instance::get(*instance, expr->name);
+      return Class::get(*instance, expr->name);
     }
 
     throw Error{expr->name.line, "Only instances have properties."};
@@ -205,7 +205,7 @@ struct ExpressionEvaluator {
 
     if (auto const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
       Object const value{std::visit(*this, expr->value)};
-      Instance::set(*instance, expr->name, value);
+      Class::set(*instance, expr->name, value);
 
       return value;
     }

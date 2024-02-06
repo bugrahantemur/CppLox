@@ -35,7 +35,7 @@ auto run(std::string const &file_path) -> void {
 auto main(int argc, char *argv[]) -> int {
   if (argc != 2) {
     LOX::report(
-        std::runtime_error{"Wrong usage! Correct usage: cpplox [script]\n"});
+        std::runtime_error{"Wrong usage! Correct usage: lox [script]\n"});
   } else {
     try {
       LOX::run(argv[1]);

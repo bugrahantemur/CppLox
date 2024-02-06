@@ -1,17 +1,14 @@
-#ifndef LOX_INTERPRETER_EXPRESSION_EVALUATOR
-#define LOX_INTERPRETER_EXPRESSION_EVALUATOR
+#include "./Evaluate.hpp"
 
 #include <optional>
 #include <unordered_map>
 
-#include "../../Types/Objects/Class.hpp"
-#include "../../Types/Objects/Function.hpp"
+#include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Token/Token.hpp"
 #include "../../Utils/Arc.hpp"
 #include "../../Utils/Box.hpp"
-#include "../Environment/Environment.hpp"
 #include "../Error/Error.hpp"
 #include "../Utils/Operands/Operands.hpp"
 #include "../Utils/Truth/Truth.hpp"
@@ -25,6 +22,7 @@ using namespace Utils;
 
 using namespace Types::Objects;
 using namespace Types::Syntax::Expressions;
+using Types::Environment;
 
 struct ExpressionEvaluator {
   Arc<Environment> environment;
@@ -232,5 +230,12 @@ struct ExpressionEvaluator {
     return std::monostate{};
   }
 };
+
+auto evaluate(Types::Syntax::Expressions::Expression const& expression,
+              Arc<Environment> environment,
+              std::unordered_map<Token, std::size_t> const& resolution)
+    -> Types::Objects::Object {
+  return std::visit(ExpressionEvaluator{environment, resolution}, expression);
+}
+
 }  // namespace LOX::Interpreter::Expressions
-#endif

@@ -2,17 +2,17 @@
 
 #include <exception>
 
-#include "../../../Types/Objects/Builtins/FunctionInterface.hpp"
-#include "../../../Types/Objects/Class.hpp"
-#include "../../../Types/Objects/Function.hpp"
+#include "../../../Types/Environment/Environment.hpp"
 #include "../../../Types/Objects/Object.hpp"
 #include "../../../Utils/Arcdyn.hpp"
 #include "../../../Utils/Box.hpp"
+#include "../../Interpreter.hpp"
 #include "../../Utils/Return/Return.hpp"
 
 namespace LOX::Interpreter::Expressions {
 
 using namespace Types::Objects;
+using Types::Environment;
 
 struct Arity {
   auto operator()(Box<LoxFunction> const& func) -> std::size_t {

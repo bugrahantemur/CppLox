@@ -14,25 +14,30 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
-    src/Lox.cpp
-    src/Types/Token/Token.cpp
-    src/Scanner/Scanner.cpp
-    src/Scanner/Error/Error.cpp
-    src/Scanner/Cursor/Cursor.cpp
-    src/Scanner/Tokens/Tokens.cpp
-    src/Parser/Cursor/Cursor.cpp
-    src/Parser/Error/Error.cpp
-    src/Parser/Parser.cpp
-    src/Parser/Expressions/Expressions.cpp
-    src/Parser/Statements/Statements.cpp
-    src/Interpreter/Interpreter.cpp
-    src/Interpreter/Expressions/Call/Call.cpp
-    src/Interpreter/Expressions/Equality/Equality.cpp
-    src/Interpreter/Expressions/Instance/Instance.cpp
-    src/Interpreter/Error/Error.cpp
-    src/Resolver/Resolver.cpp
-    src/Resolver/Error/Error.cpp
+    "src/Lox.cpp"
+    "src/Interpreter/Interpreter.cpp"
+    "src/Interpreter/Statements/Execute.cpp"
+    "src/Interpreter/Expressions/Call/Call.cpp"
+    "src/Interpreter/Expressions/Equality/Equality.cpp"
+    "src/Interpreter/Expressions/Instance/Instance.cpp"
+    "src/Interpreter/Expressions/Evaluate.cpp"
+    "src/Interpreter/Error/Error.cpp"
+    "src/Interpreter/Utils/Truth/Truth.cpp"
+    "src/Parser/Cursor/Cursor.cpp"
+    "src/Parser/Error/Error.cpp"
+    "src/Parser/Parser.cpp"
+    "src/Parser/Expressions/Expressions.cpp"
+    "src/Parser/Statements/Statements.cpp"
+    "src/Resolver/Resolver.cpp"
+    "src/Resolver/Error/Error.cpp"
+    "src/Scanner/Scanner.cpp"
+    "src/Scanner/Error/Error.cpp"
+    "src/Scanner/Cursor/Cursor.cpp"
+    "src/Scanner/Tokens/Tokens.cpp"
+    "src/Types/Token/Token.cpp"
+    "src/Types/Environment/Environment.cpp"
 )
+
 add_executable(lox ${TARGET_SRC})
 
 # TESTING

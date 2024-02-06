@@ -1,13 +1,13 @@
 #include "./Instance.hpp"
 
-#include "../../../Types/Objects/Class.hpp"
-#include "../../../Types/Objects/Function.hpp"
+#include "../../../Types/Environment/Environment.hpp"
 #include "../../../Types/Objects/Object.hpp"
 #include "../../Error/Error.hpp"
 
 namespace LOX::Interpreter::Expressions::Instance {
 
 using namespace Types::Objects;
+using Types::Environment;
 
 auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
   if (auto const field{instance->fields_.find(token.lexeme)};
@@ -27,7 +27,7 @@ auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
   throw Error{token.line, "Undefined property '" + token.lexeme + "'."};
 }
 
-auto set(Arc<LoxInstance> instance, Token const& name, Object const& value)
+auto set(Arc<LoxInstance>& instance, Token const& name, Object const& value)
     -> void {
   instance->fields_[name.lexeme] = value;
 }

@@ -7,20 +7,7 @@
 
 namespace LOX::Interpreter::Utils {
 
-struct Truth {
-  auto operator()(std::monostate) -> bool { return false; }
-
-  auto operator()(bool b) -> bool { return b; }
-
-  template <typename T>
-  auto operator()(T const& number) -> bool {
-    return true;
-  }
-};
-
-auto is_truthy(Types::Objects::Object const& obj) -> bool {
-  return std::visit(Truth{}, obj);
-}
+auto is_truthy(Types::Objects::Object const& obj) -> bool;
 
 }  // namespace LOX::Interpreter::Utils
 

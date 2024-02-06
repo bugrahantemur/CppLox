@@ -1,26 +1,26 @@
-#ifndef LOX_INTERPRETER_STATEMENT_EXECUTOR
-#define LOX_INTERPRETER_STATEMENT_EXECUTOR
+#include "./Execute.hpp"
 
 #include <unordered_map>
 #include <variant>
 
-#include "../../Types/Objects/Class.hpp"
-#include "../../Types/Objects/Function.hpp"
+#include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Statement.hpp"
 #include "../../Types/Token/Token.hpp"
 #include "../../Utils/Arc.hpp"
 #include "../../Utils/Box.hpp"
-#include "../Environment/Environment.hpp"
 #include "../Error/Error.hpp"
-#include "../Expressions/ExpressionEvaluator.hpp"
+#include "../Expressions/Evaluate.hpp"
+#include "../Utils/Return/Return.hpp"
 #include "../Utils/Truth/Truth.hpp"
 #include "./Put/Put.hpp"
 
 namespace LOX::Interpreter::Statements {
 
 using namespace Types::Syntax::Statements;
-using Expressions::ExpressionEvaluator;
+using namespace Types::Syntax::Expressions;
+using namespace Types::Objects;
+using Types::Environment;
 
 struct StatementExecutor {
   Arc<Environment> environment;
@@ -30,26 +30,25 @@ struct StatementExecutor {
 
   auto operator()(Box<ExpressionStmt> const& stmt) -> void {
     static_cast<void>(
-        std::visit(Expressions::ExpressionEvaluator{environment, resolution},
-                   stmt->expression));
+        Expressions::evaluate(stmt->expression, environment, resolution));
   }
 
   auto operator()(Box<PrintStmt> const& stmt) -> void {
-    Object const value{std::visit(ExpressionEvaluator{environment, resolution},
-                                  stmt->expression)};
+    Object const value{
+        Expressions::evaluate(stmt->expression, environment, resolution)};
     std::visit(Put{std::cout}, value);
   }
 
   auto operator()(Box<ReturnStmt> const& stmt) -> void {
     Object const value{
-        std::visit(ExpressionEvaluator{environment, resolution}, stmt->value)};
+        Expressions::evaluate(stmt->value, environment, resolution)};
 
     throw Utils::Return{value};
   }
 
   auto operator()(Box<VariableStmt> const& stmt) -> void {
-    Object const value{std::visit(ExpressionEvaluator{environment, resolution},
-                                  stmt->initializer)};
+    Object const value{
+        Expressions::evaluate(stmt->initializer, environment, resolution)};
 
     environment->define(stmt->name.lexeme, value);
   }
@@ -60,8 +59,8 @@ struct StatementExecutor {
     auto env{Arc{Environment{environment}}};
 
     // Execute statements in the block with the new environment
-    for (Statement const& stmt : stmt->statements) {
-      std::visit(StatementExecutor{env, resolution}, stmt);
+    for (Statement const& statement : stmt->statements) {
+      execute(statement, env, resolution);
     }
   }
 
@@ -74,8 +73,8 @@ struct StatementExecutor {
     std::optional<Box<LoxClass>> superclass;
     if (stmt->super_class.name != Token::none()) {
       try {
-        superclass = std::get<Box<LoxClass>>(
-            ExpressionEvaluator{environment, resolution}(stmt->super_class));
+        superclass = std::get<Box<LoxClass>>(Expressions::evaluate(
+            Expression{stmt->super_class}, environment, resolution));
       } catch (std::bad_variant_access const&) {
         throw Error{stmt->super_class.name.line, "Superclass must be a class."};
       }
@@ -104,8 +103,8 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<IfStmt> const& stmt) -> void {
-    if (Utils::is_truthy(std::visit(
-            ExpressionEvaluator{environment, resolution}, stmt->condition))) {
+    if (Utils::is_truthy(
+            Expressions::evaluate(stmt->condition, environment, resolution))) {
       std::visit(*this, stmt->then_branch);
     } else {
       std::visit(*this, stmt->else_branch);
@@ -113,11 +112,16 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<WhileStmt> const& stmt) -> void {
-    while (Utils::is_truthy(std::visit(
-        ExpressionEvaluator{environment, resolution}, stmt->condition))) {
+    while (Utils::is_truthy(
+        Expressions::evaluate(stmt->condition, environment, resolution))) {
       std::visit(*this, stmt->body);
     }
   }
 };
+
+auto execute(Statement const& statement, Arc<Environment> environment,
+             std::unordered_map<Token, std::size_t> const& resolution) -> void {
+  std::visit(StatementExecutor{environment, resolution}, statement);
+}
+
 }  // namespace LOX::Interpreter::Statements
-#endif

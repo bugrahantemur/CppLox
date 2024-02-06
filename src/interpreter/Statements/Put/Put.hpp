@@ -4,13 +4,9 @@
 #include <string>
 #include <variant>
 
-#include "../../../Types/Objects/Class.hpp"
-#include "../../../Types/Objects/Function.hpp"
 #include "../../../Types/Objects/Object.hpp"
 
 namespace LOX::Interpreter::Statements {
-
-using namespace Types::Objects;
 
 template <typename OStream>
 struct Put {
@@ -26,19 +22,22 @@ struct Put {
     return b ? put("true") : put("false");
   }
 
-  auto operator()(Box<LoxFunction> const& func) -> OStream& {
+  auto operator()(Box<Types::Objects::LoxFunction> const& func) -> OStream& {
     return put("<fn " + func->declaration_.name.lexeme + ">");
   }
 
-  auto operator()(Box<LoxClass> const& klass) -> OStream& {
+  auto operator()(Box<Types::Objects::LoxClass> const& klass) -> OStream& {
     return put("<class " + klass->name + ">");
   }
 
-  auto operator()(Arc<LoxInstance> const& instance) -> OStream& {
+  auto operator()(Arc<Types::Objects::LoxInstance> const& instance)
+      -> OStream& {
     return put("<instance of " + instance->class_.name + ">");
   }
 
-  auto operator()(ArcDyn<Builtins::FunctionInterface> const& func) -> OStream& {
+  auto operator()(
+      ArcDyn<Types::Objects::Builtins::FunctionInterface> const& func)
+      -> OStream& {
     return put("<builtin-fn " + func->to_string() + ">");
   }
 

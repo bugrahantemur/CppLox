@@ -1,6 +1,6 @@
 
-#ifndef LOX_TYPES_STATEMENT
-#define LOX_TYPES_STATEMENT
+#ifndef LOX_TYPES_SYNTAX_STATEMENT
+#define LOX_TYPES_SYNTAX_STATEMENT
 
 #include <variant>
 

@@ -12,6 +12,7 @@
 namespace LOX::Interpreter::Expressions {
 
 using namespace Types::Objects;
+using namespace Types::Tokens;
 using Types::Environment;
 
 struct Arity {

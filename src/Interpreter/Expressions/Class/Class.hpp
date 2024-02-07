@@ -8,15 +8,15 @@
 
 namespace LOX::Interpreter::Expressions::Class {
 
-using namespace Types::Objects;
+auto get(Arc<Types::Objects::LoxInstance> const& instance,
+         Types::Tokens::Token const& token) -> Types::Objects::Object;
 
-auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object;
-
-auto set(Arc<LoxInstance>& instance, Token const& name, Object const& value)
+auto set(Arc<Types::Objects::LoxInstance>& instance,
+         Types::Tokens::Token const& name, Types::Objects::Object const& value)
     -> void;
 
-auto find_method(LoxClass const& klass, std::string const& name)
-    -> std::optional<LoxFunction>;
+auto find_method(Types::Objects::LoxClass const& klass, std::string const& name)
+    -> std::optional<Types::Objects::LoxFunction>;
 
 }  // namespace LOX::Interpreter::Expressions::Class
 #endif

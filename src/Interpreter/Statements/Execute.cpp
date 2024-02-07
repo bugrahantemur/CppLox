@@ -6,7 +6,7 @@
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Statement.hpp"
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
 #include "../../Utils/Arc.hpp"
 #include "../../Utils/Box.hpp"
 #include "../Error/Error.hpp"
@@ -20,6 +20,7 @@ namespace LOX::Interpreter::Statements {
 using namespace Types::Syntax::Statements;
 using namespace Types::Syntax::Expressions;
 using namespace Types::Objects;
+using namespace Types::Tokens;
 using Types::Environment;
 
 struct StatementExecutor {

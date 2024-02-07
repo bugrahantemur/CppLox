@@ -3,7 +3,7 @@
 
 #include <variant>
 
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
 #include "../../Utils/Box.hpp"
 
 namespace LOX::Types::Syntax::Expressions {
@@ -32,24 +32,24 @@ using Expression =
                  Box<Expressions::VariableExpr>>;
 
 struct AssignmentExpr {
-  Token name;
+  Tokens::Token name;
   Expression value;
 };
 
 struct BinaryExpr {
   Expression left;
-  Token op;
+  Tokens::Token op;
   Expression right;
 };
 
 struct CallExpr {
   Expression callee;
-  Token paren;
+  Tokens::Token paren;
   std::vector<Expression> arguments;
 };
 
 struct GetExpr {
-  Token name;
+  Tokens::Token name;
   Expression object;
 };
 
@@ -58,37 +58,37 @@ struct GroupingExpr {
 };
 
 struct LiteralExpr {
-  Token::Literal value;
+  Tokens::Token::Literal value;
 };
 
 struct LogicalExpr {
   Expression left;
-  Token op;
+  Tokens::Token op;
   Expression right;
 };
 
 struct SetExpr {
-  Token name;
+  Tokens::Token name;
   Expression object;
   Expression value;
 };
 
 struct SuperExpr {
-  Token keyword;
-  Token method;
+  Tokens::Token keyword;
+  Tokens::Token method;
 };
 
 struct ThisExpr {
-  Token keyword;
+  Tokens::Token keyword;
 };
 
 struct UnaryExpr {
-  Token op;
+  Tokens::Token op;
   Expression right;
 };
 
 struct VariableExpr {
-  Token name;
+  Tokens::Token name;
 };
 
 }  // namespace LOX::Types::Syntax::Expressions

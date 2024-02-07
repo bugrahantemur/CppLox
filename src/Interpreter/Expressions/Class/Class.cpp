@@ -7,6 +7,7 @@
 namespace LOX::Interpreter::Expressions::Class {
 
 using namespace Types::Objects;
+using namespace Types::Tokens;
 using Types::Environment;
 
 auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {

@@ -5,13 +5,14 @@
 
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Statement.hpp"
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
 
 namespace LOX::Interpreter::Expressions {
 
-auto evaluate(Types::Syntax::Expressions::Expression const& expression,
-              Arc<Types::Environment> environment,
-              std::unordered_map<Token, std::size_t> const& resolution)
+auto evaluate(
+    Types::Syntax::Expressions::Expression const& expression,
+    Arc<Types::Environment> environment,
+    std::unordered_map<Types::Tokens::Token, std::size_t> const& resolution)
     -> Types::Objects::Object;
 
 }

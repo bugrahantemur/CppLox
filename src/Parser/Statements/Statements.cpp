@@ -4,6 +4,8 @@
 
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Syntax/Statement.hpp"
+#include "../../Types/Tokens/Token.hpp"
+#include "../../Types/Tokens/TokenTypes.hpp"
 #include "../../Utils/Error.hpp"
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
@@ -14,6 +16,7 @@ namespace LOX::Parser::Statements {
 
 using namespace Types::Syntax::Statements;
 using namespace Types::Syntax::Expressions;
+using namespace Types::Tokens;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};

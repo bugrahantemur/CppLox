@@ -10,7 +10,7 @@
 #include "./Scanner/Scanner.hpp"
 #include "./Types/Objects/Object.hpp"
 #include "./Types/Syntax/Statement.hpp"
-#include "./Types/Token/Token.hpp"
+#include "./Types/Tokens/Token.hpp"
 #include "./Utils/Error.hpp"
 #include "./Utils/Reader.hpp"
 
@@ -19,12 +19,12 @@ namespace LOX {
 auto run(std::string const &file_path) -> void {
   std::string const contents{Reader::read(file_path)};
 
-  std::vector<Token> const tokens{Scanner::scan(contents)};
+  std::vector<Types::Tokens::Token> const tokens{Scanner::scan(contents)};
 
   std::vector<Types::Syntax::Statements::Statement> const statements{
       Parser::parse(tokens)};
 
-  std::unordered_map<Token, std::size_t> const resolution{
+  std::unordered_map<Types::Tokens::Token, std::size_t> const resolution{
       Resolver::resolve(statements)};
 
   Interpreter::interpret(statements, resolution);

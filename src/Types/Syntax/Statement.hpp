@@ -4,7 +4,7 @@
 
 #include <variant>
 
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
 #include "../../Utils/Box.hpp"
 #include "./Expression.hpp"
 
@@ -34,7 +34,7 @@ struct BlockStmt {
 };
 
 struct ClassStmt {
-  Token name;
+  Tokens::Token name;
   Expressions::VariableExpr super_class;
   std::vector<Box<FunctionStmt>> methods;
 };
@@ -44,8 +44,8 @@ struct ExpressionStmt {
 };
 
 struct FunctionStmt {
-  Token name;
-  std::vector<Token> params;
+  Tokens::Token name;
+  std::vector<Tokens::Token> params;
   std::vector<Statement> body;
 };
 
@@ -60,12 +60,12 @@ struct PrintStmt {
 };
 
 struct ReturnStmt {
-  Token keyword;
+  Tokens::Token keyword;
   Expressions::Expression value;
 };
 
 struct VariableStmt {
-  Token name;
+  Tokens::Token name;
   Expressions::Expression initializer;
 };
 

@@ -4,10 +4,10 @@
 #include <vector>
 
 #include "../Types/Syntax/Statement.hpp"
-#include "../Types/Token/Token.hpp"
+#include "../Types/Tokens/Token.hpp"
 
 namespace LOX::Parser {
-auto parse(std::vector<Token> const& tokens)
+auto parse(std::vector<Types::Tokens::Token> const& tokens)
     -> std::vector<Types::Syntax::Statements::Statement>;
 }  // namespace LOX::Parser
 

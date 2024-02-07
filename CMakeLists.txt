@@ -34,7 +34,7 @@ set(TARGET_SRC
     "src/Scanner/Error/Error.cpp"
     "src/Scanner/Cursor/Cursor.cpp"
     "src/Scanner/Tokens/Tokens.cpp"
-    "src/Types/Token/Token.cpp"
+    "src/Types/Tokens/Token.cpp"
     "src/Types/Environment/Environment.cpp"
 )
 

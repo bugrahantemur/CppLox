@@ -1,10 +1,13 @@
 #include "./Tokens.hpp"
 
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
+#include "../../Types/Tokens/TokenTypes.hpp"
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
 
 namespace LOX::Scanner {
+
+using namespace Types::Tokens;
 
 auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType> {

@@ -9,6 +9,7 @@ namespace LOX::Resolver {
 
 using namespace Types::Syntax::Statements;
 using namespace Types::Syntax::Expressions;
+using namespace Types::Tokens;
 
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };

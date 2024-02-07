@@ -6,10 +6,13 @@
 #include <string>
 #include <vector>
 
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
+#include "../../Types/Tokens/TokenTypes.hpp"
 #include "../Error/Error.hpp"
 
 namespace LOX::Parser {
+
+using namespace Types::Tokens;
 
 Cursor::Cursor(std::vector<Token> const& tokens) : tokens(tokens), current(0){};
 

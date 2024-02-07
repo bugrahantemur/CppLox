@@ -3,6 +3,8 @@
 #include <initializer_list>
 
 #include "../../Types/Syntax/Expression.hpp"
+#include "../../Types/Tokens/Token.hpp"
+#include "../../Types/Tokens/TokenTypes.hpp"
 #include "../../Utils/Error.hpp"
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
@@ -11,6 +13,7 @@
 namespace LOX::Parser::Expressions {
 
 using namespace Types::Syntax::Expressions;
+using namespace Types::Tokens;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {

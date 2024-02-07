@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
 #include "../../Utils/Error.hpp"
 
 namespace LOX::Parser {
@@ -15,7 +15,8 @@ class Error : public ErrorInterface {
         std::string const& message);
 };
 
-auto error(Token const& token, std::string const& message) -> Error;
+auto error(Types::Tokens::Token const& token, std::string const& message)
+    -> Error;
 
 }  // namespace LOX::Parser
 

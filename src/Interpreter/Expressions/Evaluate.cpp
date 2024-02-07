@@ -6,7 +6,8 @@
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Expression.hpp"
-#include "../../Types/Token/Token.hpp"
+#include "../../Types/Tokens/Token.hpp"
+#include "../../Types/Tokens/TokenTypes.hpp"
 #include "../../Utils/Arc.hpp"
 #include "../../Utils/Box.hpp"
 #include "../Error/Error.hpp"
@@ -22,6 +23,7 @@ using namespace Utils;
 
 using namespace Types::Objects;
 using namespace Types::Syntax::Expressions;
+using namespace Types::Tokens;
 using Types::Environment;
 
 struct ExpressionEvaluator {

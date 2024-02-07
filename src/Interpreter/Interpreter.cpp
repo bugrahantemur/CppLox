@@ -11,7 +11,7 @@
 #include "../Types/Objects/Object.hpp"
 #include "../Types/Syntax/Expression.hpp"
 #include "../Types/Syntax/Statement.hpp"
-#include "../Types/Token/Token.hpp"
+#include "../Types/Tokens/Token.hpp"
 #include "../Utils/Arc.hpp"
 #include "../Utils/Box.hpp"
 #include "./Error/Error.hpp"
@@ -21,6 +21,7 @@ namespace LOX::Interpreter {
 
 using Types::Environment;
 using namespace Types::Objects;
+using namespace Types::Tokens;
 using namespace Types::Syntax::Expressions;
 using namespace Types::Syntax::Statements;
 

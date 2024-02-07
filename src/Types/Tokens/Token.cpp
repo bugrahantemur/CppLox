@@ -1,6 +1,8 @@
 #include "./Token.hpp"
 
-namespace LOX {
+#include "./TokenTypes.hpp"
+
+namespace LOX::Types::Tokens {
 
 auto Token::operator==(Token const& other) const -> bool {
   return token_id == other.token_id;
@@ -10,9 +12,9 @@ auto Token::none() -> Token {
   return Token{TokenType::EOFF, "", std::monostate{}, 0, 0};
 }
 
-}  // namespace LOX
+}  // namespace LOX::Types::Tokens
 
-auto std::hash<LOX::Token>::operator()(LOX::Token const& token) const
-    -> std::size_t {
+auto std::hash<LOX::Types::Tokens::Token>::operator()(
+    LOX::Types::Tokens::Token const& token) const -> std::size_t {
   return token.token_id;
 }

@@ -8,9 +8,6 @@ namespace LOX::Parser::Expressions {
 
 auto primary(Cursor& tc) -> Types::Syntax::Expressions::Expression;
 
-auto parse_args(Cursor& tc)
-    -> std::vector<Types::Syntax::Expressions::Expression>;
-
 auto call(Cursor& tc) -> Types::Syntax::Expressions::Expression;
 
 auto unary(Cursor& tc) -> Types::Syntax::Expressions::Expression;

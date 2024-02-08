@@ -54,16 +54,13 @@ auto primary(Cursor& cursor) -> Expression {
   throw error(cursor.peek(), "Expected expression.");
 }
 
-auto parse_args(Cursor& cursor) -> std::vector<Expression> {
-  return Utils::parse_parenthesized_list<Expression>(cursor, expression);
-}
-
 auto call(Cursor& cursor) -> Expression {
   Expression expr{primary(cursor)};
 
   while (true) {
     if (cursor.match(TokenType::LEFT_PAREN)) {
-      std::vector<Expression> const args{parse_args(cursor)};
+      std::vector<Expression> const args{
+          Utils::parse_parenthesized_list<Expression>(cursor, expression)};
 
       Token const closing{cursor.previous()};
       assert(closing.type == TokenType::RIGHT_PAREN);

@@ -155,12 +155,6 @@ auto statement(Cursor& cursor) -> Statement {
   return expression_statement(cursor);
 }
 
-auto parse_params(Cursor& cursor) -> std::vector<Token> {
-  return Utils::parse_parenthesized_list<Token>(cursor, [](Cursor& cursor) {
-    return cursor.consume(TokenType::IDENTIFIER, "Expect parameter name.");
-  });
-}
-
 enum class FunctionType { Function, Method };
 
 auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
@@ -173,7 +167,10 @@ auto function_declaration(Cursor& cursor, FunctionType type) -> Statement {
   Token const name{
       cursor.consume(TokenType::IDENTIFIER, "Expect function name.")};
 
-  std::vector<Token> const parameters{parse_params(cursor)};
+  std::vector<Token> const parameters{
+      Utils::parse_parenthesized_list<Token>(cursor, [](Cursor& cursor) {
+        return cursor.consume(TokenType::IDENTIFIER, "Expect parameter name.");
+      })};
 
   std::vector<Statement> const body{block_statement(cursor)};
 

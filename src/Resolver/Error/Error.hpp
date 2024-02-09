@@ -3,11 +3,11 @@
 
 #include <string>
 
-#include "../../Utils/Error.hpp"
+#include "../../Error/Interface/Interface.hpp"
 
 namespace LOX::Resolver {
 
-class Error : public ErrorInterface {
+class Error : public LOX::Error::Interface {
  public:
   Error(std::size_t line, std::string const& message);
 };

@@ -2,10 +2,10 @@
 
 #include <initializer_list>
 
+#include "../../Error/Report/Report.hpp"
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Tokens/Token.hpp"
 #include "../../Types/Tokens/TokenTypes.hpp"
-#include "../../Utils/Error.hpp"
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
 #include "../Utils/Utils.hpp"
@@ -156,7 +156,7 @@ auto assignment(Cursor& cursor) -> Expression {
     }
 
     // Do not throw, just report the error
-    report(error(equals, "Invalid assignment target."));
+    LOX::Error::report(error(equals, "Invalid assignment target."));
   }
 
   return expr;

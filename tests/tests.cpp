@@ -3,11 +3,12 @@
 #include <fstream>
 #include <string>
 
-#include "../src/Utils/Reader.hpp"
+#include "../src/Reader/Error/Error.hpp"
+#include "../src/Reader/Reader.hpp"
 
 TEST(ReadFileTest, FileExists) {
   // Arrange
-  std::string const path{"../tests/test.txt"};
+  std::string const path{"../tests/test.lox"};
 
   // Act
   std::string const result{LOX::Reader::read(path)};

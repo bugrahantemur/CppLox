@@ -2,11 +2,11 @@
 
 #include <iostream>
 
+#include "../../Error/Report/Report.hpp"
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Syntax/Statement.hpp"
 #include "../../Types/Tokens/Token.hpp"
 #include "../../Types/Tokens/TokenTypes.hpp"
-#include "../../Utils/Error.hpp"
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
 #include "../Expressions/Expressions.hpp"
@@ -238,7 +238,7 @@ auto declaration(Cursor& cursor) -> Statement {
     }
     return statement(cursor);
   } catch (Error const& e) {
-    report(e);
+    LOX::Error::report(e);
     cursor.synchronize();
     return std::monostate{};
   }

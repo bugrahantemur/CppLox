@@ -9,8 +9,8 @@ namespace LOX::Parser {
 
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
-    : ErrorInterface("[line " + std::to_string(line) + "] Parsing error " +
-                     where + ": " + message + "\n") {}
+    : Interface("[line " + std::to_string(line) + "] Parsing error " + where +
+                ": " + message + "\n") {}
 
 auto error(Types::Tokens::Token const& token, std::string const& message)
     -> Error {

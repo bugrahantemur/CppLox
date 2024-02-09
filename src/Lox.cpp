@@ -4,15 +4,16 @@
 #include <unordered_map>
 #include <vector>
 
+#include "./Error/Interface/Interface.hpp"
+#include "./Error/Report/Report.hpp"
 #include "./Interpreter/Interpreter.hpp"
 #include "./Parser/Parser.hpp"
+#include "./Reader/Reader.hpp"
 #include "./Resolver/Resolver.hpp"
 #include "./Scanner/Scanner.hpp"
 #include "./Types/Objects/Object.hpp"
 #include "./Types/Syntax/Statement.hpp"
 #include "./Types/Tokens/Token.hpp"
-#include "./Utils/Error.hpp"
-#include "./Utils/Reader.hpp"
 
 namespace LOX {
 
@@ -34,19 +35,19 @@ auto run(std::string const &file_path) -> void {
 
 auto main(int argc, char *argv[]) -> int {
   if (argc != 2) {
-    LOX::report(
+    LOX::Error::report(
         std::runtime_error{"Wrong usage! Correct usage: lox [script]\n"});
   } else {
     try {
       LOX::run(argv[1]);
-    } catch (LOX::ErrorInterface const &e) {
-      LOX::report(e);
+    } catch (LOX::Error::Interface const &e) {
+      LOX::Error::report(e);
       return EXIT_FAILURE;
     } catch (std::exception const &e) {
-      LOX::report("Unhandled exception: ", e);
+      LOX::Error::report("Unhandled exception: ", e);
       return EXIT_FAILURE;
     } catch (...) {
-      LOX::report(std::runtime_error{"Unknown error occured."});
+      LOX::Error::report(std::runtime_error{"Unknown error occured."});
       return EXIT_FAILURE;
     }
   }

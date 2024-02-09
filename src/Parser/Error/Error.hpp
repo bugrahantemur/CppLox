@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
+#include "../../Error/Interface/Interface.hpp"
 #include "../../Types/Tokens/Token.hpp"
-#include "../../Utils/Error.hpp"
 
 namespace LOX::Parser {
-class Error : public ErrorInterface {
+class Error : public LOX::Error::Interface {
  public:
   Error(std::size_t const line, std::string const& where,
         std::string const& message);

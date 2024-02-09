@@ -15,6 +15,7 @@ FetchContent_MakeAvailable(googletest)
 
 set(TARGET_SRC
     "src/Lox.cpp"
+    "src/Builtins/Functions/Clock/Clock.cpp"
     "src/Error/Report/Report.cpp"
     "src/Interpreter/Interpreter.cpp"
     "src/Interpreter/Statements/Execute.cpp"

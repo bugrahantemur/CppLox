@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../Builtins/Names.hpp"
+#include "../Builtins/Builtins.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::Resolver {
@@ -243,10 +243,10 @@ struct Resolve {
   auto end_scope() -> void { scopes.pop_back(); }
 };
 
-auto preamble() -> std::unordered_map<std::string, bool> {
+auto make_preamble_scope() -> std::unordered_map<std::string, bool> {
   std::unordered_map<std::string, bool> scope;
-  for (auto const& name : Native::names()) {
-    scope[name] = true;
+  for (auto const& builtin : Native::builtins()) {
+    scope[builtin.first] = true;
   }
   return scope;
 }
@@ -255,7 +255,8 @@ auto resolve(std::vector<Statement> const& statements)
     -> std::unordered_map<Token, std::size_t> {
   auto function_type{FunctionType::NONE};
   auto class_type{ClassType::NONE};
-  std::vector<std::unordered_map<std::string, bool>> scopes{preamble()};
+  std::vector<std::unordered_map<std::string, bool>> scopes{
+      make_preamble_scope()};
   std::unordered_map<Token, std::size_t> resolution;
 
   Resolve resolver{resolution, scopes, function_type, class_type};

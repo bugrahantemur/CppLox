@@ -18,10 +18,10 @@ auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
 
   if (std::optional<LoxFunction> const method{
           find_method(instance->class_, token.lexeme)}) {
-    Arc<Environment> env{Arc{Environment{method.value().closure_}}};
+    Arc<Environment> env{Arc{Environment{method.value().closure}}};
 
     env->define("this", instance);
-    return Box{LoxFunction{method.value().declaration_, env,
+    return Box{LoxFunction{method.value().declaration, env,
                            method.value().is_initializer}};
   }
 

@@ -23,7 +23,7 @@ struct Put {
   }
 
   auto operator()(Box<Types::Objects::LoxFunction> const& func) -> OStream& {
-    return put("<fn " + func->declaration_.name.lexeme + ">");
+    return put("<fn " + func->declaration.name.lexeme + ">");
   }
 
   auto operator()(Box<Types::Objects::LoxClass> const& klass) -> OStream& {

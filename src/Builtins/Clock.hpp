@@ -3,8 +3,10 @@
 
 #include <chrono>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
+#include "../Types/Environment/Environment.hpp"
 #include "../Types/Objects/Object.hpp"
 
 namespace LOX::Native {
@@ -12,8 +14,13 @@ namespace LOX::Native {
 struct Clock : public Types::Objects::Builtins::FunctionInterface {
   auto arity() const -> std::size_t final { return 0; }
   auto to_string() const -> std::string final { return "Clock"; };
-  auto operator()(std::vector<Types::Objects::Object> const& args) const
+  auto operator()(
+      Arc<Types::Environment> const& environment,
+      std::unordered_map<Types::Tokens::Token, std::size_t> const& resolution,
+      std::vector<Types::Objects::Object> const& args) const
       -> Types::Objects::Object final {
+    static_cast<void>(environment);
+    static_cast<void>(resolution);
     static_cast<void>(args);
 
     return static_cast<double>(

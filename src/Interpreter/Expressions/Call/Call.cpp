@@ -17,7 +17,7 @@ using Types::Environment;
 
 struct Arity {
   auto operator()(Box<LoxFunction> const& func) -> std::size_t {
-    return func->declaration_.params.size();
+    return func->declaration.params.size();
   }
 
   auto operator()(Box<LoxClass> const& klass) -> std::size_t {
@@ -42,19 +42,19 @@ struct Arity {
 struct Call {
   Arc<Environment> environment;
   std::unordered_map<Token, std::size_t> const& resolution;
-  std::vector<Object> const& args_;
+  std::vector<Object> const& args;
 
   auto operator()(Box<LoxFunction> const& func) -> Object {
-    auto env{Arc{Environment{func->closure_}}};
+    auto env{Arc{Environment{func->closure}}};
 
     std::size_t const arity{Arity{}(func)};
 
     for (std::size_t i = 0; i < arity; ++i) {
-      env->define(func->declaration_.params.at(i).lexeme, args_.at(i));
+      env->define(func->declaration.params.at(i).lexeme, args.at(i));
     }
 
     try {
-      Interpreter::interpret(func->declaration_.body, resolution, env);
+      Interpreter::interpret(func->declaration.body, resolution, env);
     } catch (Utils::Return const& ret) {
       if (func->is_initializer) {
         return env->get_at("this", 0);
@@ -71,10 +71,10 @@ struct Call {
 
     if (auto const initializer{klass->methods.find("init")};
         initializer != klass->methods.end()) {
-      auto env{Arc{Environment{initializer->second.closure_}}};
+      auto env{Arc{Environment{initializer->second.closure}}};
       env->define("this", instance);
       auto const init{
-          Box{LoxFunction{initializer->second.declaration_, env, true}}};
+          Box{LoxFunction{initializer->second.declaration, env, true}}};
       (*this)(init);
     }
 
@@ -82,7 +82,7 @@ struct Call {
   }
 
   auto operator()(ArcDyn<Builtins::FunctionInterface> const& func) -> Object {
-    return (*func)(args_);
+    return (*func)(environment, resolution, args);
   }
 
   template <typename T>

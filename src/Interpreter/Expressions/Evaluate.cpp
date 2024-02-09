@@ -56,9 +56,9 @@ struct ExpressionEvaluator {
                   "Undefined property '" + expr->method.lexeme + "'"};
     }
 
-    auto env{Arc{Environment{method.value().closure_}}};
+    auto env{Arc{Environment{method.value().closure}}};
     env->define("this", instance);
-    return Box{LoxFunction{method.value().declaration_, env,
+    return Box{LoxFunction{method.value().declaration, env,
                            method.value().is_initializer}};
   }
 

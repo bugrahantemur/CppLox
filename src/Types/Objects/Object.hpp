@@ -31,8 +31,8 @@ using Object = std::variant<std::monostate, bool, double, std::string,
                             ArcDyn<Objects::Builtins::FunctionInterface>>;
 
 struct LoxFunction {
-  Syntax::Statements::FunctionStmt declaration_;
-  Arc<Environment> closure_;
+  Syntax::Statements::FunctionStmt declaration;
+  Arc<Environment> closure;
   bool is_initializer;
 };
 
@@ -51,7 +51,10 @@ namespace Builtins {
 struct FunctionInterface {
   virtual auto arity() const -> std::size_t = 0;
   virtual auto to_string() const -> std::string = 0;
-  virtual auto operator()(std::vector<Object> const& args) const -> Object = 0;
+  virtual auto operator()(
+      Arc<Types::Environment> const& environment,
+      std::unordered_map<Tokens::Token, std::size_t> const& resolution,
+      std::vector<Object> const& args) const -> Object = 0;
 };
 
 }  // namespace Builtins

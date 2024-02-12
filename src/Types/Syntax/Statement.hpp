@@ -4,8 +4,8 @@
 
 #include <variant>
 
+#include "../../../RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../Types/Tokens/Token.hpp"
-#include "../../Utils/Box.hpp"
 #include "./Expression.hpp"
 
 namespace LOX::Types::Syntax::Statements {

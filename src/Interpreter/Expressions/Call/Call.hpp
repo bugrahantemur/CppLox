@@ -5,9 +5,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../../../RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../Types/Objects/Object.hpp"
 #include "../../../Types/Tokens/Token.hpp"
-#include "../../../Utils/Arc.hpp"
 
 namespace LOX::Types {
 struct Environment;

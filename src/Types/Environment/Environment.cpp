@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../Utils/Arc.hpp"
+#include "../../../RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../Objects/Object.hpp"
 
 namespace LOX::Types {

@@ -1,0 +1,3 @@
+[submodule "RustyPtr"]
+	path = RustyPtr
+	url = https://github.com/bugrahantemur/RustyPtr

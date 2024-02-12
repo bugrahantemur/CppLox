@@ -6,9 +6,9 @@
 #include <unordered_map>
 #include <variant>
 
-#include "../../../RustyPtr/include/RustyPtr/Arc.hpp"
-#include "../../../RustyPtr/include/RustyPtr/ArcDyn.hpp"
-#include "../../../RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/ArcDyn.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../Syntax/Statement.hpp"
 
 namespace LOX::Types {

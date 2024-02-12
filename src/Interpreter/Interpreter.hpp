@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../Types/Objects/Object.hpp"
 #include "../Types/Syntax/Statement.hpp"
 #include "../Types/Tokens/Token.hpp"

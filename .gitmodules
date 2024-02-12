@@ -1,3 +1,3 @@
 [submodule "RustyPtr"]
-	path = RustyPtr
+	path = submodules/RustyPtr
 	url = https://github.com/bugrahantemur/RustyPtr

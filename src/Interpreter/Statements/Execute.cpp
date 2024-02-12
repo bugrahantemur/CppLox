@@ -3,8 +3,8 @@
 #include <unordered_map>
 #include <variant>
 
-#include "../../../RustyPtr/include/RustyPtr/Arc.hpp"
-#include "../../../RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../../Types/Syntax/Statement.hpp"

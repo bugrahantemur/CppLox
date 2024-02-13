@@ -46,7 +46,7 @@ add_executable(lox ${TARGET_SRC})
 
 # TESTING
 enable_testing()
-add_executable(cpplox_test tests/tests.cpp src/Reader/Error/Error.cpp src/Reader/Reader.cpp)
+add_executable(cpplox_test unit_tests/tests.cpp src/Reader/Error/Error.cpp src/Reader/Reader.cpp)
 target_link_libraries(cpplox_test GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(cpplox_test)

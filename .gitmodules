@@ -1,3 +1,6 @@
 [submodule "RustyPtr"]
 	path = submodules/RustyPtr
 	url = https://github.com/bugrahantemur/RustyPtr
+[submodule "submodules/craftinginterpreters"]
+	path = submodules/craftinginterpreters
+	url = https://github.com/munificent/craftinginterpreters.git

@@ -1,5 +1,5 @@
-#ifndef LOX_TYPES_OBJECT
-#define LOX_TYPES_OBJECT
+#ifndef LOX_TREEWALK_TYPES_OBJECT
+#define LOX_TREEWALK_TYPES_OBJECT
 
 #include <optional>
 #include <string>

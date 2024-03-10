@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_EXPRESSIONS
-#define LOX_PARSER_EXPRESSIONS
+#ifndef LOX_TREEWALK_PARSER_EXPRESSIONS
+#define LOX_TREEWALK_PARSER_EXPRESSIONS
 
 #include "../../Types/Syntax/Expression.hpp"
 #include "../Cursor/Cursor.hpp"

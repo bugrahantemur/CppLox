@@ -1,5 +1,5 @@
-#ifndef LOX_INTERPRETER_UTILS_OPERANDS
-#define LOX_INTERPRETER_UTILS_OPERANDS
+#ifndef LOX_TREEWALK_INTERPRETER_UTILS_OPERANDS
+#define LOX_TREEWALK_INTERPRETER_UTILS_OPERANDS
 
 #include "../../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Types/Objects/Object.hpp"

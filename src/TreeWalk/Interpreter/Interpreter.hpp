@@ -1,5 +1,5 @@
-#ifndef LOX_INTERPRETER
-#define LOX_INTERPRETER
+#ifndef LOX_TREEWALK_INTERPRETER
+#define LOX_TREEWALK_INTERPRETER
 
 #include <unordered_map>
 #include <vector>

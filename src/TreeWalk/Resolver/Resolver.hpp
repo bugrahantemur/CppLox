@@ -1,5 +1,5 @@
-#ifndef LOX_RESOLVER
-#define LOX_RESOLVER
+#ifndef LOX_TREEWALK_RESOLVER
+#define LOX_TREEWALK_RESOLVER
 
 #include <unordered_map>
 #include <vector>

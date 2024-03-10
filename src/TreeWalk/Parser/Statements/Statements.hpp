@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_STATEMENTS
-#define LOX_PARSER_STATEMENTS
+#ifndef LOX_TREEWALK_PARSER_STATEMENTS
+#define LOX_TREEWALK_PARSER_STATEMENTS
 
 #include "../../Types/Syntax/Statement.hpp"
 #include "../Cursor/Cursor.hpp"

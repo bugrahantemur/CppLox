@@ -1,5 +1,5 @@
-#ifndef LOX_BUILTINS
-#define LOX_BUILTINS
+#ifndef LOX_TREEWALK_BUILTINS
+#define LOX_TREEWALK_BUILTINS
 
 #include <string>
 #include <vector>

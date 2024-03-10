@@ -1,5 +1,5 @@
-#ifndef LOX_RESOLVER_ERROR
-#define LOX_RESOLVER_ERROR
+#ifndef LOX_TREEWALK_RESOLVER_ERROR
+#define LOX_TREEWALK_RESOLVER_ERROR
 
 #include <string>
 

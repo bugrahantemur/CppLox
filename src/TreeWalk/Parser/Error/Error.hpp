@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_ERROR
-#define LOX_PARSER_ERROR
+#ifndef LOX_TREEWALK_PARSER_ERROR
+#define LOX_TREEWALK_PARSER_ERROR
 
 #include <exception>
 #include <string>

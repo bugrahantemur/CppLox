@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_UTILS
-#define LOX_PARSER_UTILS
+#ifndef LOX_TREEWALK_PARSER_UTILS
+#define LOX_TREEWALK_PARSER_UTILS
 
 #include <vector>
 

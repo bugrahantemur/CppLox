@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_CURSOR
-#define LOX_PARSER_CURSOR
+#ifndef LOX_TREEWALK_PARSER_CURSOR
+#define LOX_TREEWALK_PARSER_CURSOR
 
 #include <cassert>
 #include <initializer_list>

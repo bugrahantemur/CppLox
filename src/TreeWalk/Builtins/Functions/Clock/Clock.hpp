@@ -1,5 +1,5 @@
-#ifndef LOX_BUILTINS_CLOCK
-#define LOX_BUILTINS_CLOCK
+#ifndef LOX_TREEWALK_BUILTINS_CLOCK
+#define LOX_TREEWALK_BUILTINS_CLOCK
 
 #include <string>
 #include <unordered_map>

@@ -1,5 +1,5 @@
-#ifndef LOX_TYPES_ENVIRONMENT
-#define LOX_TYPES_ENVIRONMENT
+#ifndef LOX_TREEWALK_TYPES_ENVIRONMENT
+#define LOX_TREEWALK_TYPES_ENVIRONMENT
 
 #include <cassert>
 #include <optional>

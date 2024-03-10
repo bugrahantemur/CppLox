@@ -13,40 +13,48 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(TARGET_SRC
-    "src/Lox.cpp"
-    "src/Builtins/Functions/Clock/Clock.cpp"
-    "src/Error/Report/Report.cpp"
-    "src/Interpreter/Interpreter.cpp"
-    "src/Interpreter/Statements/Execute.cpp"
-    "src/Interpreter/Expressions/Call/Call.cpp"
-    "src/Interpreter/Expressions/Equality/Equality.cpp"
-    "src/Interpreter/Expressions/Class/Class.cpp"
-    "src/Interpreter/Expressions/Evaluate.cpp"
-    "src/Interpreter/Error/Error.cpp"
-    "src/Interpreter/Utils/Truth/Truth.cpp"
-    "src/Parser/Cursor/Cursor.cpp"
-    "src/Parser/Error/Error.cpp"
-    "src/Parser/Parser.cpp"
-    "src/Parser/Expressions/Expressions.cpp"
-    "src/Parser/Statements/Statements.cpp"
-    "src/Reader/Error/Error.cpp"
-    "src/Reader/Reader.cpp"
-    "src/Resolver/Resolver.cpp"
-    "src/Resolver/Error/Error.cpp"
-    "src/Scanner/Scanner.cpp"
-    "src/Scanner/Error/Error.cpp"
-    "src/Scanner/Cursor/Cursor.cpp"
-    "src/Scanner/Tokens/Tokens.cpp"
-    "src/Types/Tokens/Token.cpp"
-    "src/Types/Environment/Environment.cpp"
+set(COMMON_SRC
+  "src/Common/Error/Report/Report.cpp"
+  "src/Common/Types/Tokens/Token.cpp"
+  "src/Common/Reader/Reader.cpp"
+  "src/Common/Reader/Error/Error.cpp"
+  "src/Common/Scanner/Scanner.cpp"
+  "src/Common/Scanner/Cursor/Cursor.cpp"
+  "src/Common/Scanner/Error/Error.cpp"
+  "src/Common/Scanner/Tokens/Tokens.cpp"
+)
+set(TREEWALK_SRC
+  ${COMMON_SRC}
+  "src/TreeWalk/Lox.cpp"
+  "src/TreeWalk/Builtins/Functions/Clock/Clock.cpp"
+  "src/TreeWalk/Interpreter/Interpreter.cpp"
+  "src/TreeWalk/Interpreter/Statements/Execute.cpp"
+  "src/TreeWalk/Interpreter/Expressions/Call/Call.cpp"
+  "src/TreeWalk/Interpreter/Expressions/Equality/Equality.cpp"
+  "src/TreeWalk/Interpreter/Expressions/Class/Class.cpp"
+  "src/TreeWalk/Interpreter/Expressions/Evaluate.cpp"
+  "src/TreeWalk/Interpreter/Error/Error.cpp"
+  "src/TreeWalk/Interpreter/Utils/Truth/Truth.cpp"
+  "src/TreeWalk/Parser/Cursor/Cursor.cpp"
+  "src/TreeWalk/Parser/Error/Error.cpp"
+  "src/TreeWalk/Parser/Parser.cpp"
+  "src/TreeWalk/Parser/Expressions/Expressions.cpp"
+  "src/TreeWalk/Parser/Statements/Statements.cpp"
+  "src/TreeWalk/Resolver/Resolver.cpp"
+  "src/TreeWalk/Resolver/Error/Error.cpp"
+  "src/TreeWalk/Types/Environment/Environment.cpp"
+)
+set(BYTECODE_SRC
+  ${COMMON_SRC}
+  "src/Bytecode/Lox.cpp"
 )
 
-add_executable(lox ${TARGET_SRC})
+add_executable(twlox ${TREEWALK_SRC})
+add_executable(bclox ${BYTECODE_SRC})
 
 # TESTING
 enable_testing()
-add_executable(cpplox_test unit_tests/tests.cpp src/Reader/Error/Error.cpp src/Reader/Reader.cpp)
+add_executable(cpplox_test unit_tests/tests.cpp src/Common/Reader/Error/Error.cpp src/Common/Reader/Reader.cpp)
 target_link_libraries(cpplox_test GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(cpplox_test)

@@ -3,8 +3,8 @@
 #include <fstream>
 #include <string>
 
-#include "../src/Reader/Error/Error.hpp"
-#include "../src/Reader/Reader.hpp"
+#include "../src/Common/Reader/Error/Error.hpp"
+#include "../src/Common/Reader/Reader.hpp"
 
 TEST(ReadFileTest, FileDoesNotExist) {
   // Arrange

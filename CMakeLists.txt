@@ -46,7 +46,11 @@ set(TREEWALK_SRC
 )
 set(BYTECODE_SRC
   ${COMMON_SRC}
-  "src/Bytecode/Lox.cpp"
+  "src/ByteCode/Lox.cpp"
+  "src/ByteCode/VM/VM.cpp"
+  "src/ByteCode/Debug/Debug.cpp"
+  "src/ByteCode/Compiler/Compiler.cpp"
+  "src/ByteCode/Chunk/Chunk.cpp"
 )
 
 add_executable(twlox ${TREEWALK_SRC})

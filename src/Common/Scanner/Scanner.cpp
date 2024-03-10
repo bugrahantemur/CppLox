@@ -12,10 +12,10 @@
 #include "./Error/Error.hpp"
 #include "./Tokens/Tokens.hpp"
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
 
 [[nodiscard]] auto scan_token(Cursor& cursor) -> std::optional<Token> {
   char const c{cursor.take()};
@@ -68,4 +68,4 @@ using LOX::Types::Token;
 
   return tokens;
 }
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner

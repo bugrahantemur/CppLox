@@ -10,7 +10,7 @@ namespace LOX::TreeWalk::Resolver {
 
 auto resolve(
     std::vector<Types::Syntax::Statements::Statement> const& statements)
-    -> std::unordered_map<LOX::Types::Token, std::size_t>;
+    -> std::unordered_map<LOX::Common::Types::Token, std::size_t>;
 
 }  // namespace LOX::TreeWalk::Resolver
 

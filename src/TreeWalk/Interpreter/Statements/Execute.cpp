@@ -17,12 +17,13 @@
 
 namespace LOX::TreeWalk::Interpreter::Statements {
 
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Syntax::Statements;
 using namespace LOX::TreeWalk::Types::Syntax::Expressions;
 using namespace LOX::TreeWalk::Types::Objects;
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
-using Types::Environment;
+using LOX::TreeWalk::Types::Environment;
 
 struct StatementExecutor {
   Arc<Environment> environment;

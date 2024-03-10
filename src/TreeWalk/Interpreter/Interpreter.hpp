@@ -17,13 +17,14 @@ namespace LOX::TreeWalk::Interpreter {
 
 auto interpret(
     std::vector<Types::Syntax::Statements::Statement> const& statements,
-    std::unordered_map<LOX::Types::Token, std::size_t> const& resolution,
+    std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
+        resolution,
     Arc<Types::Environment> const& env) -> void;
 
 auto interpret(
     std::vector<Types::Syntax::Statements::Statement> const& statements,
-    std::unordered_map<LOX::Types::Token, std::size_t> const& resolution)
-    -> void;
+    std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
+        resolution) -> void;
 
 }  // namespace LOX::TreeWalk::Interpreter
 

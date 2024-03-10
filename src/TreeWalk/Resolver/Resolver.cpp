@@ -7,10 +7,11 @@
 
 namespace LOX::TreeWalk::Resolver {
 
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Syntax::Statements;
 using namespace LOX::TreeWalk::Types::Syntax::Expressions;
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
+using namespace LOX::Common::Types::Tokens;
 
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
 enum class ClassType { NONE, CLASS, SUBCLASS };

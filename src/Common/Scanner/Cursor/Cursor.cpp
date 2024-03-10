@@ -1,6 +1,6 @@
 #include "./Cursor.hpp"
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
 Cursor::Cursor(std::string const& source)
     : source(source), start(0), current(0), line(1) {}
@@ -43,4 +43,4 @@ auto Cursor::match(char const expected) const -> bool {
 
 auto Cursor::index() const -> std::size_t { return 1 + current; }
 
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner

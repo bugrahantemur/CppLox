@@ -7,7 +7,7 @@
 #include "../Types/Syntax/Statement.hpp"
 
 namespace LOX::TreeWalk::Parser {
-auto parse(std::vector<LOX::Types::Token> const& tokens)
+auto parse(std::vector<LOX::Common::Types::Token> const& tokens)
     -> std::vector<Types::Syntax::Statements::Statement>;
 }  // namespace LOX::TreeWalk::Parser
 

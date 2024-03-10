@@ -5,13 +5,13 @@
 
 #include "../../../Common/Error/Interface/Interface.hpp"
 
-namespace LOX::Reader {
+namespace LOX::Common::Reader {
 
-class Error : public LOX::Error::Interface {
+class Error : public LOX::Common::Error::Interface {
  public:
   Error(std::string const &message);
 };
 
-}  // namespace LOX::Reader
+}  // namespace LOX::Common::Reader
 
 #endif

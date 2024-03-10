@@ -6,7 +6,7 @@
 
 #include "./TokenTypes.hpp"
 
-namespace LOX::Types {
+namespace LOX::Common::Types {
 
 struct Token {
   using Literal = std::variant<std::monostate, bool, double, std::string>;
@@ -22,11 +22,11 @@ struct Token {
   static auto none() -> Token;
 };
 
-}  // namespace LOX::Types
+}  // namespace LOX::Common::Types
 
 template <>
-struct std::hash<LOX::Types::Token> {
-  auto operator()(LOX::Types::Token const& token) const -> std::size_t;
+struct std::hash<LOX::Common::Types::Token> {
+  auto operator()(LOX::Common::Types::Token const& token) const -> std::size_t;
 };
 
 #endif

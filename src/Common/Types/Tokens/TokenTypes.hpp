@@ -1,7 +1,7 @@
 #ifndef LOX_TYPES_TOKENTYPES
 #define LOX_TYPES_TOKENTYPES
 
-namespace LOX::Types::Tokens {
+namespace LOX::Common::Types::Tokens {
 
 enum class TokenType {
   LEFT_PAREN,

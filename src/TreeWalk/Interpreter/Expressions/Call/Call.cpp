@@ -11,9 +11,10 @@
 
 namespace LOX::TreeWalk::Interpreter::Expressions {
 
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Objects;
 using LOX::TreeWalk::Types::Environment;
-using LOX::Types::Token;
 
 struct Arity {
   auto operator()(Box<LoxFunction> const& func) -> std::size_t {

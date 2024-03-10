@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
 Error::Error(std::size_t const line, std::string const& message)
     : Interface("[line " + std::to_string(line) +
@@ -12,4 +12,4 @@ auto error(std::size_t const line, std::string message) -> void {
   throw Error{line, message};
 }
 
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner

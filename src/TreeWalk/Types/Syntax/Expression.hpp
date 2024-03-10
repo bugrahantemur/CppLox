@@ -33,24 +33,24 @@ using Expression =
                  Box<Expressions::VariableExpr>>;
 
 struct AssignmentExpr {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
   Expression value;
 };
 
 struct BinaryExpr {
   Expression left;
-  LOX::Types::Token op;
+  LOX::Common::Types::Token op;
   Expression right;
 };
 
 struct CallExpr {
   Expression callee;
-  LOX::Types::Token paren;
+  LOX::Common::Types::Token paren;
   std::vector<Expression> arguments;
 };
 
 struct GetExpr {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
   Expression object;
 };
 
@@ -59,37 +59,37 @@ struct GroupingExpr {
 };
 
 struct LiteralExpr {
-  LOX::Types::Token::Literal value;
+  LOX::Common::Types::Token::Literal value;
 };
 
 struct LogicalExpr {
   Expression left;
-  LOX::Types::Token op;
+  LOX::Common::Types::Token op;
   Expression right;
 };
 
 struct SetExpr {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
   Expression object;
   Expression value;
 };
 
 struct SuperExpr {
-  LOX::Types::Token keyword;
-  LOX::Types::Token method;
+  LOX::Common::Types::Token keyword;
+  LOX::Common::Types::Token method;
 };
 
 struct ThisExpr {
-  LOX::Types::Token keyword;
+  LOX::Common::Types::Token keyword;
 };
 
 struct UnaryExpr {
-  LOX::Types::Token op;
+  LOX::Common::Types::Token op;
   Expression right;
 };
 
 struct VariableExpr {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
 };
 
 }  // namespace LOX::TreeWalk::Types::Syntax::Expressions

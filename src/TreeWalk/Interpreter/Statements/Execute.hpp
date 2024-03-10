@@ -13,11 +13,10 @@ struct Environment;
 
 namespace LOX::TreeWalk::Interpreter::Statements {
 
-auto execute(
-    Types::Syntax::Statements::Statement const& statement,
-    Arc<Types::Environment> environment,
-    std::unordered_map<LOX::Types::Token, std::size_t> const& resolution)
-    -> void;
+auto execute(Types::Syntax::Statements::Statement const& statement,
+             Arc<Types::Environment> environment,
+             std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
+                 resolution) -> void;
 
 }  // namespace LOX::TreeWalk::Interpreter::Statements
 

@@ -7,7 +7,7 @@
 
 #include "./Error/Error.hpp"
 
-namespace LOX::Reader {
+namespace LOX::Common::Reader {
 
 auto read(std::string const &path) -> std::string {
   std::string const extension{".lox"};
@@ -27,4 +27,4 @@ auto read(std::string const &path) -> std::string {
   return buffer.str();
 }
 
-}  // namespace LOX::Reader
+}  // namespace LOX::Common::Reader

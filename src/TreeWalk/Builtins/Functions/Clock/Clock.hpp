@@ -16,10 +16,10 @@ namespace LOX::TreeWalk::Native::Functions {
 struct Clock : public Types::Objects::Builtins::FunctionInterface {
   auto arity() const -> std::size_t final;
   auto to_string() const -> std::string final;
-  auto operator()(
-      Arc<Types::Environment> const& environment,
-      std::unordered_map<LOX::Types::Token, std::size_t> const& resolution,
-      std::vector<Types::Objects::Object> const& args) const
+  auto operator()(Arc<Types::Environment> const& environment,
+                  std::unordered_map<LOX::Common::Types::Token,
+                                     std::size_t> const& resolution,
+                  std::vector<Types::Objects::Object> const& args) const
       -> Types::Objects::Object final;
 };
 

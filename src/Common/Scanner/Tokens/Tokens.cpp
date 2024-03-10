@@ -5,10 +5,10 @@
 #include "../Cursor/Cursor.hpp"
 #include "../Error/Error.hpp"
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
-using namespace LOX::Types::Tokens;
-using Types::Token;
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
 
 auto match_keyword_token_type(std::string const& text)
     -> std::optional<TokenType> {
@@ -172,4 +172,4 @@ auto handle_newline(Cursor& cursor) -> std::nullopt_t {
   return std::nullopt;
 }
 
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner

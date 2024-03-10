@@ -9,11 +9,10 @@
 
 namespace LOX::TreeWalk::Interpreter::Expressions {
 
-auto evaluate(
-    Types::Syntax::Expressions::Expression const& expression,
-    Arc<Types::Environment> environment,
-    std::unordered_map<LOX::Types::Token, std::size_t> const& resolution)
-    -> Types::Objects::Object;
+auto evaluate(Types::Syntax::Expressions::Expression const& expression,
+              Arc<Types::Environment> environment,
+              std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
+                  resolution) -> Types::Objects::Object;
 
 }
 

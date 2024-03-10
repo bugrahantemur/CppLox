@@ -4,13 +4,13 @@
 #include <exception>
 #include <iostream>
 
-namespace LOX::Error {
+namespace LOX::Common::Error {
 
 class Interface : public std::runtime_error {
  public:
   Interface(std::string const& msg) : std::runtime_error(msg){};
 };
 
-}  // namespace LOX::Error
+}  // namespace LOX::Common::Error
 
 #endif

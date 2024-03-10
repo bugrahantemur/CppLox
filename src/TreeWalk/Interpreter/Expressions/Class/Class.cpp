@@ -6,10 +6,11 @@
 
 namespace LOX::TreeWalk::Interpreter::Expressions::Class {
 
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Objects;
-using namespace LOX::Types::Tokens;
 using LOX::TreeWalk::Types::Environment;
-using LOX::Types::Token;
 
 auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {
   if (auto const field{instance->fields.find(token.lexeme)};

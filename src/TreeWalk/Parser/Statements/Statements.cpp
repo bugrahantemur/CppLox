@@ -14,10 +14,11 @@
 
 namespace LOX::TreeWalk::Parser::Statements {
 
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Syntax::Statements;
 using namespace LOX::TreeWalk::Types::Syntax::Expressions;
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
@@ -239,7 +240,7 @@ auto declaration(Cursor& cursor) -> Statement {
     }
     return statement(cursor);
   } catch (Error const& e) {
-    LOX::Error::report(e);
+    LOX::Common::Error::report(e);
     cursor.synchronize();
     return std::monostate{};
   }

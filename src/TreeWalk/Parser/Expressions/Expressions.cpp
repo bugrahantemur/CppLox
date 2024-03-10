@@ -12,9 +12,10 @@
 
 namespace LOX::TreeWalk::Parser::Expressions {
 
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
+
 using namespace LOX::TreeWalk::Types::Syntax::Expressions;
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
@@ -157,7 +158,7 @@ auto assignment(Cursor& cursor) -> Expression {
     }
 
     // Do not throw, just report the error
-    LOX::Error::report(error(equals, "Invalid assignment target."));
+    LOX::Common::Error::report(error(equals, "Invalid assignment target."));
   }
 
   return expr;

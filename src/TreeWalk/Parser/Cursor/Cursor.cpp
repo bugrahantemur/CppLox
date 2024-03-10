@@ -12,8 +12,8 @@
 
 namespace LOX::TreeWalk::Parser {
 
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
 
 Cursor::Cursor(std::vector<Token> const& tokens) : tokens(tokens), current(0){};
 

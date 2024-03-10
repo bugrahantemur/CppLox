@@ -12,9 +12,10 @@ Error::Error(std::size_t const line, std::string const& where,
     : Interface("[line " + std::to_string(line) + "] Parsing error " + where +
                 ": " + message + "\n") {}
 
-auto error(Types::Token const& token, std::string const& message) -> Error {
+auto error(LOX::Common::Types::Token const& token, std::string const& message)
+    -> Error {
   return Error{token.line,
-               token.type == LOX::Types::Tokens::TokenType::EOFF
+               token.type == LOX::Common::Types::Tokens::TokenType::EOFF
                    ? "at the end"
                    : " at '" + token.lexeme + "'",
                message};

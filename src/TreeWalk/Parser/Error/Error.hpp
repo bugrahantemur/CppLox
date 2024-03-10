@@ -9,13 +9,14 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 
 namespace LOX::TreeWalk::Parser {
-class Error : public LOX::Error::Interface {
+class Error : public LOX::Common::Error::Interface {
  public:
   Error(std::size_t const line, std::string const& where,
         std::string const& message);
 };
 
-auto error(LOX::Types::Token const& token, std::string const& message) -> Error;
+auto error(LOX::Common::Types::Token const& token, std::string const& message)
+    -> Error;
 
 }  // namespace LOX::TreeWalk::Parser
 

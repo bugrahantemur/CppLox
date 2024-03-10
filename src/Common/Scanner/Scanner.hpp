@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "../../Common/Types/Tokens/Token.hpp"
+#include "../Types/Tokens/Token.hpp"
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
 [[nodiscard]] auto scan(std::string const& contents)
     -> std::vector<Types::Token>;
 
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner
 
 #endif

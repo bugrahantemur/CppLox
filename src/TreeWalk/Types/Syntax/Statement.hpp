@@ -34,7 +34,7 @@ struct BlockStmt {
 };
 
 struct ClassStmt {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
   Expressions::VariableExpr super_class;
   std::vector<Box<FunctionStmt>> methods;
 };
@@ -44,8 +44,8 @@ struct ExpressionStmt {
 };
 
 struct FunctionStmt {
-  LOX::Types::Token name;
-  std::vector<LOX::Types::Token> params;
+  LOX::Common::Types::Token name;
+  std::vector<LOX::Common::Types::Token> params;
   std::vector<Statement> body;
 };
 
@@ -60,12 +60,12 @@ struct PrintStmt {
 };
 
 struct ReturnStmt {
-  LOX::Types::Token keyword;
+  LOX::Common::Types::Token keyword;
   Expressions::Expression value;
 };
 
 struct VariableStmt {
-  LOX::Types::Token name;
+  LOX::Common::Types::Token name;
   Expressions::Expression initializer;
 };
 

@@ -7,8 +7,8 @@
 namespace LOX::TreeWalk::Interpreter::Utils::Operands {
 
 template <typename... Objs>
-auto check_number_operand(LOX::Types::Token const& token, Objs... operands)
-    -> void {
+auto check_number_operand(LOX::Common::Types::Token const& token,
+                          Objs... operands) -> void {
   std::array const ops{operands...};
   if (std::all_of(std::begin(ops), std::end(ops),
                   [](Types::Objects::Object const& obj) {

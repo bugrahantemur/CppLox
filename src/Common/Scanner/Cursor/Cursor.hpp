@@ -4,7 +4,7 @@
 #include <cassert>
 #include <string>
 
-namespace LOX::Scanner {
+namespace LOX::Common::Scanner {
 
 class Cursor {
  public:
@@ -37,5 +37,5 @@ class Cursor {
   std::size_t line;
 };
 
-}  // namespace LOX::Scanner
+}  // namespace LOX::Common::Scanner
 #endif

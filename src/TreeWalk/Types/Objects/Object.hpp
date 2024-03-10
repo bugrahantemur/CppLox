@@ -51,10 +51,10 @@ namespace Builtins {
 struct FunctionInterface {
   virtual auto arity() const -> std::size_t = 0;
   virtual auto to_string() const -> std::string = 0;
-  virtual auto operator()(
-      Arc<Types::Environment> const& environment,
-      std::unordered_map<LOX::Types::Token, std::size_t> const& resolution,
-      std::vector<Object> const& args) const -> Object = 0;
+  virtual auto operator()(Arc<Types::Environment> const& environment,
+                          std::unordered_map<LOX::Common::Types::Token,
+                                             std::size_t> const& resolution,
+                          std::vector<Object> const& args) const -> Object = 0;
 };
 
 }  // namespace Builtins

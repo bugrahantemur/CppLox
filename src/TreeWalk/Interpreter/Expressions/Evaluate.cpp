@@ -19,13 +19,13 @@
 
 namespace LOX::TreeWalk::Interpreter::Expressions {
 
-using namespace Utils;
+using namespace LOX::Common::Types::Tokens;
+using LOX::Common::Types::Token;
 
+using namespace LOX::TreeWalk::Interpreter::Utils;
 using namespace LOX::TreeWalk::Types::Objects;
 using namespace LOX::TreeWalk::Types::Syntax::Expressions;
-using namespace LOX::Types::Tokens;
-using LOX::Types::Token;
-using Types::Environment;
+using LOX::TreeWalk::Types::Environment;
 
 struct ExpressionEvaluator {
   Arc<Environment> environment;

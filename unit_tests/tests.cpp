@@ -11,5 +11,5 @@ TEST(ReadFileTest, FileDoesNotExist) {
   std::string const path{"nonexistent.lox"};
 
   // Act and Assert
-  ASSERT_THROW(LOX::Reader::read(path), LOX::Reader::Error);
+  ASSERT_THROW(LOX::Common::Reader::read(path), LOX::Common::Reader::Error);
 }

@@ -1,5 +1,5 @@
-#ifndef LOX_TYPES_TOKENTYPES
-#define LOX_TYPES_TOKENTYPES
+#ifndef LOX_COMMON_TYPES_TOKENTYPES
+#define LOX_COMMON_TYPES_TOKENTYPES
 
 namespace LOX::Common::Types::Tokens {
 

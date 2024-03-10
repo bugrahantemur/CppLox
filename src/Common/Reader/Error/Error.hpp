@@ -1,5 +1,5 @@
-#ifndef LOX_READER_ERROR
-#define LOX_READER_ERROR
+#ifndef LOX_COMMON_READER_ERROR
+#define LOX_COMMON_READER_ERROR
 
 #include <string>
 

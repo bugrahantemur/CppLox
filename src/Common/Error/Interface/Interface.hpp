@@ -1,5 +1,5 @@
-#ifndef LOX_ERROR_ERROR
-#define LOX_ERROR_ERROR
+#ifndef LOX_COMMON_ERROR_ERROR
+#define LOX_COMMON_ERROR_ERROR
 
 #include <exception>
 #include <iostream>

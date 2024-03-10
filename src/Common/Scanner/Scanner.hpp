@@ -1,5 +1,5 @@
-#ifndef LOX_SCANNER
-#define LOX_SCANNER
+#ifndef LOX_COMMON_SCANNER
+#define LOX_COMMON_SCANNER
 
 #include <string>
 #include <vector>

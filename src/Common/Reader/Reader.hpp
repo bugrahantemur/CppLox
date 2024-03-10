@@ -1,6 +1,6 @@
 
-#ifndef LOX_READER
-#define LOX_READER
+#ifndef LOX_COMMON_READER
+#define LOX_COMMON_READER
 
 #include <string>
 

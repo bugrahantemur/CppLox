@@ -1,5 +1,5 @@
-#ifndef LOX_SCANNER_CURSOR
-#define LOX_SCANNER_CURSOR
+#ifndef LOX_COMMON_SCANNER_CURSOR
+#define LOX_COMMON_SCANNER_CURSOR
 
 #include <cassert>
 #include <string>

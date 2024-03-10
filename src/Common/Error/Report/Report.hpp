@@ -1,5 +1,5 @@
-#ifndef LOX_ERROR_REPORT
-#define LOX_ERROR_REPORT
+#ifndef LOX_COMMON_ERROR_REPORT
+#define LOX_COMMON_ERROR_REPORT
 
 #include <exception>
 #include <string>

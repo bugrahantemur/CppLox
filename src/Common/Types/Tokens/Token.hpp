@@ -1,5 +1,5 @@
-#ifndef LOX_TYPES_TOKEN
-#define LOX_TYPES_TOKEN
+#ifndef LOX_COMMON_TYPES_TOKEN
+#define LOX_COMMON_TYPES_TOKEN
 
 #include <string>
 #include <variant>

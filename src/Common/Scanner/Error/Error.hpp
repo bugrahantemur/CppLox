@@ -1,5 +1,5 @@
-#ifndef LOX_SCANNER_ERROR
-#define LOX_SCANNER_ERROR
+#ifndef LOX_COMMON_SCANNER_ERROR
+#define LOX_COMMON_SCANNER_ERROR
 
 #include <exception>
 #include <string>

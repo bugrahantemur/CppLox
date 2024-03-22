@@ -30,26 +30,26 @@ inline auto VirtualMachine::handle_op_return(Chunk const& chunk) -> void {
   std::cout << value << '\n';
 }
 
-#define BINARY_OP(op)             \
-  do {                            \
-    double const b = stack.top(); \
-    stack.pop();                  \
-    double const a = stack.top(); \
-    stack.pop();                  \
-    stack.push(a op b);           \
-  } while (false)
+inline auto binary_op(std::stack<Value>& stack,
+                      std::function<Value(Value, Value)> const& op) -> void {
+  double const b = stack.top();
+  stack.pop();
+  double const a = stack.top();
+  stack.pop();
+  stack.push(op(a, b));
+}
 
 inline auto VirtualMachine::handle_op_add(Chunk const& chunk) -> void {
-  BINARY_OP(+);
+  binary_op(stack, [](auto const& a, auto const& b) { return a + b; });
 }
 inline auto VirtualMachine::handle_op_subtract(Chunk const& chunk) -> void {
-  BINARY_OP(-);
+  binary_op(stack, [](auto const& a, auto const& b) { return a * b; });
 }
 inline auto VirtualMachine::handle_op_multiply(Chunk const& chunk) -> void {
-  BINARY_OP(*);
+  binary_op(stack, [](auto const& a, auto const& b) { return a / b; });
 }
 inline auto VirtualMachine::handle_op_divide(Chunk const& chunk) -> void {
-  BINARY_OP(/);
+  binary_op(stack, [](auto const& a, auto const& b) { return a / b; });
 }
 
 #undef BINARY_OP

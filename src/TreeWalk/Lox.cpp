@@ -6,27 +6,27 @@
 
 #include "../Common/Error/Interface/Interface.hpp"
 #include "../Common/Error/Report/Report.hpp"
+#include "../Common/Parser/Parser.hpp"
 #include "../Common/Reader/Reader.hpp"
 #include "../Common/Scanner/Scanner.hpp"
+#include "../Common/Types/Syntax/Statement.hpp"
 #include "../Common/Types/Tokens/Token.hpp"
 #include "./Interpreter/Interpreter.hpp"
-#include "./Parser/Parser.hpp"
 #include "./Resolver/Resolver.hpp"
 #include "./Types/Objects/Object.hpp"
-#include "./Types/Syntax/Statement.hpp"
 
 namespace LOX::TreeWalk {
 
 auto run(std::string const &file_path) -> void {
-  std::string const contents{LOX::Common::Reader::read(file_path)};
+  std::string const contents{Common::Reader::read(file_path)};
 
-  std::vector<LOX::Common::Types::Token> const tokens{
+  std::vector<Common::Types::Token> const tokens{
       LOX::Common::Scanner::scan(contents)};
 
-  std::vector<Types::Syntax::Statements::Statement> const statements{
-      Parser::parse(tokens)};
+  std::vector<Common::Types::Syntax::Statements::Statement> const statements{
+      Common::Parser::parse(tokens)};
 
-  std::unordered_map<LOX::Common::Types::Token, std::size_t> const resolution{
+  std::unordered_map<Common::Types::Token, std::size_t> const resolution{
       Resolver::resolve(statements)};
 
   Interpreter::interpret(statements, resolution);

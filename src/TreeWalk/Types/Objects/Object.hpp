@@ -9,7 +9,7 @@
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/ArcDyn.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
-#include "../Syntax/Statement.hpp"
+#include "../../../Common/Types/Syntax/Statement.hpp"
 
 namespace LOX::TreeWalk::Types {
 struct Environment;
@@ -31,7 +31,7 @@ using Object = std::variant<std::monostate, bool, double, std::string,
                             ArcDyn<Objects::Builtins::FunctionInterface>>;
 
 struct LoxFunction {
-  Syntax::Statements::FunctionStmt declaration;
+  Common::Types::Syntax::Statements::FunctionStmt declaration;
   Arc<Environment> closure;
   bool is_initializer;
 };

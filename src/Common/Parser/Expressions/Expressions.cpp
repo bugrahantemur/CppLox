@@ -10,14 +10,12 @@
 #include "../../Types/Syntax/Expression.hpp"
 #include "../Utils/Utils.hpp"
 
-namespace LOX::TreeWalk::Parser::Expressions {
+namespace LOX::Common::Parser::Expressions {
 
-using LOX::Common::Parser::Cursor;
-using LOX::Common::Parser::error;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Syntax::Expressions;
+using namespace LOX::Common::Types::Syntax::Expressions;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
@@ -168,4 +166,4 @@ auto assignment(Cursor& cursor) -> Expression {
 
 auto expression(Cursor& cursor) -> Expression { return assignment(cursor); };
 
-}  // namespace LOX::TreeWalk::Parser::Expressions
+}  // namespace LOX::Common::Parser::Expressions

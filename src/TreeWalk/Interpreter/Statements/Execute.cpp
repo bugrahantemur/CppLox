@@ -5,10 +5,10 @@
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../Common/Types/Syntax/Statement.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
-#include "../../Types/Syntax/Statement.hpp"
 #include "../Error/Error.hpp"
 #include "../Expressions/Evaluate.hpp"
 #include "../Utils/Return/Return.hpp"
@@ -17,11 +17,11 @@
 
 namespace LOX::TreeWalk::Interpreter::Statements {
 
+using namespace LOX::Common::Types::Syntax::Statements;
+using namespace LOX::Common::Types::Syntax::Expressions;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Syntax::Statements;
-using namespace LOX::TreeWalk::Types::Syntax::Expressions;
 using namespace LOX::TreeWalk::Types::Objects;
 using LOX::TreeWalk::Types::Environment;
 

@@ -15,15 +15,18 @@ FetchContent_MakeAvailable(googletest)
 
 set(COMMON_SRC
   "src/Common/Error/Report/Report.cpp"
-  "src/Common/Types/Tokens/Token.cpp"
-  "src/Common/Reader/Reader.cpp"
-  "src/Common/Reader/Error/Error.cpp"
   "src/Common/Parser/Cursor/Cursor.cpp"
   "src/Common/Parser/Error/Error.cpp"
+  "src/Common/Parser/Parser.cpp"
+  "src/Common/Parser/Expressions/Expressions.cpp"
+  "src/Common/Parser/Statements/Statements.cpp"
+  "src/Common/Reader/Reader.cpp"
+  "src/Common/Reader/Error/Error.cpp"
   "src/Common/Scanner/Scanner.cpp"
   "src/Common/Scanner/Cursor/Cursor.cpp"
   "src/Common/Scanner/Error/Error.cpp"
   "src/Common/Scanner/Tokens/Tokens.cpp"
+  "src/Common/Types/Tokens/Token.cpp"
 )
 set(TREEWALK_SRC
   ${COMMON_SRC}
@@ -37,9 +40,6 @@ set(TREEWALK_SRC
   "src/TreeWalk/Interpreter/Expressions/Evaluate.cpp"
   "src/TreeWalk/Interpreter/Error/Error.cpp"
   "src/TreeWalk/Interpreter/Utils/Truth/Truth.cpp"
-  "src/TreeWalk/Parser/Parser.cpp"
-  "src/TreeWalk/Parser/Expressions/Expressions.cpp"
-  "src/TreeWalk/Parser/Statements/Statements.cpp"
   "src/TreeWalk/Resolver/Resolver.cpp"
   "src/TreeWalk/Resolver/Error/Error.cpp"
   "src/TreeWalk/Types/Environment/Environment.cpp"

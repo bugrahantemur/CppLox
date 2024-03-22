@@ -5,9 +5,9 @@
 #include <vector>
 
 #include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../Types/Objects/Object.hpp"
-#include "../Types/Syntax/Statement.hpp"
 
 namespace LOX::TreeWalk::Types {
 struct Environment;
@@ -16,13 +16,13 @@ struct Environment;
 namespace LOX::TreeWalk::Interpreter {
 
 auto interpret(
-    std::vector<Types::Syntax::Statements::Statement> const& statements,
+    std::vector<Common::Types::Syntax::Statements::Statement> const& statements,
     std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
         resolution,
     Arc<Types::Environment> const& env) -> void;
 
 auto interpret(
-    std::vector<Types::Syntax::Statements::Statement> const& statements,
+    std::vector<Common::Types::Syntax::Statements::Statement> const& statements,
     std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
         resolution) -> void;
 

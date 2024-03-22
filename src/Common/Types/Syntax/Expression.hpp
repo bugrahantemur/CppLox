@@ -7,7 +7,7 @@
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 
-namespace LOX::TreeWalk::Types::Syntax::Expressions {
+namespace LOX::Common::Types::Syntax::Expressions {
 
 // Forward declaration of all expression types
 struct AssignmentExpr;
@@ -92,6 +92,6 @@ struct VariableExpr {
   LOX::Common::Types::Token name;
 };
 
-}  // namespace LOX::TreeWalk::Types::Syntax::Expressions
+}  // namespace LOX::Common::Types::Syntax::Expressions
 
 #endif

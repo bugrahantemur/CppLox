@@ -44,7 +44,7 @@ auto Cursor::consume(TokenType const& type, std::string const& message)
   throw error(peek(), message);
 }
 
-auto Cursor::previous() -> Token {
+auto Cursor::previous() const -> Token {
   assert(current > 0);
   return tokens.at(current - 1);
 }

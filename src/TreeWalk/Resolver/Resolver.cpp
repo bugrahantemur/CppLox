@@ -9,8 +9,8 @@ namespace LOX::TreeWalk::Resolver {
 
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Syntax::Statements;
-using namespace LOX::TreeWalk::Types::Syntax::Expressions;
+using namespace LOX::Common::Types::Syntax::Statements;
+using namespace LOX::Common::Types::Syntax::Expressions;
 using namespace LOX::Common::Types::Tokens;
 
 enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };

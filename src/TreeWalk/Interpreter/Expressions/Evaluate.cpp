@@ -5,11 +5,11 @@
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../Common/Types/Syntax/Expression.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
-#include "../../Types/Syntax/Expression.hpp"
 #include "../Error/Error.hpp"
 #include "../Utils/Operands/Operands.hpp"
 #include "../Utils/Truth/Truth.hpp"
@@ -21,10 +21,10 @@ namespace LOX::TreeWalk::Interpreter::Expressions {
 
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
+using namespace LOX::Common::Types::Syntax::Expressions;
 
 using namespace LOX::TreeWalk::Interpreter::Utils;
 using namespace LOX::TreeWalk::Types::Objects;
-using namespace LOX::TreeWalk::Types::Syntax::Expressions;
 using LOX::TreeWalk::Types::Environment;
 
 struct ExpressionEvaluator {
@@ -234,8 +234,7 @@ struct ExpressionEvaluator {
   }
 };
 
-auto evaluate(Types::Syntax::Expressions::Expression const& expression,
-              Arc<Environment> environment,
+auto evaluate(Expression const& expression, Arc<Environment> environment,
               std::unordered_map<Token, std::size_t> const& resolution)
     -> Types::Objects::Object {
   return std::visit(ExpressionEvaluator{environment, resolution}, expression);

@@ -34,7 +34,7 @@ class Cursor {
   auto consume(LOX::Common::Types::Tokens::TokenType const& type,
                std::string const& message) -> LOX::Common::Types::Token;
 
-  auto previous() -> LOX::Common::Types::Token;
+  auto previous() const -> LOX::Common::Types::Token;
 
   auto synchronize() -> void;
 };

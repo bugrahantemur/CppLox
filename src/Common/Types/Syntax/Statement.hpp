@@ -8,7 +8,7 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "./Expression.hpp"
 
-namespace LOX::TreeWalk::Types::Syntax::Statements {
+namespace LOX::Common::Types::Syntax::Statements {
 
 // Forward declaration of all statement types
 struct BlockStmt;
@@ -74,6 +74,6 @@ struct WhileStmt {
   Statement body;
 };
 
-}  // namespace LOX::TreeWalk::Types::Syntax::Statements
+}  // namespace LOX::Common::Types::Syntax::Statements
 
 #endif

@@ -12,15 +12,13 @@
 #include "../Expressions/Expressions.hpp"
 #include "../Utils/Utils.hpp"
 
-namespace LOX::TreeWalk::Parser::Statements {
+namespace LOX::Common::Parser::Statements {
 
-using LOX::Common::Parser::Cursor;
-using LOX::Common::Parser::Error;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Syntax::Statements;
-using namespace LOX::TreeWalk::Types::Syntax::Expressions;
+using namespace LOX::Common::Types::Syntax::Statements;
+using namespace LOX::Common::Types::Syntax::Expressions;
 
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
@@ -248,4 +246,4 @@ auto declaration(Cursor& cursor) -> Statement {
   }
 }
 
-}  // namespace LOX::TreeWalk::Parser::Statements
+}  // namespace LOX::Common::Parser::Statements

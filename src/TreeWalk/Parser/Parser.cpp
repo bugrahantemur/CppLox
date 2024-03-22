@@ -2,16 +2,16 @@
 
 #include <vector>
 
+#include "../../Common/Parser/Cursor/Cursor.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../Types/Syntax/Statement.hpp"
-#include "./Cursor/Cursor.hpp"
 #include "./Statements/Statements.hpp"
 
 namespace LOX::TreeWalk::Parser {
 
 auto parse(std::vector<LOX::Common::Types::Token> const& tokens)
     -> std::vector<Types::Syntax::Statements::Statement> {
-  Cursor cursor(tokens);
+  Common::Parser::Cursor cursor(tokens);
 
   std::vector<Types::Syntax::Statements::Statement> statements{};
 

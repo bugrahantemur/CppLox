@@ -1,44 +1,53 @@
 #ifndef LOX_TREEWALK_PARSER_EXPRESSIONS
 #define LOX_TREEWALK_PARSER_EXPRESSIONS
 
+#include "../../../Common/Parser/Cursor/Cursor.hpp"
 #include "../../Types/Syntax/Expression.hpp"
-#include "../Cursor/Cursor.hpp"
 
 namespace LOX::TreeWalk::Parser::Expressions {
 
-auto primary(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto primary(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto call(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto call(Common::Parser::Cursor& tc) -> Types::Syntax::Expressions::Expression;
 
-auto unary(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto unary(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
 template <typename F, typename Result, typename... Ts>
-auto sequence(Cursor& tc, F const& f, Ts... ts)
+auto sequence(Common::Parser::Cursor& tc, F const& f, Ts... ts)
     -> Types::Syntax::Expressions::Expression;
 
 template <typename F, typename... Ts>
-auto binary_expression(Cursor& tc, F const& f, Ts... ts)
+auto binary_expression(Common::Parser::Cursor& tc, F const& f, Ts... ts)
     -> Types::Syntax::Expressions::Expression;
 
 template <typename F, typename... Ts>
-auto logical_expression(Cursor& tc, F const& f, Ts... ts)
+auto logical_expression(Common::Parser::Cursor& tc, F const& f, Ts... ts)
     -> Types::Syntax::Expressions::Expression;
 
-auto factor(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto factor(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto term(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto term(Common::Parser::Cursor& tc) -> Types::Syntax::Expressions::Expression;
 
-auto comparison(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto comparison(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto equality(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto equality(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto and_expr(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto and_expr(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto or_expr(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto or_expr(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto assignment(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto assignment(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
-auto expression(Cursor& tc) -> Types::Syntax::Expressions::Expression;
+auto expression(Common::Parser::Cursor& tc)
+    -> Types::Syntax::Expressions::Expression;
 
 }  // namespace LOX::TreeWalk::Parser::Expressions
 

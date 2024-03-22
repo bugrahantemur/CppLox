@@ -3,17 +3,19 @@
 #include <iostream>
 
 #include "../../../Common/Error/Report/Report.hpp"
+#include "../../../Common/Parser/Cursor/Cursor.hpp"
+#include "../../../Common/Parser/Error/Error.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../../Types/Syntax/Expression.hpp"
 #include "../../Types/Syntax/Statement.hpp"
-#include "../Cursor/Cursor.hpp"
-#include "../Error/Error.hpp"
 #include "../Expressions/Expressions.hpp"
 #include "../Utils/Utils.hpp"
 
 namespace LOX::TreeWalk::Parser::Statements {
 
+using LOX::Common::Parser::Cursor;
+using LOX::Common::Parser::Error;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 

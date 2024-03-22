@@ -5,7 +5,7 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 
-namespace LOX::TreeWalk::Parser {
+namespace LOX::Common::Parser {
 
 Error::Error(std::size_t const line, std::string const& where,
              std::string const& message)
@@ -21,4 +21,4 @@ auto error(LOX::Common::Types::Token const& token, std::string const& message)
                message};
 }
 
-}  // namespace LOX::TreeWalk::Parser
+}  // namespace LOX::Common::Parser

@@ -8,7 +8,7 @@
 #include "../../../Common/Error/Interface/Interface.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 
-namespace LOX::TreeWalk::Parser {
+namespace LOX::Common::Parser {
 class Error : public LOX::Common::Error::Interface {
  public:
   Error(std::size_t const line, std::string const& where,
@@ -18,6 +18,6 @@ class Error : public LOX::Common::Error::Interface {
 auto error(LOX::Common::Types::Token const& token, std::string const& message)
     -> Error;
 
-}  // namespace LOX::TreeWalk::Parser
+}  // namespace LOX::Common::Parser
 
 #endif

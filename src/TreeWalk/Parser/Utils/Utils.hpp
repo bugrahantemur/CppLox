@@ -3,14 +3,15 @@
 
 #include <vector>
 
+#include "../../../Common/Parser/Cursor/Cursor.hpp"
+#include "../../../Common/Parser/Error/Error.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
-#include "../Cursor/Cursor.hpp"
-#include "../Error/Error.hpp"
 
 namespace LOX::TreeWalk::Parser::Utils {
 
 template <typename T, typename F>
-auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
+auto parse_parenthesized_list(Common::Parser::Cursor& cursor, F const& f)
+    -> std::vector<T> {
   cursor.consume(LOX::Common::Types::Tokens::TokenType::LEFT_PAREN,
                  "Expect '(' before list.");
 
@@ -25,7 +26,8 @@ auto parse_parenthesized_list(Cursor& cursor, F const& f) -> std::vector<T> {
   }
 
   if (list.size() >= 255) {
-    throw error(cursor.peek(), "Can't have more than 255 constituents.");
+    throw Common::Parser::error(cursor.peek(),
+                                "Can't have more than 255 constituents.");
   }
 
   cursor.consume(LOX::Common::Types::Tokens::TokenType::RIGHT_PAREN,

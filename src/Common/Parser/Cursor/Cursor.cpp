@@ -1,4 +1,4 @@
-#include "Cursor.hpp"
+#include "./Cursor.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -10,7 +10,7 @@
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../Error/Error.hpp"
 
-namespace LOX::TreeWalk::Parser {
+namespace LOX::Common::Parser {
 
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
@@ -64,4 +64,4 @@ auto Cursor::synchronize() -> void {
     }
   }
 }
-}  // namespace LOX::TreeWalk::Parser
+}  // namespace LOX::Common::Parser

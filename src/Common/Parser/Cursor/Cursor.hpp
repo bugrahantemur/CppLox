@@ -9,7 +9,7 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 
-namespace LOX::TreeWalk::Parser {
+namespace LOX::Common::Parser {
 
 class Cursor {
   std::vector<LOX::Common::Types::Token> const& tokens;
@@ -38,6 +38,6 @@ class Cursor {
 
   auto synchronize() -> void;
 };
-}  // namespace LOX::TreeWalk::Parser
+}  // namespace LOX::Common::Parser
 
 #endif

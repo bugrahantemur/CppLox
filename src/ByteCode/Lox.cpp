@@ -3,9 +3,7 @@
 
 #include "../Common/Reader/Reader.hpp"
 #include "./Chunk/Chunk.hpp"
-#include "./Common.hpp"
-#include "./Debug/Debug.hpp"
-#include "./OpCode/OpCode.hpp"
+#include "./Compiler/Compiler.hpp"
 #include "./VM/VM.hpp"
 
 namespace LOX::ByteCode {
@@ -14,6 +12,8 @@ static void run_file(std::string const& path) {
   std::string const source = Common::Reader::read(path);
 
   VM::VirtualMachine vm{};
+
+  Chunk chunk{Compiler::compile(source)};
 
   VM::InterpretResult result = vm.interpret(source);
 

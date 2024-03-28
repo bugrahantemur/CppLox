@@ -111,19 +111,28 @@ struct ExpressionCompiler {
   Chunk& chunk;
 };
 
+struct StatementCompiler {
+  template <typename T>
+  auto operator()(T const&) -> void {}
+
+  Chunk& chunk;
+};
+
 auto number(Chunk& chunk, Value const& value) -> void {
   emit_constant(chunk, value);
 }
 
-auto compile(std::string const& source) -> void {
+auto compile(std::string const& source) -> Chunk {
   std::vector<Token> tokens = Common::Scanner::scan(source);
   std::vector<Statement> statements = Common::Parser::parse(tokens);
 
   Chunk chunk;
 
   for (auto const& stmt : statements) {
-    // Pass
+    std::visit(StatementCompiler{chunk}, stmt);
   }
+
+  return chunk;
 }
 
 }  // namespace LOX::ByteCode::Compiler

@@ -12,8 +12,8 @@ struct Chunk {
   std::vector<Value> constants{};
   std::vector<std::size_t> lines{};
 
-  auto add_instruction(Byte byte, std::size_t line) -> std::size_t;
-  auto add_constant(Value const& value) -> std::size_t;
+  auto append_byte(Byte byte, std::size_t line) -> std::size_t;
+  auto append_constant(Value const& value) -> std::size_t;
 };
 
 }  // namespace LOX::ByteCode

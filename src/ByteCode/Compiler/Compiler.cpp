@@ -21,19 +21,19 @@ using LOX::Common::Types::Tokens::TokenType;
 using namespace LOX::Common::Types::Syntax::Expressions;
 
 auto emit_byte(Chunk& chunk, Byte byte, std::size_t line) -> void {
-  chunk.add_instruction(byte, line);
+  chunk.append_byte(byte, line);
 }
 
 auto emit_bytes(Chunk& chunk, Byte byte1, std::size_t line1, Byte byte2,
                 std::size_t line2) -> void {
-  chunk.add_instruction(byte1, line1);
-  chunk.add_instruction(byte2, line2);
+  chunk.append_byte(byte1, line1);
+  chunk.append_byte(byte2, line2);
 }
 
 auto error(std::string const& msg) { throw std::runtime_error(msg); }
 
 auto make_constant(Chunk& chunk, Value const& value) -> Byte {
-  std::size_t const_idx{chunk.add_constant(value)};
+  std::size_t const_idx{chunk.append_constant(value)};
   if (const_idx > static_cast<std::size_t>(std::numeric_limits<Byte>::max())) {
     error("Too many constants in one chunk.");
     return 0;  // Unreachable
@@ -102,9 +102,8 @@ struct ExpressionCompiler {
 
     if (op_type == TokenType::MINUS) {
       emit_byte(chunk, OpCode::OP_NEGATE, expr->op.line);
-    }
-
-    if (op_type == TokenType::BANG) {
+    } else if (op_type == TokenType::BANG) {
+      // Pass
     }
   }
 
@@ -123,12 +122,11 @@ auto number(Chunk& chunk, Value const& value) -> void {
 }
 
 auto compile(std::string const& source) -> Chunk {
-  std::vector<Token> tokens = Common::Scanner::scan(source);
-  std::vector<Statement> statements = Common::Parser::parse(tokens);
+  std::vector<Token> const tokens = Common::Scanner::scan(source);
+  std::vector<Statement> const statements = Common::Parser::parse(tokens);
 
   Chunk chunk;
-
-  for (auto const& stmt : statements) {
+  for (Statement const& stmt : statements) {
     std::visit(StatementCompiler{chunk}, stmt);
   }
 

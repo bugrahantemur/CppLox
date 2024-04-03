@@ -1,5 +1,6 @@
 #include "./VM.hpp"
 
+#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -13,46 +14,21 @@ namespace LOX::ByteCode::VM {
 VirtualMachine::VirtualMachine() {}
 VirtualMachine::~VirtualMachine() {}
 
-inline auto VirtualMachine::handle_op_constant(Chunk const& chunk) -> void {
-  Value const constant = chunk.constants[*ip++];
+auto VirtualMachine::handle_op_constant(Value const& constant) -> void {
   stack.push(constant);
 }
 
-inline auto VirtualMachine::handle_op_negate(Chunk const& chunk) -> void {
+auto VirtualMachine::handle_op_negate() -> void {
   Value const value{-stack.top()};
   stack.pop();
   stack.push(value);
 }
 
-inline auto VirtualMachine::handle_op_return(Chunk const& chunk) -> void {
+auto VirtualMachine::handle_op_return() -> void {
   Value const value{stack.top()};
   stack.pop();
   std::cout << value << '\n';
 }
-
-inline auto binary_op(std::stack<Value>& stack,
-                      std::function<Value(Value, Value)> const& op) -> void {
-  double const b = stack.top();
-  stack.pop();
-  double const a = stack.top();
-  stack.pop();
-  stack.push(op(a, b));
-}
-
-inline auto VirtualMachine::handle_op_add(Chunk const& chunk) -> void {
-  binary_op(stack, [](auto const& a, auto const& b) { return a + b; });
-}
-inline auto VirtualMachine::handle_op_subtract(Chunk const& chunk) -> void {
-  binary_op(stack, [](auto const& a, auto const& b) { return a * b; });
-}
-inline auto VirtualMachine::handle_op_multiply(Chunk const& chunk) -> void {
-  binary_op(stack, [](auto const& a, auto const& b) { return a / b; });
-}
-inline auto VirtualMachine::handle_op_divide(Chunk const& chunk) -> void {
-  binary_op(stack, [](auto const& a, auto const& b) { return a / b; });
-}
-
-#undef BINARY_OP
 
 auto VirtualMachine::run(Chunk const& chunk) -> InterpretResult {
   while (ip != chunk.code.end()) {
@@ -74,25 +50,25 @@ auto VirtualMachine::run(Chunk const& chunk) -> InterpretResult {
 
     switch (instruction) {
       case OpCode::OP_CONSTANT:
-        handle_op_constant(chunk);
+        handle_op_constant(chunk.constants[*ip++]);
         break;
       case OpCode::OP_NEGATE:
-        handle_op_negate(chunk);
+        handle_op_negate();
         break;
       case OpCode::OP_ADD:
-        handle_op_add(chunk);
+        handle_binary_op(std::plus<>{});
         break;
       case OpCode::OP_SUBTRACT:
-        handle_op_subtract(chunk);
+        handle_binary_op(std::minus<>{});
         break;
       case OpCode::OP_MULTIPLY:
-        handle_op_multiply(chunk);
+        handle_binary_op(std::multiplies<>{});
         break;
       case OpCode::OP_DIVIDE:
-        handle_op_divide(chunk);
+        handle_binary_op(std::divides<>{});
         break;
       case OpCode::OP_RETURN:
-        handle_op_return(chunk);
+        handle_op_return();
         break;
       default:
         return InterpretResult::OK;

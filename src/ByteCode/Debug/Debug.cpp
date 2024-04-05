@@ -39,7 +39,7 @@ auto constant_instruction(std::string const& name, Chunk const& chunk,
   auto const idx_of_constant =
       static_cast<std::size_t>(chunk.code[idx_of_instruction + 1]);
   std::cout << name << ' ' << std::setw(4) << std::setfill('0')
-            << idx_of_constant << " '" << chunk.constants[idx_of_constant]
+            << idx_of_constant << " '"  // << chunk.constants[idx_of_constant]
             << "'\n";
 
   return idx_of_instruction + 2;

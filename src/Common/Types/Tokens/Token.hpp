@@ -2,18 +2,16 @@
 #define LOX_COMMON_TYPES_TOKEN
 
 #include <string>
-#include <variant>
 
+#include "../Value/Value.hpp"
 #include "./TokenTypes.hpp"
 
 namespace LOX::Common::Types {
 
 struct Token {
-  using Literal = std::variant<std::monostate, bool, double, std::string>;
-
   Tokens::TokenType type;
   std::string lexeme;
-  Literal literal;
+  Value literal;
   std::size_t line;
   std::size_t token_id;
 

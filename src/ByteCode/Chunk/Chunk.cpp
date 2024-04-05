@@ -1,9 +1,8 @@
 #include "./Chunk.hpp"
 
 #include <cassert>
-#include <vector>
 
-#include "../Value/Value.hpp"
+#include "../../Common/Types/Value/Value.hpp"
 
 namespace LOX::ByteCode {
 
@@ -16,7 +15,8 @@ auto Chunk::append_byte(Byte byte, std::size_t line) -> std::size_t {
   return code.size() - 1;
 }
 
-auto Chunk::append_constant(Value const& constant) -> std::size_t {
+auto Chunk::append_constant(Common::Types::Value const& constant)
+    -> std::size_t {
   constants.push_back(constant);
   return constants.size() - 1;
 }

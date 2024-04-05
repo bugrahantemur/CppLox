@@ -11,6 +11,8 @@
 
 namespace LOX::ByteCode::VM {
 
+using LOX::Common::Types::Value;
+
 VirtualMachine::VirtualMachine() {}
 VirtualMachine::~VirtualMachine() {}
 
@@ -19,15 +21,16 @@ auto VirtualMachine::handle_op_constant(Value const& constant) -> void {
 }
 
 auto VirtualMachine::handle_op_negate() -> void {
-  Value const value{-stack.top()};
+  // Value const value{-stack.top()};
   stack.pop();
-  stack.push(value);
+  // stack.push(value);
+  stack.push({});
 }
 
 auto VirtualMachine::handle_op_return() -> void {
   Value const value{stack.top()};
   stack.pop();
-  std::cout << value << '\n';
+  // std::cout << value << '\n';
 }
 
 auto VirtualMachine::run(Chunk const& chunk) -> InterpretResult {

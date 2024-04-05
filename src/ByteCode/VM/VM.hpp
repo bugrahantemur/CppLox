@@ -3,8 +3,8 @@
 
 #include <stack>
 
+#include "../../Common/Types/Value/Value.hpp"
 #include "../Chunk/Chunk.hpp"
-#include "../Value/Value.hpp"
 
 namespace LOX::ByteCode::VM {
 
@@ -25,23 +25,23 @@ class VirtualMachine {
   auto interpret(std::string const& source) -> InterpretResult;
 
  private:
-  auto handle_op_constant(Value const& constant) -> void;
+  auto handle_op_constant(Common::Types::Value const& constant) -> void;
   auto handle_op_negate() -> void;
   auto handle_op_return() -> void;
 
   template <typename Op>
   auto handle_binary_op(Op op) -> void {
-    double const b = stack.top();
+    Common::Types::Value const b = stack.top();
     stack.pop();
 
-    double const a = stack.top();
+    Common::Types::Value const a = stack.top();
     stack.pop();
 
-    stack.push(op(a, b));
+    // stack.push(op(a, b));
   }
 
   IP ip;
-  std::stack<Value> stack;
+  std::stack<Common::Types::Value> stack;
 };
 
 }  // namespace LOX::ByteCode::VM

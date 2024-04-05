@@ -1,7 +1,5 @@
 #include "Scanner.hpp"
 
-#include <cassert>
-#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>

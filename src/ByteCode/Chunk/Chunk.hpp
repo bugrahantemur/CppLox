@@ -3,17 +3,17 @@
 
 #include <vector>
 
+#include "../../Common/Types/Value/Value.hpp"
 #include "../Common.hpp"
-#include "../Value/Value.hpp"
 
 namespace LOX::ByteCode {
 struct Chunk {
   std::vector<Byte> code{};
-  std::vector<Value> constants{};
+  std::vector<Common::Types::Value> constants{};
   std::vector<std::size_t> lines{};
 
   auto append_byte(Byte byte, std::size_t line) -> std::size_t;
-  auto append_constant(Value const& value) -> std::size_t;
+  auto append_constant(Common::Types::Value const& value) -> std::size_t;
 };
 
 }  // namespace LOX::ByteCode

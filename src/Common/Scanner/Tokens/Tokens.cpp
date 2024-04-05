@@ -37,7 +37,7 @@ auto match_keyword_token_type(std::string const& text)
 }
 
 [[nodiscard]] auto make_token(Cursor& cursor, TokenType token_type,
-                              Token::Literal const& literal = std::monostate{})
+                              Types::Value const& literal = std::monostate{})
     -> Token {
   std::string const text{cursor.peek_word()};
   return Token{token_type, text, literal, cursor.at_line(), cursor.index()};

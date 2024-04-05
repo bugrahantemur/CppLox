@@ -22,19 +22,17 @@ struct VariableStmt;
 struct WhileStmt;
 
 // Statement variant
-using Statement =
-    std::variant<std::monostate, Box<Statements::BlockStmt>,
-                 Box<Statements::ClassStmt>, Box<Statements::ExpressionStmt>,
-                 Box<Statements::FunctionStmt>, Box<Statements::IfStmt>,
-                 Box<Statements::PrintStmt>, Box<Statements::ReturnStmt>,
-                 Box<Statements::VariableStmt>, Box<Statements::WhileStmt>>;
+using Statement = std::variant<std::monostate, Box<BlockStmt>, Box<ClassStmt>,
+                               Box<ExpressionStmt>, Box<FunctionStmt>,
+                               Box<IfStmt>, Box<PrintStmt>, Box<ReturnStmt>,
+                               Box<VariableStmt>, Box<WhileStmt>>;
 
 struct BlockStmt {
   std::vector<Statement> statements;
 };
 
 struct ClassStmt {
-  LOX::Common::Types::Token name;
+  Token name;
   Expressions::VariableExpr super_class;
   std::vector<Box<FunctionStmt>> methods;
 };
@@ -44,8 +42,8 @@ struct ExpressionStmt {
 };
 
 struct FunctionStmt {
-  LOX::Common::Types::Token name;
-  std::vector<LOX::Common::Types::Token> params;
+  Token name;
+  std::vector<Token> params;
   std::vector<Statement> body;
 };
 
@@ -60,12 +58,12 @@ struct PrintStmt {
 };
 
 struct ReturnStmt {
-  LOX::Common::Types::Token keyword;
+  Token keyword;
   Expressions::Expression value;
 };
 
 struct VariableStmt {
-  LOX::Common::Types::Token name;
+  Token name;
   Expressions::Expression initializer;
 };
 

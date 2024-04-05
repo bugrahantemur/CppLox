@@ -10,12 +10,14 @@
 #include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../../Common/Types/Tokens/TokenTypes.hpp"
+#include "../../Common/Types/Value/Value.hpp"
 #include "../Chunk/Chunk.hpp"
 #include "../OpCode/OpCode.hpp"
 
 namespace LOX::ByteCode::Compiler {
 
 using LOX::Common::Types::Token;
+using LOX::Common::Types::Value;
 using LOX::Common::Types::Syntax::Statements::Statement;
 using LOX::Common::Types::Tokens::TokenType;
 using namespace LOX::Common::Types::Syntax::Expressions;
@@ -49,7 +51,9 @@ auto emit_constant(Chunk& chunk, Value const& value) -> void {
 struct ExpressionCompiler {
   auto operator()(std::monostate) -> void {}
 
-  auto operator()(Box<LiteralExpr> const& expr) -> void {}
+  auto operator()(Box<LiteralExpr> const& expr) -> void {
+    emit_constant(chunk, expr->value);
+  }
 
   auto operator()(Box<SuperExpr> const& expr) -> void {}
 

@@ -6,6 +6,7 @@
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
+#include "../../../Common/Types/Value/Value.hpp"
 
 namespace LOX::Common::Types::Syntax::Expressions {
 
@@ -24,33 +25,31 @@ struct UnaryExpr;
 struct VariableExpr;
 
 using Expression =
-    std::variant<std::monostate, Box<Expressions::AssignmentExpr>,
-                 Box<Expressions::BinaryExpr>, Box<Expressions::CallExpr>,
-                 Box<Expressions::GetExpr>, Box<Expressions::GroupingExpr>,
-                 Box<Expressions::LiteralExpr>, Box<Expressions::LogicalExpr>,
-                 Box<Expressions::SetExpr>, Box<Expressions::SuperExpr>,
-                 Box<Expressions::ThisExpr>, Box<Expressions::UnaryExpr>,
-                 Box<Expressions::VariableExpr>>;
+    std::variant<std::monostate, Box<AssignmentExpr>, Box<BinaryExpr>,
+                 Box<CallExpr>, Box<GetExpr>, Box<GroupingExpr>,
+                 Box<LiteralExpr>, Box<LogicalExpr>, Box<SetExpr>,
+                 Box<SuperExpr>, Box<ThisExpr>, Box<UnaryExpr>,
+                 Box<VariableExpr>>;
 
 struct AssignmentExpr {
-  LOX::Common::Types::Token name;
+  Token name;
   Expression value;
 };
 
 struct BinaryExpr {
   Expression left;
-  LOX::Common::Types::Token op;
+  Token op;
   Expression right;
 };
 
 struct CallExpr {
   Expression callee;
-  LOX::Common::Types::Token paren;
+  Token paren;
   std::vector<Expression> arguments;
 };
 
 struct GetExpr {
-  LOX::Common::Types::Token name;
+  Token name;
   Expression object;
 };
 
@@ -59,37 +58,37 @@ struct GroupingExpr {
 };
 
 struct LiteralExpr {
-  LOX::Common::Types::Token::Literal value;
+  Value value;
 };
 
 struct LogicalExpr {
   Expression left;
-  LOX::Common::Types::Token op;
+  Token op;
   Expression right;
 };
 
 struct SetExpr {
-  LOX::Common::Types::Token name;
+  Token name;
   Expression object;
   Expression value;
 };
 
 struct SuperExpr {
-  LOX::Common::Types::Token keyword;
-  LOX::Common::Types::Token method;
+  Token keyword;
+  Token method;
 };
 
 struct ThisExpr {
-  LOX::Common::Types::Token keyword;
+  Token keyword;
 };
 
 struct UnaryExpr {
-  LOX::Common::Types::Token op;
+  Token op;
   Expression right;
 };
 
 struct VariableExpr {
-  LOX::Common::Types::Token name;
+  Token name;
 };
 
 }  // namespace LOX::Common::Types::Syntax::Expressions

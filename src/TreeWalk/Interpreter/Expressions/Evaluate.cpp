@@ -98,15 +98,15 @@ struct ExpressionEvaluator {
     TokenType const& op_type{op.type};
 
     if (op_type == TokenType::MINUS) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) - std::get<double>(right);
     }
     if (op_type == TokenType::SLASH) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) / std::get<double>(right);
     }
     if (op_type == TokenType::STAR) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) * std::get<double>(right);
     }
     if (op_type == TokenType::PLUS) {
@@ -121,19 +121,19 @@ struct ExpressionEvaluator {
       throw Error{op.line, "Operands must be two numbers or two strings."};
     }
     if (op_type == TokenType::GREATER) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) > std::get<double>(right);
     }
     if (op_type == TokenType::GREATER_EQUAL) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) >= std::get<double>(right);
     }
     if (op_type == TokenType::LESS) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) < std::get<double>(right);
     }
     if (op_type == TokenType::LESS_EQUAL) {
-      Operands::check_number_operand(op, left, right);
+      Operands::check_number_operand(op.line, left, right);
       return std::get<double>(left) <= std::get<double>(right);
     }
     try {
@@ -222,7 +222,7 @@ struct ExpressionEvaluator {
     TokenType const& op_type{op.type};
 
     if (op_type == TokenType::MINUS) {
-      Utils::Operands::check_number_operand(op, right);
+      Utils::Operands::check_number_operand(op.line, right);
       return -std::get<double>(right);
     }
 

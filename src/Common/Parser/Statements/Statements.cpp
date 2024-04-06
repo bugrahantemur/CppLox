@@ -117,10 +117,11 @@ auto for_statement(Cursor& cursor) -> Statement {
 
   return BlockStmt{
       {initializer,
-       WhileStmt{std::holds_alternative<std::monostate>(condition)
-                     ? Types::Syntax::Expressions::LiteralExpr{true}
-                     : condition,
-                 BlockStmt{{body, ExpressionStmt{increment}}}}}};
+       WhileStmt{
+           std::holds_alternative<std::monostate>(condition)
+               ? Types::Syntax::Expressions::LiteralExpr{keyword.line, true}
+               : condition,
+           BlockStmt{{body, ExpressionStmt{increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {

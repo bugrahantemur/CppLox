@@ -19,19 +19,17 @@ using namespace LOX::Common::Types::Syntax::Expressions;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
-    cursor.take();
-    return LiteralExpr{false};
+    return LiteralExpr{cursor.take().line, false};
   }
   if (cursor.match(TokenType::TRUE)) {
-    cursor.take();
-    return LiteralExpr{true};
+    return LiteralExpr{cursor.take().line, true};
   }
   if (cursor.match(TokenType::NIL)) {
-    cursor.take();
-    return LiteralExpr{std::monostate{}};
+    return LiteralExpr{cursor.take().line, std::monostate{}};
   }
   if (cursor.match_any_of({TokenType::NUMBER, TokenType::STRING})) {
-    return LiteralExpr{cursor.take().literal};
+    Token const token{cursor.take()};
+    return LiteralExpr{token.line, token.literal};
   }
   if (cursor.match(TokenType::LEFT_PAREN)) {
     cursor.take();

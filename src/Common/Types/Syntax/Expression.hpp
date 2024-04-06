@@ -58,6 +58,7 @@ struct GroupingExpr {
 };
 
 struct LiteralExpr {
+  std::size_t line;
   Value value;
 };
 

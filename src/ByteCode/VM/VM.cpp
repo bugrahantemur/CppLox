@@ -51,11 +51,11 @@ class VirtualMachine {
 
   auto handle_op_negate() -> void {
     Value const value{stack.top()};
+    stack.pop();
+
     Common::Utils::Operands::check_number_operand<Error>(chunk.lines[ip],
                                                          value);
-    stack.pop();
     stack.push(-std::get<double>(value));
-    stack.push({});
   }
 
   auto handle_op_return() -> void {

@@ -24,6 +24,7 @@ class VirtualMachine {
       Byte const instruction{chunk.code[ip++]};
 
       if (instruction == OpCode::OP_CONSTANT) {
+        handle_op_constant();
       } else if (instruction == OpCode::OP_NEGATE) {
         handle_op_negate();
       } else if (instruction == OpCode::OP_ADD) {
@@ -43,9 +44,9 @@ class VirtualMachine {
   }
 
  private:
-  auto handle_op_constant(Value const& constant) -> void {
+  auto handle_op_constant() -> void {
     std::size_t const constant_idx{chunk.code[ip++]};
-    handle_op_constant(chunk.constants[constant_idx]);
+    stack.push(chunk.constants[constant_idx]);
   }
 
   auto handle_op_negate() -> void {

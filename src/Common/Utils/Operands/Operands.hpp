@@ -5,19 +5,19 @@
 #include <array>
 #include <variant>
 
-namespace LOX::TreeWalk::Interpreter::Utils::Operands {
+namespace LOX::Common::Utils::Operands {
 
-template <typename... Objs>
+template <typename Err, typename... Objs>
 auto check_number_operand(std::size_t line, Objs... operands) -> void {
   std::array const ops{operands...};
   if (std::all_of(std::begin(ops), std::end(ops), [](auto const& obj) {
         return !std::holds_alternative<double>(obj);
       })) {
-    throw Error{line, sizeof...(operands) > 1 ? "Operands must be numbers."
-                                              : "Operand must be a number."};
+    throw Err{line, sizeof...(operands) > 1 ? "Operands must be numbers."
+                                            : "Operand must be a number."};
   }
 }
 
-}  // namespace LOX::TreeWalk::Interpreter::Utils::Operands
+}  // namespace LOX::Common::Utils::Operands
 
 #endif

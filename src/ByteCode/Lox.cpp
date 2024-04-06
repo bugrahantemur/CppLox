@@ -8,17 +8,14 @@
 
 namespace LOX::ByteCode {
 
-static void run_file(std::string const& path) {
-  std::string const source = Common::Reader::read(path);
-
-  VM::VirtualMachine vm{};
-
-  Chunk chunk{Compiler::compile(source)};
-
-  VM::InterpretResult result = vm.interpret(source);
-
-  if (result == VM::InterpretResult::COMPILE_ERROR) exit(65);
-  if (result == VM::InterpretResult::RUNTIME_ERROR) exit(70);
+static auto run_file(std::string const& path) -> void {
+  try {
+    std::string const source = Common::Reader::read(path);
+    Chunk const chunk{Compiler::compile(source)};
+    VM::interpret(chunk);
+  } catch (...) {
+    std::exit(1);
+  }
 }
 
 }  // namespace LOX::ByteCode

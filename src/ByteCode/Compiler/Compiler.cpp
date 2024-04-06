@@ -44,15 +44,16 @@ auto make_constant(Chunk& chunk, Value const& value) -> Byte {
   return static_cast<Byte>(const_idx);
 }
 
-auto emit_constant(Chunk& chunk, Value const& value) -> void {
-  emit_bytes(chunk, OpCode::OP_CONSTANT, 0, make_constant(chunk, value), 0);
+auto emit_constant(Chunk& chunk, Value const& value, std::size_t line) -> void {
+  emit_bytes(chunk, OpCode::OP_CONSTANT, line, make_constant(chunk, value),
+             line);
 }
 
 struct ExpressionCompiler {
   auto operator()(std::monostate) -> void {}
 
   auto operator()(Box<LiteralExpr> const& expr) -> void {
-    emit_constant(chunk, expr->value);
+    emit_constant(chunk, expr->value, expr->line);
   }
 
   auto operator()(Box<SuperExpr> const& expr) -> void {}
@@ -120,10 +121,6 @@ struct StatementCompiler {
 
   Chunk& chunk;
 };
-
-auto number(Chunk& chunk, Value const& value) -> void {
-  emit_constant(chunk, value);
-}
 
 auto compile(std::string const& source) -> Chunk {
   std::vector<Token> const tokens = Common::Scanner::scan(source);

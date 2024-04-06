@@ -48,6 +48,7 @@ set(BYTECODE_SRC
   ${COMMON_SRC}
   "src/ByteCode/Lox.cpp"
   "src/ByteCode/VM/VM.cpp"
+  "src/ByteCode/VM/Error/Error.cpp"
   "src/ByteCode/Debug/Debug.cpp"
   "src/ByteCode/Compiler/Compiler.cpp"
   "src/ByteCode/Chunk/Chunk.cpp"

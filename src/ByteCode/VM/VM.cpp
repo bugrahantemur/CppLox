@@ -2,88 +2,85 @@
 
 #include <functional>
 #include <iostream>
+#include <stack>
 #include <vector>
 
+#include "../../Common/Utils/Operands/Operands.hpp"
 #include "../Common.hpp"
-#include "../Compiler/Compiler.hpp"
 #include "../Debug/Debug.hpp"
 #include "../OpCode/OpCode.hpp"
+#include "./Error/Error.hpp"
 
 namespace LOX::ByteCode::VM {
 
 using LOX::Common::Types::Value;
 
-VirtualMachine::VirtualMachine() {}
-VirtualMachine::~VirtualMachine() {}
+class VirtualMachine {
+ public:
+  VirtualMachine(Chunk const& chunk) : ip{0}, stack{}, chunk{chunk} {}
 
-auto VirtualMachine::handle_op_constant(Value const& constant) -> void {
-  stack.push(constant);
-}
+  auto run() -> void {
+    while (ip < chunk.code.size()) {
+      Byte const instruction{chunk.code[ip++]};
 
-auto VirtualMachine::handle_op_negate() -> void {
-  // Value const value{-stack.top()};
-  stack.pop();
-  // stack.push(value);
-  stack.push({});
-}
-
-auto VirtualMachine::handle_op_return() -> void {
-  Value const value{stack.top()};
-  stack.pop();
-  // std::cout << value << '\n';
-}
-
-auto VirtualMachine::run(Chunk const& chunk) -> InterpretResult {
-  while (ip != chunk.code.end()) {
-#ifdef DEBUG_TRACE_EXECUTION
-    std::cout << "          ";
-    auto debug_stack = stack;
-    std::vector<Value> debug_vector;
-    while (!debug_stack.empty()) {
-      debug_vector.push_back(debug_stack.top());
-      debug_stack.pop();
-    }
-    for (Value const& value : debug_vector) {
-      std::cout << "[ " << value << " ]\n";
-    }
-    disassemble_instruction(chunk, std::distance(chunk.code.cbegin(), ip));
-#endif
-
-    Byte const instruction{*ip++};
-
-    switch (instruction) {
-      case OpCode::OP_CONSTANT:
-        handle_op_constant(chunk.constants[*ip++]);
-        break;
-      case OpCode::OP_NEGATE:
+      if (instruction == OpCode::OP_CONSTANT) {
+      } else if (instruction == OpCode::OP_NEGATE) {
         handle_op_negate();
-        break;
-      case OpCode::OP_ADD:
+      } else if (instruction == OpCode::OP_ADD) {
         handle_binary_op(std::plus<>{});
-        break;
-      case OpCode::OP_SUBTRACT:
+      } else if (instruction == OpCode::OP_SUBTRACT) {
         handle_binary_op(std::minus<>{});
-        break;
-      case OpCode::OP_MULTIPLY:
+      } else if (instruction == OpCode::OP_MULTIPLY) {
         handle_binary_op(std::multiplies<>{});
-        break;
-      case OpCode::OP_DIVIDE:
+      } else if (instruction == OpCode::OP_DIVIDE) {
         handle_binary_op(std::divides<>{});
-        break;
-      case OpCode::OP_RETURN:
+      } else if (instruction == OpCode::OP_RETURN) {
         handle_op_return();
-        break;
-      default:
-        return InterpretResult::OK;
+      } else {
+        //
+      }
     }
   }
-  return InterpretResult::OK;
+
+ private:
+  auto handle_op_constant(Value const& constant) -> void {
+    std::size_t const constant_idx{chunk.code[ip++]};
+    handle_op_constant(chunk.constants[constant_idx]);
+  }
+
+  auto handle_op_negate() -> void {
+    Value const value{stack.top()};
+    Common::Utils::Operands::check_number_operand<Error>(chunk.lines[ip],
+                                                         value);
+    stack.pop();
+    stack.push(-std::get<double>(value));
+    stack.push({});
+  }
+
+  auto handle_op_return() -> void {
+    Value const value{stack.top()};
+    stack.pop();
+  }
+
+  template <typename Op>
+  auto handle_binary_op(Op op) -> void {
+    Common::Types::Value const b = stack.top();
+    stack.pop();
+
+    Common::Types::Value const a = stack.top();
+    stack.pop();
+
+    // stack.push(op(a, b));
+  }
+
+  std::size_t ip;
+  std::stack<Common::Types::Value> stack;
+
+  Chunk const& chunk;
+};
+
+auto interpret(Chunk const& chunk) -> void {
+  VirtualMachine vm{chunk};
+  vm.run();
 }
-
-auto VirtualMachine::interpret(std::string const& source) -> InterpretResult {
-  Compiler::compile(source);
-
-  return InterpretResult::OK;
-}
-
 }  // namespace LOX::ByteCode::VM

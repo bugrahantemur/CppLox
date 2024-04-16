@@ -1,13 +1,11 @@
 #include "./VM.hpp"
 
 #include <functional>
-#include <iostream>
 #include <stack>
 #include <vector>
 
 #include "../../Common/Utils/Operands/Operands.hpp"
 #include "../Common.hpp"
-#include "../Debug/Debug.hpp"
 #include "../OpCode/OpCode.hpp"
 #include "./Error/Error.hpp"
 

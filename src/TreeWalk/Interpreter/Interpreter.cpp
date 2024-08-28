@@ -1,25 +1,17 @@
 #include "./Interpreter.hpp"
 
-#include <chrono>
-#include <concepts>
-#include <iostream>
-#include <string>
-#include <variant>
+#include <vector>
 
 #include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
-#include "../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
-#include "../../Common/Types/Syntax/Expression.hpp"
 #include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../Builtins/Builtins.hpp"
 #include "../Types/Environment/Environment.hpp"
 #include "../Types/Objects/Object.hpp"
-#include "./Error/Error.hpp"
 #include "./Statements/Execute.hpp"
 
 namespace LOX::TreeWalk::Interpreter {
 
-using namespace LOX::Common::Types::Syntax::Expressions;
 using namespace LOX::Common::Types::Syntax::Statements;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;

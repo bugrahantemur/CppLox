@@ -10,16 +10,19 @@ namespace LOX::TreeWalk::Interpreter::Statements {
 
 template <typename OStream>
 struct Put {
-  Put(OStream& out) : out{out} {}
+  explicit Put(OStream& out) : out{out} {}
 
-  auto operator()(std::monostate) -> OStream& { return put("nil"); }
+  auto operator()(std::monostate none) -> OStream& {
+    (void)none;
+    return put("nil");
+  }
 
   auto operator()(std::string const& str) -> OStream& { return put(str); }
 
   auto operator()(double const number) -> OStream& { return put(number); }
 
-  auto operator()(bool const b) -> OStream& {
-    return b ? put("true") : put("false");
+  auto operator()(bool const val) -> OStream& {
+    return val ? put("true") : put("false");
   }
 
   auto operator()(Box<Types::Objects::LoxFunction> const& func) -> OStream& {

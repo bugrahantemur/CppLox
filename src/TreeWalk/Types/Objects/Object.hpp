@@ -49,8 +49,21 @@ struct LoxInstance {
 
 namespace Builtins {
 struct FunctionInterface {
-  virtual auto arity() const -> std::size_t = 0;
-  virtual auto to_string() const -> std::string = 0;
+  FunctionInterface() = default;
+
+  virtual ~FunctionInterface() = default;
+
+  FunctionInterface(FunctionInterface const& other) = default;
+  auto operator=(FunctionInterface const& other)
+      -> FunctionInterface& = default;
+
+  FunctionInterface(FunctionInterface&& other) = default;
+  auto operator=(FunctionInterface&& other) -> FunctionInterface& = default;
+
+  [[nodiscard]] virtual auto arity() const -> std::size_t = 0;
+
+  [[nodiscard]] virtual auto to_string() const -> std::string = 0;
+
   virtual auto operator()(Arc<Types::Environment> const& environment,
                           std::unordered_map<LOX::Common::Types::Token,
                                              std::size_t> const& resolution,

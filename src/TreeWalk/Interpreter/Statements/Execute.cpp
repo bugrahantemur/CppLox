@@ -7,12 +7,12 @@
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../../Common/Types/Syntax/Statement.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
+#include "../../../Common/Utils/Truth/Truth.hpp"
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../Error/Error.hpp"
 #include "../Expressions/Evaluate.hpp"
 #include "../Utils/Return/Return.hpp"
-#include "../Utils/Truth/Truth.hpp"
 #include "./Put/Put.hpp"
 
 namespace LOX::TreeWalk::Interpreter::Statements {
@@ -106,7 +106,7 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<IfStmt> const& stmt) -> void {
-    if (Utils::is_truthy(
+    if (Common::Utils::is_truthy(
             Expressions::evaluate(stmt->condition, environment, resolution))) {
       std::visit(*this, stmt->then_branch);
     } else {
@@ -115,7 +115,7 @@ struct StatementExecutor {
   }
 
   auto operator()(Box<WhileStmt> const& stmt) -> void {
-    while (Utils::is_truthy(
+    while (Common::Utils::is_truthy(
         Expressions::evaluate(stmt->condition, environment, resolution))) {
       std::visit(*this, stmt->body);
     }

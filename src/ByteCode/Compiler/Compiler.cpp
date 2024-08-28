@@ -45,24 +45,32 @@ auto make_constant(Chunk& chunk, Value const& value) -> Byte {
 }
 
 auto emit_constant(Chunk& chunk, Value const& value, std::size_t line) -> void {
-  emit_bytes(chunk, OpCode::OP_CONSTANT, line, make_constant(chunk, value),
-             line);
+  emit_bytes(chunk, OpCode::CONSTANT, line, make_constant(chunk, value), line);
 }
 
 struct ExpressionCompiler {
-  auto operator()(std::monostate) -> void {}
+  auto operator()(std::monostate none) -> void { (void)none; }
 
   auto operator()(Box<LiteralExpr> const& expr) -> void {
-    emit_constant(chunk, expr->value, expr->line);
+    if (auto const* nil{std::get_if<std::monostate>(&expr->value)}) {
+      emit_byte(chunk, OpCode::NIL, expr->line);
+
+    } else if (auto const* boolean{std::get_if<bool>(&expr->value)}) {
+      *boolean ? emit_byte(chunk, OpCode::TRUE, expr->line)
+               : emit_byte(chunk, OpCode::FALSE, expr->line);
+
+    } else {
+      emit_constant(chunk, expr->value, expr->line);
+    }
   }
 
-  auto operator()(Box<SuperExpr> const& expr) -> void {}
+  auto operator()(Box<SuperExpr> const& expr) -> void { (void)expr; }
 
-  auto operator()(Box<ThisExpr> const& expr) -> void {}
+  auto operator()(Box<ThisExpr> const& expr) -> void { (void)expr; }
 
-  auto operator()(Box<VariableExpr> const& expr) -> void {}
+  auto operator()(Box<VariableExpr> const& expr) -> void { (void)expr; }
 
-  auto operator()(Box<AssignmentExpr> const& expr) -> void {}
+  auto operator()(Box<AssignmentExpr> const& expr) -> void { (void)expr; }
 
   auto operator()(Box<BinaryExpr> const& expr) -> void {
     // Compile the operands
@@ -74,28 +82,64 @@ struct ExpressionCompiler {
     TokenType const op_type{op.type};
     std::size_t const op_line{op.line};
 
-    if (op_type == TokenType::PLUS) {
-      emit_byte(chunk, OpCode::OP_ADD, op_line);
-    } else if (op_type == TokenType::MINUS) {
-      emit_byte(chunk, OpCode::OP_SUBTRACT, op_line);
-    } else if (op_type == TokenType::STAR) {
-      emit_byte(chunk, OpCode::OP_MULTIPLY, op_line);
-    } else if (op_type == TokenType::SLASH) {
-      emit_byte(chunk, OpCode::OP_DIVIDE, op_line);
+    switch (op_type) {
+      case TokenType::PLUS:
+        emit_byte(chunk, OpCode::ADD, op_line);
+        break;
+
+      case TokenType::MINUS:
+        emit_byte(chunk, OpCode::SUBTRACT, op_line);
+        break;
+
+      case TokenType::STAR:
+        emit_byte(chunk, OpCode::MULTIPLY, op_line);
+        break;
+
+      case TokenType::SLASH:
+        emit_byte(chunk, OpCode::DIVIDE, op_line);
+        break;
+
+      case TokenType::EQUAL_EQUAL:
+        emit_byte(chunk, OpCode::EQUAL, op_line);
+        break;
+
+      case TokenType::BANG_EQUAL:
+        emit_byte(chunk, OpCode::NOT_EQUAL, op_line);
+        break;
+
+      case TokenType::LESS:
+        emit_byte(chunk, OpCode::LESS, op_line);
+        break;
+
+      case TokenType::LESS_EQUAL:
+        emit_byte(chunk, OpCode::LESS_EQUAL, op_line);
+        break;
+
+      case TokenType::GREATER:
+        emit_byte(chunk, OpCode::GREATER, op_line);
+        break;
+
+      case TokenType::GREATER_EQUAL:
+        emit_byte(chunk, OpCode::GREATER_EQUAL, op_line);
+        break;
+
+      default:
+        // Handle unexpected cases
+        break;
     }
   }
 
-  auto operator()(Box<CallExpr> const& expr) -> void {}
+  auto operator()(Box<CallExpr> const& expr) -> void { (void)expr; }
 
-  auto operator()(Box<GetExpr> const& expr) -> void {}
+  auto operator()(Box<GetExpr> const& expr) -> void { (void)expr; }
 
   auto operator()(Box<GroupingExpr> const& expr) -> void {
     std::visit(*this, expr->expression);
   }
 
-  auto operator()(Box<LogicalExpr> const& expr) -> void {}
+  auto operator()(Box<LogicalExpr> const& expr) -> void { (void)expr; }
 
-  auto operator()(Box<SetExpr> const& expr) -> void {}
+  auto operator()(Box<SetExpr> const& expr) -> void { (void)expr; }
 
   auto operator()(Box<UnaryExpr> const& expr) -> void {
     // Compile the operand
@@ -106,9 +150,9 @@ struct ExpressionCompiler {
     TokenType const op_type{op.type};
 
     if (op_type == TokenType::MINUS) {
-      emit_byte(chunk, OpCode::OP_NEGATE, expr->op.line);
+      emit_byte(chunk, OpCode::NEGATE, expr->op.line);
     } else if (op_type == TokenType::BANG) {
-      // Pass
+      emit_byte(chunk, OpCode::NOT, expr->op.line);
     }
   }
 

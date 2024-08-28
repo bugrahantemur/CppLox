@@ -9,10 +9,10 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../../../Common/Utils/Operands/Operands.hpp"
+#include "../../../Common/Utils/Truth/Truth.hpp"
 #include "../../Types/Environment/Environment.hpp"
 #include "../../Types/Objects/Object.hpp"
 #include "../Error/Error.hpp"
-#include "../Utils/Truth/Truth.hpp"
 #include "./Call/Call.hpp"
 #include "./Class/Class.hpp"
 #include "./Equality/Equality.hpp"
@@ -23,7 +23,6 @@ using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 using namespace LOX::Common::Types::Syntax::Expressions;
 
-using namespace LOX::TreeWalk::Interpreter::Utils;
 using namespace LOX::TreeWalk::Types::Objects;
 using LOX::TreeWalk::Types::Environment;
 
@@ -31,9 +30,7 @@ struct ExpressionEvaluator {
   Arc<Environment> environment;
   std::unordered_map<Token, std::size_t> const& resolution;
 
-  [[nodiscard]] auto operator()(std::monostate) -> Object {
-    return std::monostate{};
-  }
+  [[nodiscard]] auto operator()(std::monostate none) -> Object { return none; }
 
   [[nodiscard]] auto operator()(Box<LiteralExpr> const& expr) -> Object {
     return std::visit([](auto const& value) -> Object { return value; },
@@ -72,9 +69,9 @@ struct ExpressionEvaluator {
         found != resolution.end()) {
       std::size_t const distance = found->second;
       return environment->get_at(expr->name.lexeme, distance);
-    } else {
-      throw Error{expr->name.line, expr->name.lexeme + " is not defined"};
     }
+
+    throw Error{expr->name.line, expr->name.lexeme + " is not defined"};
   }
 
   [[nodiscard]] auto operator()(Box<AssignmentExpr> const& expr) -> Object {
@@ -199,11 +196,11 @@ struct ExpressionEvaluator {
     Object const left{std::visit(*this, expr->left)};
 
     if (expr->op.type == TokenType::OR) {
-      if (Utils::is_truthy(left)) {
+      if (Common::Utils::is_truthy(left)) {
         return left;
       }
     } else {
-      if (!Utils::is_truthy(left)) {
+      if (!Common::Utils::is_truthy(left)) {
         return left;
       }
     }
@@ -213,7 +210,7 @@ struct ExpressionEvaluator {
   [[nodiscard]] auto operator()(Box<SetExpr> const& expr) -> Object {
     Object obj{std::visit(*this, expr->object)};
 
-    if (auto const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
+    if (auto* const instance{std::get_if<Arc<LoxInstance>>(&obj)}) {
       Object const value{std::visit(*this, expr->value)};
       Class::set(*instance, expr->name, value);
 
@@ -234,7 +231,7 @@ struct ExpressionEvaluator {
     }
 
     if (op_type == TokenType::BANG) {
-      return !is_truthy(right);
+      return !Common::Utils::is_truthy(right);
     }
 
     return std::monostate{};

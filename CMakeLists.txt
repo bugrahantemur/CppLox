@@ -28,6 +28,7 @@ set(COMMON_SRC
   "src/Common/Scanner/Tokens/Tokens.cpp"
   "src/Common/Types/Tokens/Token.cpp"
 )
+
 set(TREEWALK_SRC
   ${COMMON_SRC}
   "src/TreeWalk/Lox.cpp"
@@ -39,17 +40,16 @@ set(TREEWALK_SRC
   "src/TreeWalk/Interpreter/Expressions/Class/Class.cpp"
   "src/TreeWalk/Interpreter/Expressions/Evaluate.cpp"
   "src/TreeWalk/Interpreter/Error/Error.cpp"
-  "src/TreeWalk/Interpreter/Utils/Truth/Truth.cpp"
   "src/TreeWalk/Resolver/Resolver.cpp"
   "src/TreeWalk/Resolver/Error/Error.cpp"
   "src/TreeWalk/Types/Environment/Environment.cpp"
 )
+
 set(BYTECODE_SRC
   ${COMMON_SRC}
   "src/ByteCode/Lox.cpp"
   "src/ByteCode/VM/VM.cpp"
   "src/ByteCode/VM/Error/Error.cpp"
-  "src/ByteCode/Debug/Debug.cpp"
   "src/ByteCode/Compiler/Compiler.cpp"
   "src/ByteCode/Chunk/Chunk.cpp"
 )

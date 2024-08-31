@@ -8,7 +8,7 @@
 #include "../../../Common/Types/Tokens/Token.hpp"
 
 namespace LOX::TreeWalk::Types {
-struct Environment;
+class Environment;
 }
 
 namespace LOX::TreeWalk::Interpreter::Statements {

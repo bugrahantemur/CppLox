@@ -1,7 +1,7 @@
 #include "./Class.hpp"
 
+#include "../../../../Common/Types/Objects/Object.hpp"
 #include "../../../Types/Environment/Environment.hpp"
-#include "../../../Types/Objects/Object.hpp"
 #include "../../Error/Error.hpp"
 
 namespace LOX::TreeWalk::Interpreter::Expressions::Class {
@@ -9,7 +9,8 @@ namespace LOX::TreeWalk::Interpreter::Expressions::Class {
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Objects;
+using namespace LOX::Common::Types::Objects;
+using LOX::Common::Types::Object;
 using LOX::TreeWalk::Types::Environment;
 
 auto get(Arc<LoxInstance> const& instance, Token const& token) -> Object {

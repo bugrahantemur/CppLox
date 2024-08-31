@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../Common/Types/Objects/Object.hpp"
 #include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../Builtins/Builtins.hpp"
 #include "../Types/Environment/Environment.hpp"
-#include "../Types/Objects/Object.hpp"
 #include "./Statements/Execute.hpp"
 
 namespace LOX::TreeWalk::Interpreter {
@@ -16,7 +16,6 @@ using namespace LOX::Common::Types::Syntax::Statements;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Objects;
 using LOX::TreeWalk::Types::Environment;
 
 auto make_preamble_environment() -> Arc<Environment> {

@@ -5,15 +5,15 @@
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../Common/Types/Objects/Object.hpp"
 #include "../../../Common/Types/Syntax/Statement.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
+#include "../../../Common/Utils/Put/Put.hpp"
 #include "../../../Common/Utils/Truth/Truth.hpp"
 #include "../../Types/Environment/Environment.hpp"
-#include "../../Types/Objects/Object.hpp"
 #include "../Error/Error.hpp"
 #include "../Expressions/Evaluate.hpp"
 #include "../Utils/Return/Return.hpp"
-#include "./Put/Put.hpp"
 
 namespace LOX::TreeWalk::Interpreter::Statements {
 
@@ -22,7 +22,8 @@ using namespace LOX::Common::Types::Syntax::Expressions;
 using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Objects;
+using namespace LOX::Common::Types::Objects;
+using LOX::Common::Types::Object;
 using LOX::TreeWalk::Types::Environment;
 
 struct StatementExecutor {
@@ -39,7 +40,7 @@ struct StatementExecutor {
   auto operator()(Box<PrintStmt> const& stmt) -> void {
     Object const value{
         Expressions::evaluate(stmt->expression, environment, resolution)};
-    std::visit(Put{std::cout}, value);
+    std::visit(Common::Utils::Put{std::cout}, value);
   }
 
   auto operator()(Box<ReturnStmt> const& stmt) -> void {

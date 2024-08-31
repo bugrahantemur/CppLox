@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
-#include "../Objects/Object.hpp"
+#include "../../../Common/Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Types {
 
@@ -19,21 +19,24 @@ class Environment {
 
   Environment();
 
-  auto define(std::string const& name, Objects::Object const& value) -> void;
+  auto define(std::string const& name, Common::Types::Object const& value)
+      -> void;
 
-  auto get_at(std::string const& name, std::size_t distance) -> Objects::Object;
+  auto get_at(std::string const& name, std::size_t distance)
+      -> Common::Types::Object;
 
-  auto get(std::string const& name) -> Objects::Object;
+  auto get(std::string const& name) -> Common::Types::Object;
 
-  auto assign_at(std::string const& name, Objects::Object const& value,
+  auto assign_at(std::string const& name, Common::Types::Object const& value,
                  std::size_t distance) -> void;
 
-  auto assign(std::string const& name, Objects::Object const& value) -> void;
+  auto assign(std::string const& name, Common::Types::Object const& value)
+      -> void;
 
  private:
   auto ancestor(std::size_t distance) -> Environment*;
 
-  std::unordered_map<std::string, Objects::Object> map;
+  std::unordered_map<std::string, Common::Types::Object> map;
 };
 
 }  // namespace LOX::TreeWalk::Types

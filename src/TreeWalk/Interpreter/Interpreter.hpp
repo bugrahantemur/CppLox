@@ -7,10 +7,9 @@
 #include "../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
-#include "../Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Types {
-struct Environment;
+class Environment;
 }
 
 namespace LOX::TreeWalk::Interpreter {

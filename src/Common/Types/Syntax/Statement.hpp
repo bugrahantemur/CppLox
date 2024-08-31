@@ -2,6 +2,7 @@
 #ifndef LOX_TREEWALK_TYPES_SYNTAX_STATEMENT
 #define LOX_TREEWALK_TYPES_SYNTAX_STATEMENT
 
+#include <cstddef>
 #include <variant>
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
@@ -28,6 +29,7 @@ using Statement = std::variant<std::monostate, Box<BlockStmt>, Box<ClassStmt>,
                                Box<VariableStmt>, Box<WhileStmt>>;
 
 struct BlockStmt {
+  Token beginning;
   std::vector<Statement> statements;
 };
 
@@ -38,6 +40,7 @@ struct ClassStmt {
 };
 
 struct ExpressionStmt {
+  Token ending;
   Expressions::Expression expression;
 };
 
@@ -48,12 +51,14 @@ struct FunctionStmt {
 };
 
 struct IfStmt {
+  Token keyword;
   Expressions::Expression condition;
   Statement then_branch;
   Statement else_branch;
 };
 
 struct PrintStmt {
+  Token keyword;
   Expressions::Expression expression;
 };
 
@@ -68,6 +73,7 @@ struct VariableStmt {
 };
 
 struct WhileStmt {
+  Token keyword;
   Expressions::Expression condition;
   Statement body;
 };

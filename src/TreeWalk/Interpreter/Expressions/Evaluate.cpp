@@ -5,13 +5,13 @@
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../Common/Types/Objects/Object.hpp"
 #include "../../../Common/Types/Syntax/Expression.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
 #include "../../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../../../Common/Utils/Operands/Operands.hpp"
 #include "../../../Common/Utils/Truth/Truth.hpp"
 #include "../../Types/Environment/Environment.hpp"
-#include "../../Types/Objects/Object.hpp"
 #include "../Error/Error.hpp"
 #include "./Call/Call.hpp"
 #include "./Class/Class.hpp"
@@ -23,7 +23,8 @@ using namespace LOX::Common::Types::Tokens;
 using LOX::Common::Types::Token;
 using namespace LOX::Common::Types::Syntax::Expressions;
 
-using namespace LOX::TreeWalk::Types::Objects;
+using namespace LOX::Common::Types::Objects;
+using LOX::Common::Types::Object;
 using LOX::TreeWalk::Types::Environment;
 
 struct ExpressionEvaluator {
@@ -240,7 +241,7 @@ struct ExpressionEvaluator {
 
 auto evaluate(Expression const& expression, Arc<Environment> environment,
               std::unordered_map<Token, std::size_t> const& resolution)
-    -> Types::Objects::Object {
+    -> Common::Types::Object {
   return std::visit(ExpressionEvaluator{environment, resolution}, expression);
 }
 

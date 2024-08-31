@@ -1,7 +1,5 @@
 #include "./Statements.hpp"
 
-#include <iostream>
-
 #include "../../../Common/Error/Report/Report.hpp"
 #include "../../../Common/Parser/Cursor/Cursor.hpp"
 #include "../../../Common/Parser/Error/Error.hpp"
@@ -23,25 +21,24 @@ using namespace LOX::Common::Types::Syntax::Expressions;
 auto print_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type == TokenType::PRINT);
-  static_cast<void>(keyword);
 
   Expression const value{Expressions::expression(cursor)};
 
   cursor.consume(TokenType::SEMICOLON, "Expect ';' after value.");
 
-  return PrintStmt{value};
+  return PrintStmt{keyword, value};
 }
 
 auto expression_statement(Cursor& cursor) -> Statement {
   Expression const expr{Expressions::expression(cursor)};
-  cursor.consume(TokenType::SEMICOLON, "Expect ';' after expression.");
-  return ExpressionStmt{expr};
+  auto const semicolon{
+      cursor.consume(TokenType::SEMICOLON, "Expect ';' after expression.")};
+  return ExpressionStmt{semicolon, expr};
 }
 
 auto block_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type == TokenType::LEFT_BRACE);
-  static_cast<void>(keyword);
 
   std::vector<Statement> statements{};
 
@@ -51,13 +48,12 @@ auto block_statement(Cursor& cursor) -> Statement {
 
   cursor.consume(TokenType::RIGHT_BRACE, "Expect '}' to close a block.");
 
-  return BlockStmt{statements};
+  return BlockStmt{keyword, statements};
 }
 
 auto if_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type == TokenType::IF);
-  static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
   Expression const condition{Expressions::expression(cursor)};
@@ -71,25 +67,23 @@ auto if_statement(Cursor& cursor) -> Statement {
     else_branch = statement(cursor);
   }
 
-  return IfStmt{condition, then_branch, else_branch};
+  return IfStmt{keyword, condition, then_branch, else_branch};
 }
 
 auto while_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type == TokenType::WHILE);
-  static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
   Expression const condition{Expressions::expression(cursor)};
   cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
 
-  return WhileStmt{condition, statement(cursor)};
+  return WhileStmt{keyword, condition, statement(cursor)};
 }
 
 auto for_statement(Cursor& cursor) -> Statement {
   Token const keyword{cursor.take()};
   assert(keyword.type == TokenType::FOR);
-  static_cast<void>(keyword);
 
   cursor.consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
 
@@ -106,22 +100,27 @@ auto for_statement(Cursor& cursor) -> Statement {
   if (!cursor.match(TokenType::SEMICOLON)) {
     condition = Expressions::expression(cursor);
   }
-  cursor.consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+  Token const semicolon{
+      cursor.consume(TokenType::SEMICOLON, "Expect ';' after loop condition.")};
 
   Expression const increment{cursor.match(TokenType::RIGHT_PAREN)
                                  ? std::monostate{}
                                  : Expressions::expression(cursor)};
-  cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+  Token const right_paren{
+      cursor.consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.")};
 
   Statement const body{statement(cursor)};
 
   return BlockStmt{
+      keyword,
       {initializer,
        WhileStmt{
+           keyword,
            std::holds_alternative<std::monostate>(condition)
                ? Types::Syntax::Expressions::LiteralExpr{keyword.line, true}
                : condition,
-           BlockStmt{{body, ExpressionStmt{increment}}}}}};
+           BlockStmt{right_paren,
+                     {body, ExpressionStmt{right_paren, increment}}}}}};
 }
 
 auto return_statement(Cursor& cursor) -> Statement {

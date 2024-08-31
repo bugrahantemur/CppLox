@@ -1,5 +1,5 @@
-#ifndef LOX_TREEWALK_TYPES_OBJECT
-#define LOX_TREEWALK_TYPES_OBJECT
+#ifndef LOX_COMMON_TYPES_OBJECT
+#define LOX_COMMON_TYPES_OBJECT
 
 #include <optional>
 #include <string>
@@ -12,10 +12,30 @@
 #include "../../../Common/Types/Syntax/Statement.hpp"
 
 namespace LOX::TreeWalk::Types {
-struct Environment;
+class Environment;
 }
 
-namespace LOX::TreeWalk::Types::Objects {
+namespace LOX::Common::Types::Objects {
+
+struct LoxFunction;
+struct LoxClass;
+struct LoxInstance;
+
+namespace Builtins {
+struct FunctionInterface;
+}
+}  // namespace LOX::Common::Types::Objects
+
+namespace LOX::Common::Types {
+
+using Object = std::variant<std::monostate, bool, double, std::string,
+                            Box<Objects::LoxFunction>, Box<Objects::LoxClass>,
+                            Arc<Objects::LoxInstance>,
+                            ArcDyn<Objects::Builtins::FunctionInterface>>;
+
+}
+
+namespace LOX::Common::Types::Objects {
 
 struct LoxFunction;
 struct LoxClass;
@@ -25,14 +45,9 @@ namespace Builtins {
 struct FunctionInterface;
 }
 
-using Object = std::variant<std::monostate, bool, double, std::string,
-                            Box<Objects::LoxFunction>, Box<Objects::LoxClass>,
-                            Arc<Objects::LoxInstance>,
-                            ArcDyn<Objects::Builtins::FunctionInterface>>;
-
 struct LoxFunction {
   Common::Types::Syntax::Statements::FunctionStmt declaration;
-  Arc<Environment> closure;
+  Arc<TreeWalk::Types::Environment> closure;
   bool is_initializer;
 };
 
@@ -48,6 +63,7 @@ struct LoxInstance {
 };
 
 namespace Builtins {
+
 struct FunctionInterface {
   FunctionInterface() = default;
 
@@ -64,7 +80,7 @@ struct FunctionInterface {
 
   [[nodiscard]] virtual auto to_string() const -> std::string = 0;
 
-  virtual auto operator()(Arc<Types::Environment> const& environment,
+  virtual auto operator()(Arc<TreeWalk::Types::Environment> const& environment,
                           std::unordered_map<LOX::Common::Types::Token,
                                              std::size_t> const& resolution,
                           std::vector<Object> const& args) const -> Object = 0;
@@ -72,6 +88,6 @@ struct FunctionInterface {
 
 }  // namespace Builtins
 
-}  // namespace LOX::TreeWalk::Types::Objects
+}  // namespace LOX::Common::Types::Objects
 
 #endif

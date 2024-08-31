@@ -1,11 +1,9 @@
 #include "./Call.hpp"
 
-#include <exception>
-
 #include "../../../../../submodules/RustyPtr/include/RustyPtr/ArcDyn.hpp"
 #include "../../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../../../Common/Types/Objects/Object.hpp"
 #include "../../../Types/Environment/Environment.hpp"
-#include "../../../Types/Objects/Object.hpp"
 #include "../../Interpreter.hpp"
 #include "../../Utils/Return/Return.hpp"
 
@@ -13,7 +11,8 @@ namespace LOX::TreeWalk::Interpreter::Expressions {
 
 using LOX::Common::Types::Token;
 
-using namespace LOX::TreeWalk::Types::Objects;
+using namespace LOX::Common::Types::Objects;
+using LOX::Common::Types::Object;
 using LOX::TreeWalk::Types::Environment;
 
 struct Arity {
@@ -36,6 +35,7 @@ struct Arity {
 
   template <typename T>
   auto operator()(T const& t) -> std::size_t {
+    (void)t;
     throw UncallableError{};
   }
 };

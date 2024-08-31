@@ -1,12 +1,12 @@
-#ifndef LOX_TREEWALK_INTERPRETER_STATEMENTS_PUT
-#define LOX_TREEWALK_INTERPRETER_STATEMENTS_PUT
+#ifndef LOX_COMMON_UTILS_PUT
+#define LOX_COMMON_UTILS_PUT
 
 #include <string>
 #include <variant>
 
-#include "../../../Types/Objects/Object.hpp"
+#include "../../Types/Objects/Object.hpp"
 
-namespace LOX::TreeWalk::Interpreter::Statements {
+namespace LOX::Common::Utils {
 
 template <typename OStream>
 struct Put {
@@ -25,21 +25,23 @@ struct Put {
     return val ? put("true") : put("false");
   }
 
-  auto operator()(Box<Types::Objects::LoxFunction> const& func) -> OStream& {
+  auto operator()(Box<Common::Types::Objects::LoxFunction> const& func)
+      -> OStream& {
     return put("<fn " + func->declaration.name.lexeme + ">");
   }
 
-  auto operator()(Box<Types::Objects::LoxClass> const& klass) -> OStream& {
+  auto operator()(Box<Common::Types::Objects::LoxClass> const& klass)
+      -> OStream& {
     return put("<class " + klass->name + ">");
   }
 
-  auto operator()(Arc<Types::Objects::LoxInstance> const& instance)
+  auto operator()(Arc<Common::Types::Objects::LoxInstance> const& instance)
       -> OStream& {
     return put("<instance of " + instance->class_.name + ">");
   }
 
   auto operator()(
-      ArcDyn<Types::Objects::Builtins::FunctionInterface> const& func)
+      ArcDyn<Common::Types::Objects::Builtins::FunctionInterface> const& func)
       -> OStream& {
     return put("<builtin-fn " + func->to_string() + ">");
   }
@@ -54,6 +56,6 @@ struct Put {
   OStream& out;
 };
 
-}  // namespace LOX::TreeWalk::Interpreter::Statements
+}  // namespace LOX::Common::Utils
 
 #endif

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
-#include "../Objects/Object.hpp"
+#include "../../../Common/Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Types {
 
@@ -15,33 +15,33 @@ Environment::Environment(std::optional<Arc<Environment>> const& enclosing)
 
 Environment::Environment() : enclosing(std::nullopt) {}
 
-auto Environment::define(std::string const& name, Objects::Object const& value)
-    -> void {
+auto Environment::define(std::string const& name,
+                         Common::Types::Object const& value) -> void {
   map[name] = value;
 }
 
 auto Environment::get_at(std::string const& name, std::size_t distance)
-    -> Objects::Object {
+    -> Common::Types::Object {
   return ancestor(distance)->map.at(name);
 }
 
-auto Environment::get(std::string const& name) -> Objects::Object {
+auto Environment::get(std::string const& name) -> Common::Types::Object {
   return get_at(name, 0);
 }
 
 auto Environment::assign_at(std::string const& name,
-                            Objects::Object const& value, std::size_t distance)
-    -> void {
+                            Common::Types::Object const& value,
+                            std::size_t distance) -> void {
   ancestor(distance)->map[name] = value;
 }
 
-auto Environment::assign(std::string const& name, Objects::Object const& value)
-    -> void {
+auto Environment::assign(std::string const& name,
+                         Common::Types::Object const& value) -> void {
   assign_at(name, value, 0);
 }
 
 auto Environment::ancestor(std::size_t distance) -> Environment* {
-  auto current{this};
+  auto* current{this};
   for (std::size_t i{0}; i < distance; ++i) {
     assert(current);
     current = current->enclosing.value().get();

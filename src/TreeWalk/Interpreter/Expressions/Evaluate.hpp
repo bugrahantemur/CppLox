@@ -3,15 +3,15 @@
 
 #include <unordered_map>
 
+#include "../../../Common/Types/Objects/Object.hpp"
 #include "../../../Common/Types/Tokens/Token.hpp"
-#include "../../Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Interpreter::Expressions {
 
 auto evaluate(Common::Types::Syntax::Expressions::Expression const& expression,
               Arc<Types::Environment> environment,
               std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
-                  resolution) -> Types::Objects::Object;
+                  resolution) -> Common::Types::Object;
 
 }
 

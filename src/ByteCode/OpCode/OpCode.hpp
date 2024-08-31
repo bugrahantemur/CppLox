@@ -8,6 +8,7 @@ enum OpCode : unsigned char {
   NIL,
   TRUE,
   FALSE,
+  POP,
   EQUAL,
   NOT_EQUAL,
   LESS,
@@ -20,6 +21,7 @@ enum OpCode : unsigned char {
   DIVIDE,
   NOT,
   NEGATE,
+  PRINT,
   RETURN,
 };
 

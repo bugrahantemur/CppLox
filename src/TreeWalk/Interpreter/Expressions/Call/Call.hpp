@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "../../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
+#include "../../../../Common/Types/Objects/Object.hpp"
 #include "../../../../Common/Types/Tokens/Token.hpp"
-#include "../../../Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Types {
-struct Environment;
+class Environment;
 }
 
 namespace LOX::TreeWalk::Interpreter::Expressions {
@@ -20,10 +20,10 @@ struct UncallableError : public std::exception {};
 auto call(Arc<Types::Environment> environment,
           std::unordered_map<LOX::Common::Types::Token, std::size_t> const&
               resolution,
-          std::vector<Types::Objects::Object> const& args,
-          Types::Objects::Object const& callee) -> Types::Objects::Object;
+          std::vector<Common::Types::Object> const& args,
+          Common::Types::Object const& callee) -> Common::Types::Object;
 
-auto arity_of(Types::Objects::Object const& callee) -> std::size_t;
+auto arity_of(Common::Types::Object const& callee) -> std::size_t;
 
 }  // namespace LOX::TreeWalk::Interpreter::Expressions
 

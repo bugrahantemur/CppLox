@@ -160,8 +160,21 @@ struct ExpressionCompiler {
 };
 
 struct StatementCompiler {
+  auto operator()(Box<Common::Types::Syntax::Statements::PrintStmt> const& stmt)
+      -> void {
+    std::visit(ExpressionCompiler{chunk}, stmt->expression);
+    emit_byte(chunk, OpCode::PRINT, stmt->keyword.line);
+  }
+
+  auto operator()(
+      Box<Common::Types::Syntax::Statements::ExpressionStmt> const& stmt)
+      -> void {
+    std::visit(ExpressionCompiler{chunk}, stmt->expression);
+    emit_byte(chunk, OpCode::POP, stmt->ending.line);
+  }
+
   template <typename T>
-  auto operator()(T const&) -> void {}
+  auto operator()(T const& /*unused*/) -> void {}
 
   Chunk& chunk;
 };

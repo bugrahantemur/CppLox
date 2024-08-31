@@ -4,19 +4,21 @@
 #include <optional>
 #include <string>
 
-#include "../../../Types/Objects/Object.hpp"
+#include "../../../../Common/Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk::Interpreter::Expressions::Class {
 
-auto get(Arc<Types::Objects::LoxInstance> const& instance,
-         LOX::Common::Types::Token const& token) -> Types::Objects::Object;
+auto get(Arc<Common::Types::Objects::LoxInstance> const& instance,
+         LOX::Common::Types::Token const& token) -> Common::Types::Object;
 
-auto set(Arc<Types::Objects::LoxInstance>& instance,
+auto set(Arc<Common::Types::Objects::LoxInstance>& instance,
          LOX::Common::Types::Token const& name,
-         Types::Objects::Object const& value) -> void;
+         Common::Types::Object const& value) -> void;
 
-auto find_method(Types::Objects::LoxClass const& klass, std::string const& name)
-    -> std::optional<Types::Objects::LoxFunction>;
+auto find_method(Common::Types::Objects::LoxClass const& klass,
+                 std::string const& name)
+    -> std::optional<Common::Types::Objects::LoxFunction>;
 
 }  // namespace LOX::TreeWalk::Interpreter::Expressions::Class
+
 #endif

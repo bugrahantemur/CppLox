@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -9,11 +8,11 @@
 #include "../Common/Parser/Parser.hpp"
 #include "../Common/Reader/Reader.hpp"
 #include "../Common/Scanner/Scanner.hpp"
+#include "../Common/Types/Objects/Object.hpp"
 #include "../Common/Types/Syntax/Statement.hpp"
 #include "../Common/Types/Tokens/Token.hpp"
 #include "./Interpreter/Interpreter.hpp"
 #include "./Resolver/Resolver.hpp"
-#include "./Types/Objects/Object.hpp"
 
 namespace LOX::TreeWalk {
 

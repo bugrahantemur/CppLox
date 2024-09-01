@@ -49,7 +49,11 @@ auto emit_constant(Chunk& chunk, Value const& value, std::size_t line) -> void {
 }
 
 struct ExpressionCompiler {
-  auto operator()(std::monostate none) -> void { (void)none; }
+  auto operator()(std::monostate none) -> void {
+    (void)none;
+
+    emit_byte(chunk, OpCode::NIL, 0);
+  }
 
   auto operator()(Box<LiteralExpr> const& expr) -> void {
     if (auto const* nil{std::get_if<std::monostate>(&expr->value)}) {
@@ -171,6 +175,19 @@ struct StatementCompiler {
       -> void {
     std::visit(ExpressionCompiler{chunk}, stmt->expression);
     emit_byte(chunk, OpCode::POP, stmt->ending.line);
+  }
+
+  auto operator()(
+      Box<Common::Types::Syntax::Statements::VariableStmt> const& stmt)
+      -> void {
+    // Left hand side
+    Byte const name_index{make_constant(chunk, stmt->name.lexeme)};
+
+    // Right hand side
+    std::visit(*this, stmt->initializer);
+
+    std::size_t const line{stmt->name.line};
+    emit_bytes(chunk, OpCode::DEFINE_GLOBAL, line, name_index, line);
   }
 
   template <typename T>

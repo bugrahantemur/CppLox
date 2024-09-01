@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <functional>
 #include <stack>
+#include <unordered_map>
 #include <vector>
 
 #include "../../Common/Utils/Operands/Operands.hpp"
@@ -43,6 +44,10 @@ class VirtualMachine {
 
         case OpCode::POP:
           handle_pop();
+          break;
+
+        case OpCode::DEFINE_GLOBAL:
+          handle_define_global();
           break;
 
         case OpCode::NEGATE:
@@ -108,6 +113,14 @@ class VirtualMachine {
   }
 
  private:
+  auto handle_define_global() -> void {
+    std::size_t const global_index{chunk.code[ip++]};
+    auto const name{std::get<std::string>(chunk.objects[global_index])};
+
+    globals.insert_or_assign(name, stack.top());
+    stack.pop();
+  };
+
   auto handle_print() -> void {
     Object const object{stack.top()};
     stack.pop();
@@ -190,6 +203,7 @@ class VirtualMachine {
 
   std::size_t ip{0};
   std::stack<Common::Types::Object> stack;
+  std::unordered_map<std::string, Common::Types::Object> globals;
 
   Chunk const& chunk;
 };

@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../Common/Types/Objects/Object.hpp"
+#include "../../Common/Types/Value/Value.hpp"
 #include "../../Common/Utils/Operands/Operands.hpp"
 #include "../../Common/Utils/Put/Put.hpp"
 #include "../../Common/Utils/Truth/Truth.hpp"
@@ -16,6 +18,7 @@
 namespace LOX::ByteCode::VM {
 
 using LOX::Common::Types::Object;
+using LOX::Common::Types::Value;
 
 class VirtualMachine {
  public:
@@ -115,7 +118,7 @@ class VirtualMachine {
  private:
   auto handle_define_global() -> void {
     std::size_t const global_index{chunk.code[ip++]};
-    auto const name{std::get<std::string>(chunk.objects[global_index])};
+    auto const name{std::get<std::string>(chunk.constants[global_index])};
 
     globals.insert_or_assign(name, stack.top());
     stack.pop();
@@ -137,7 +140,8 @@ class VirtualMachine {
 
   auto handle_op_constant() -> void {
     std::size_t const constant_idx{chunk.code[ip++]};
-    stack.push(chunk.objects[constant_idx]);
+    stack.emplace(
+        Common::Types::Objects::to_object(chunk.constants[constant_idx]));
   }
 
   auto handle_op_not() -> void {

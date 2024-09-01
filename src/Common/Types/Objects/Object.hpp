@@ -37,6 +37,11 @@ using Object = std::variant<std::monostate, bool, double, std::string,
 
 namespace LOX::Common::Types::Objects {
 
+template <typename T>
+static auto to_object(T const& value) -> Object {
+  return std::visit([](auto&& value) { return Object(value); }, value);
+}
+
 struct LoxFunction;
 struct LoxClass;
 struct LoxInstance;

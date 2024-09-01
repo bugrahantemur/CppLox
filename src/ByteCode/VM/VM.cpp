@@ -46,11 +46,11 @@ class VirtualMachine {
           break;
 
         case OpCode::POP:
-          handle_pop();
+          handle_op_pop();
           break;
 
         case OpCode::DEFINE_GLOBAL:
-          handle_define_global();
+          handle_op_define_global();
           break;
 
         case OpCode::NEGATE:
@@ -58,19 +58,19 @@ class VirtualMachine {
           break;
 
         case OpCode::ADD:
-          handle_binary_op(number_or_string(std::plus{}));
+          handle_op_binary(number_or_string_op(std::plus{}));
           break;
 
         case OpCode::SUBTRACT:
-          handle_binary_op(number(std::minus{}));
+          handle_op_binary(number_op(std::minus{}));
           break;
 
         case OpCode::MULTIPLY:
-          handle_binary_op(number(std::multiplies{}));
+          handle_op_binary(number_op(std::multiplies{}));
           break;
 
         case OpCode::DIVIDE:
-          handle_binary_op(number(std::divides{}));
+          handle_op_binary(number_op(std::divides{}));
           break;
 
         case OpCode::NOT:
@@ -82,31 +82,31 @@ class VirtualMachine {
           break;
 
         case OpCode::EQUAL:
-          handle_binary_op(number_or_string(std::equal_to{}));
+          handle_op_binary(number_or_string_op(std::equal_to{}));
           break;
 
         case OpCode::NOT_EQUAL:
-          handle_binary_op(number_or_string(std::not_equal_to{}));
+          handle_op_binary(number_or_string_op(std::not_equal_to{}));
           break;
 
         case OpCode::LESS:
-          handle_binary_op(number_or_string(std::less{}));
+          handle_op_binary(number_or_string_op(std::less{}));
           break;
 
         case OpCode::LESS_EQUAL:
-          handle_binary_op(number_or_string(std::less_equal{}));
+          handle_op_binary(number_or_string_op(std::less_equal{}));
           break;
 
         case OpCode::GREATER:
-          handle_binary_op(number_or_string(std::greater{}));
+          handle_op_binary(number_or_string_op(std::greater{}));
           break;
 
         case OpCode::GREATER_EQUAL:
-          handle_binary_op(number_or_string(std::greater_equal{}));
+          handle_op_binary(number_or_string_op(std::greater_equal{}));
           break;
 
         case OpCode::PRINT:
-          handle_print();
+          handle_op_print();
           break;
 
         default:
@@ -116,7 +116,7 @@ class VirtualMachine {
   }
 
  private:
-  auto handle_define_global() -> void {
+  auto handle_op_define_global() -> void {
     std::size_t const global_index{chunk.code[ip++]};
     auto const name{std::get<std::string>(chunk.constants[global_index])};
 
@@ -124,14 +124,14 @@ class VirtualMachine {
     stack.pop();
   };
 
-  auto handle_print() -> void {
+  auto handle_op_print() -> void {
     Object const object{stack.top()};
     stack.pop();
 
     std::visit(Common::Utils::Put{std::cout}, object);
   }
 
-  auto handle_pop() -> void { stack.pop(); }
+  auto handle_op_pop() -> void { stack.pop(); }
 
   template <typename T>
   auto handle_op_simple(T const& object) -> void {
@@ -165,7 +165,7 @@ class VirtualMachine {
   }
 
   template <typename Op>
-  auto handle_binary_op(Op op) -> void {
+  auto handle_op_binary(Op op) -> void {
     Common::Types::Object const right = stack.top();
     stack.pop();
 
@@ -176,7 +176,7 @@ class VirtualMachine {
   }
 
   template <typename Op>
-  auto number_or_string(Op const& op)
+  auto number_or_string_op(Op const& op)
       -> std::function<Object(Object const&, Object const&)> {
     return [this, op](Object const& left, Object const& right) -> Object {
       // Numbers
@@ -195,7 +195,7 @@ class VirtualMachine {
   }
 
   template <typename Op>
-  auto number(Op const& op)
+  auto number_op(Op const& op)
       -> std::function<Object(Object const&, Object const&)> {
     return [this, op](Object const& left, Object const& right) -> Object {
       Common::Utils::Operands::check_number_operand<Error>(chunk.lines[ip],

@@ -1,6 +1,5 @@
 #include "./VM.hpp"
 
-#include <cstdio>
 #include <functional>
 #include <stack>
 #include <unordered_map>
@@ -11,8 +10,8 @@
 #include "../../Common/Utils/Operands/Operands.hpp"
 #include "../../Common/Utils/Put/Put.hpp"
 #include "../../Common/Utils/Truth/Truth.hpp"
-#include "../Common.hpp"
 #include "../OpCode/OpCode.hpp"
+#include "../Types/Byte.hpp"
 #include "./Error/Error.hpp"
 
 namespace LOX::ByteCode::VM {

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "../../Common/Types/Value/Value.hpp"
-#include "../Common.hpp"
+#include "../Types/Byte.hpp"
 
 namespace LOX::ByteCode {
 

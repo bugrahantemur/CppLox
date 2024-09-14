@@ -1,7 +1,11 @@
 #include "./Expressions.hpp"
 
+#include <cassert>
 #include <initializer_list>
+#include <variant>
+#include <vector>
 
+#include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../../Common/Error/Report/Report.hpp"
 #include "../../../Common/Parser/Cursor/Cursor.hpp"
 #include "../../../Common/Parser/Error/Error.hpp"
@@ -12,10 +16,23 @@
 
 namespace LOX::Common::Parser::Expressions {
 
-using namespace LOX::Common::Types::Tokens;
-using LOX::Common::Types::Token;
+using Types::Token;
+using Types::Tokens::TokenType;
 
-using namespace LOX::Common::Types::Syntax::Expressions;
+using Types::Syntax::Expressions::Expression;
+
+using Types::Syntax::Expressions::AssignmentExpr;
+using Types::Syntax::Expressions::BinaryExpr;
+using Types::Syntax::Expressions::CallExpr;
+using Types::Syntax::Expressions::GetExpr;
+using Types::Syntax::Expressions::GroupingExpr;
+using Types::Syntax::Expressions::LiteralExpr;
+using Types::Syntax::Expressions::LogicalExpr;
+using Types::Syntax::Expressions::SetExpr;
+using Types::Syntax::Expressions::SuperExpr;
+using Types::Syntax::Expressions::ThisExpr;
+using Types::Syntax::Expressions::UnaryExpr;
+using Types::Syntax::Expressions::VariableExpr;
 
 auto primary(Cursor& cursor) -> Expression {
   if (cursor.match(TokenType::FALSE)) {
@@ -143,20 +160,21 @@ auto or_expr(Cursor& cursor) -> Expression {
 }
 
 auto assignment(Cursor& cursor) -> Expression {
-  Expression const expr{or_expr(cursor)};
+  Expression expr{or_expr(cursor)};
 
   if (cursor.match(TokenType::EQUAL)) {
     Token const equals{cursor.take()};
     Expression const value{or_expr(cursor)};
 
-    if (auto const var{std::get_if<Box<VariableExpr>>(&expr)}) {
+    if (auto const* const var{std::get_if<Box<VariableExpr>>(&expr)}) {
       return AssignmentExpr{(*var)->name, value};
-    } else if (auto const get{std::get_if<Box<GetExpr>>(&expr)}) {
+    }
+    if (auto const* const get{std::get_if<Box<GetExpr>>(&expr)}) {
       return SetExpr{(*get)->name, (*get)->object, value};
     }
 
     // Do not throw, just report the error
-    LOX::Common::Error::report(error(equals, "Invalid assignment target."));
+    Common::Error::report(error(equals, "Invalid assignment target."));
   }
 
   return expr;

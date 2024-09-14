@@ -3,7 +3,7 @@
 
 namespace LOX::Common::Types::Tokens {
 
-enum class TokenType {
+enum class TokenType : std::uint8_t {
   LEFT_PAREN,
   RIGHT_PAREN,
   LEFT_BRACE,
@@ -45,6 +45,6 @@ enum class TokenType {
   EOFF
 };
 
-}
+}  // namespace LOX::Common::Types::Tokens
 
 #endif

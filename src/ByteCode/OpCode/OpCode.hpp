@@ -9,6 +9,8 @@ enum OpCode : unsigned char {
   TRUE,
   FALSE,
   POP,
+  GET_GLOBAL,
+  SET_GLOBAL,
   DEFINE_GLOBAL,
   EQUAL,
   NOT_EQUAL,

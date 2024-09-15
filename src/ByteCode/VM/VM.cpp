@@ -53,15 +53,15 @@ class VirtualMachine {
           handle_op_pop();
           break;
 
-        case OpCode::GET_GLOBAL:
+        case OpCode::GET_VARIABLE:
           handle_op_get_global();
           break;
 
-        case OpCode::SET_GLOBAL:
+        case OpCode::SET_VARIABLE:
           handle_op_set_global();
           break;
 
-        case OpCode::DEFINE_GLOBAL:
+        case OpCode::DEFINE_VARIABLE:
           handle_op_define_global();
           break;
 

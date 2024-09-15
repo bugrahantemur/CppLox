@@ -1,11 +1,22 @@
 #include "./Resolver.hpp"
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <string>
+#include <unordered_map>
+#include <variant>
+#include <vector>
 
-#include "../Builtins/Builtins.hpp"
+#include "../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
+#include "../../Common/Types/Syntax/Expression.hpp"
+#include "../../Common/Types/Syntax/Statement.hpp"
+#include "../../Common/Types/Tokens/Token.hpp"
+#include "../../TreeWalk/Builtins/Builtins.hpp"
 #include "./Error/Error.hpp"
 
-namespace LOX::TreeWalk::Resolver {
+namespace LOX::Common::Resolver {
 
 using LOX::Common::Types::Token;
 
@@ -13,11 +24,13 @@ using namespace LOX::Common::Types::Syntax::Statements;
 using namespace LOX::Common::Types::Syntax::Expressions;
 using namespace LOX::Common::Types::Tokens;
 
-enum class FunctionType { NONE, FUNCTION, INITIALIZER, METHOD };
-enum class ClassType { NONE, CLASS, SUBCLASS };
+enum class FunctionType : std::uint8_t { NONE, FUNCTION, INITIALIZER, METHOD };
+enum class ClassType : std::uint8_t { NONE, CLASS, SUBCLASS };
 
 struct Resolve {
   std::unordered_map<Token, std::size_t>& resolution;
+  std::unordered_map<Token, std::size_t>& depth;
+
   std::vector<std::unordered_map<std::string, bool>>& scopes;
 
   FunctionType& current_function_type;
@@ -140,7 +153,7 @@ struct Resolve {
   auto operator()(Box<VariableExpr> const& expr) -> void {
     if (!scopes.empty()) {
       if (auto const found{scopes.back().find(expr->name.lexeme)};
-          found != scopes.back().end() && found->second == false) {
+          found != scopes.back().end() && !found->second) {
         throw Resolver::Error{
             expr->name.line,
             "Can't read local variable in its own initializer."};
@@ -199,7 +212,9 @@ struct Resolve {
   auto resolve(Token const& name) -> void {
     for (auto scope{scopes.crbegin()}; scope != scopes.crend(); ++scope) {
       if (scope->find(name.lexeme) != scope->end()) {
-        resolution[name] = std::distance(scopes.crbegin(), scope);
+        auto const dist{std::distance(scopes.crbegin(), scope)};
+        resolution[name] = dist;
+        depth[name] = scopes.size() - 1 - dist;
         return;
       }
     }
@@ -247,27 +262,31 @@ struct Resolve {
 
 auto make_preamble_scope() -> std::unordered_map<std::string, bool> {
   std::unordered_map<std::string, bool> scope;
-  for (auto const& builtin : Native::builtins()) {
-    scope[builtin.first] = true;
-  }
+  // TODO: Implement builtins
+  // for (auto const& builtin : TreeWalk::Native::builtins()) {
+  //   scope[builtin.first] = true;
+  // }
   return scope;
 }
 
 auto resolve(std::vector<Statement> const& statements)
-    -> std::unordered_map<Token, std::size_t> {
+    -> std::array<std::unordered_map<Token, std::size_t>, 2> {
   auto function_type{FunctionType::NONE};
   auto class_type{ClassType::NONE};
+
   std::vector<std::unordered_map<std::string, bool>> scopes{
       make_preamble_scope()};
-  std::unordered_map<Token, std::size_t> resolution;
 
-  Resolve resolver{resolution, scopes, function_type, class_type};
+  std::unordered_map<Token, std::size_t> resolution;
+  std::unordered_map<Token, std::size_t> depth;
+
+  Resolve resolver{resolution, depth, scopes, function_type, class_type};
 
   for (Statement const& stmt : statements) {
     std::visit(resolver, stmt);
   }
 
-  return resolution;
+  return {resolution, depth};
 }
 
-}  // namespace LOX::TreeWalk::Resolver
+}  // namespace LOX::Common::Resolver

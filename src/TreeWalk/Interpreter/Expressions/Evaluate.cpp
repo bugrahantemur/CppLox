@@ -1,7 +1,10 @@
 #include "./Evaluate.hpp"
 
+#include <cstddef>
 #include <optional>
+#include <string>
 #include <unordered_map>
+#include <variant>
 
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Arc.hpp"
 #include "../../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"

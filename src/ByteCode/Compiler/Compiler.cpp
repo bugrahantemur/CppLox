@@ -6,18 +6,19 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
 #include "../../../submodules/RustyPtr/include/RustyPtr/Box.hpp"
 #include "../../Common/Parser/Parser.hpp"
+#include "../../Common/Resolver/Resolver.hpp"
 #include "../../Common/Scanner/Scanner.hpp"
 #include "../../Common/Types/Syntax/Expression.hpp"
 #include "../../Common/Types/Syntax/Statement.hpp"
 #include "../../Common/Types/Tokens/Token.hpp"
 #include "../../Common/Types/Tokens/TokenTypes.hpp"
 #include "../../Common/Types/Value/Value.hpp"
-#include "../../Common/Utils/Put/Put.hpp"
 #include "../Chunk/Chunk.hpp"
 #include "../OpCode/OpCode.hpp"
 #include "../Types/Byte.hpp"
@@ -28,6 +29,8 @@ using LOX::Common::Types::Token;
 using LOX::Common::Types::Value;
 using LOX::Common::Types::Syntax::Statements::Statement;
 using LOX::Common::Types::Tokens::TokenType;
+
+using Resolution = std::unordered_map<Token, std::size_t>;
 
 auto emit_byte(Chunk& chunk, Byte byte, std::size_t line) -> void {
   chunk.append_byte(byte, line);
@@ -55,8 +58,24 @@ auto emit_constant(Chunk& chunk, Value const& value, std::size_t line) -> void {
   emit_bytes(chunk, OpCode::CONSTANT, line, make_constant(chunk, value), line);
 }
 
+struct Local {
+  Token name;
+  std::size_t depth{0};
+};
+
+class Locals {
+ public:
+  auto begin_scope() -> void { scope_depth++; }
+  auto end_scope() -> void { scope_depth--; };
+
+ private:
+  std::vector<Local> locals;
+  std::size_t scope_depth{0};
+};
+
 struct ExpressionCompiler {
-  explicit ExpressionCompiler(Chunk& chunk) : chunk_{&chunk} {}
+  ExpressionCompiler(Chunk& chunk, Locals& locals)
+      : chunk_{&chunk}, locals_{&locals} {}
 
   auto operator()(std::monostate /*none*/) -> void {
     emit_byte(*chunk_, OpCode::NIL, 0);
@@ -91,7 +110,7 @@ struct ExpressionCompiler {
       -> void {
     Byte const name_index{make_constant(*chunk_, expr->name.lexeme)};
     std::size_t const line{expr->name.line};
-    emit_bytes(*chunk_, OpCode::GET_GLOBAL, line, name_index, line);
+    emit_bytes(*chunk_, OpCode::GET_VARIABLE, line, name_index, line);
   }
 
   auto operator()(
@@ -104,7 +123,7 @@ struct ExpressionCompiler {
     std::visit(*this, expr->value);
 
     std::size_t const line{expr->name.line};
-    emit_bytes(*chunk_, OpCode::SET_GLOBAL, line, name_index, line);
+    emit_bytes(*chunk_, OpCode::SET_VARIABLE, line, name_index, line);
   }
 
   auto operator()(
@@ -210,21 +229,25 @@ struct ExpressionCompiler {
 
  private:
   Chunk* chunk_;
+  Locals* locals_;
 };
 
 struct StatementCompiler {
-  explicit StatementCompiler(Chunk& chunk) : chunk_{&chunk} {}
+ private:
+ public:
+  StatementCompiler(Chunk& chunk, Locals& locals)
+      : chunk_{&chunk}, locals_{&locals} {}
 
   auto operator()(Box<Common::Types::Syntax::Statements::PrintStmt> const& stmt)
       -> void {
-    std::visit(ExpressionCompiler{*chunk_}, stmt->expression);
+    std::visit(ExpressionCompiler{*chunk_, *locals_}, stmt->expression);
     emit_byte(*chunk_, OpCode::PRINT, stmt->keyword.line);
   }
 
   auto operator()(
       Box<Common::Types::Syntax::Statements::ExpressionStmt> const& stmt)
       -> void {
-    std::visit(ExpressionCompiler{*chunk_}, stmt->expression);
+    std::visit(ExpressionCompiler{*chunk_, *locals_}, stmt->expression);
     emit_byte(*chunk_, OpCode::POP, stmt->ending.line);
   }
 
@@ -235,12 +258,22 @@ struct StatementCompiler {
     Byte const name_index{make_constant(*chunk_, stmt->name.lexeme)};
 
     // Right hand side
-    std::visit(ExpressionCompiler{*chunk_}, stmt->initializer);
+    std::visit(ExpressionCompiler{*chunk_, *locals_}, stmt->initializer);
 
     std::size_t const line{stmt->name.line};
-    emit_bytes(*chunk_, OpCode::DEFINE_GLOBAL, line, name_index, line);
+    emit_bytes(*chunk_, OpCode::DEFINE_VARIABLE, line, name_index, line);
   }
 
+  auto operator()(Box<Common::Types::Syntax::Statements::BlockStmt> const& stmt)
+      -> void {
+    locals_->begin_scope();
+
+    for (Statement const& statement : stmt->statements) {
+      std::visit(*this, statement);
+    }
+
+    locals_->end_scope();
+  }
   template <typename T>
   auto operator()(T const& /*unused*/) -> void {
     std::cerr << "Unhandled statement type\n";
@@ -249,15 +282,25 @@ struct StatementCompiler {
 
  private:
   Chunk* chunk_;
+  Locals* locals_;
 };
 
 auto compile(std::string const& source) -> Chunk {
-  std::vector<Token> const tokens = Common::Scanner::scan(source);
-  std::vector<Statement> const statements = Common::Parser::parse(tokens);
+  std::vector<Token> const tokens{Common::Scanner::scan(source)};
+  std::vector<Statement> const statements{Common::Parser::parse(tokens)};
+  auto const [resolution, depth]{Common::Resolver::resolve(statements)};
+  // only depth is needed for the bytecode interpreter
+  (void)resolution;
 
-  Chunk chunk;
+  for (auto const& [token, depth] : depth) {
+    std::cout << token.lexeme << " " << depth << "\n";
+  }
+
+  Chunk chunk{};
+  Locals locals{};
+
   for (Statement const& stmt : statements) {
-    std::visit(StatementCompiler{chunk}, stmt);
+    std::visit(StatementCompiler{chunk, locals}, stmt);
   }
 
   return chunk;

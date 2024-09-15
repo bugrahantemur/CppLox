@@ -22,6 +22,8 @@ set(COMMON_SRC
   "src/Common/Parser/Statements/Statements.cpp"
   "src/Common/Reader/Reader.cpp"
   "src/Common/Reader/Error/Error.cpp"
+  "src/Common/Resolver/Resolver.cpp"
+  "src/Common/Resolver/Error/Error.cpp"
   "src/Common/Scanner/Scanner.cpp"
   "src/Common/Scanner/Cursor/Cursor.cpp"
   "src/Common/Scanner/Error/Error.cpp"
@@ -40,8 +42,6 @@ set(TREEWALK_SRC
   "src/TreeWalk/Interpreter/Expressions/Class/Class.cpp"
   "src/TreeWalk/Interpreter/Expressions/Evaluate.cpp"
   "src/TreeWalk/Interpreter/Error/Error.cpp"
-  "src/TreeWalk/Resolver/Resolver.cpp"
-  "src/TreeWalk/Resolver/Error/Error.cpp"
   "src/TreeWalk/Types/Environment/Environment.cpp"
 )
 

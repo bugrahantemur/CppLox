@@ -1,6 +1,7 @@
 #include "./Environment.hpp"
 
 #include <cassert>
+#include <cstddef>
 #include <optional>
 #include <string>
 #include <unordered_map>
